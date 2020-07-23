@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/login_fragment">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="ru.g0rd1.peoplesfinder.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home"/>
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="ru.g0rd1.peoplesfinder.ui.dashboard.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_dashboard"/>
+
+    <fragment
+        android:id="@+id/navigation_notifications"
+        android:name="ru.g0rd1.peoplesfinder.ui.notifications.NotificationsFragment"
+        android:label="@string/title_notifications"
+        tools:layout="@layout/fragment_notifications"/>
+
+    <fragment
+        android:id="@+id/login_fragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment"
+        android:label="LoginFragment"/>
+
+    <fragment
+        android:id="@+id/groups_fragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.groups.GroupsFragment"
+        android:label="GroupsFragment"/>
+
+</navigation>
