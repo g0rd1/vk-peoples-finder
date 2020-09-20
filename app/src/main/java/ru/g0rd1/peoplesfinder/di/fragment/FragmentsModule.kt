@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment
 import ru.g0rd1.peoplesfinder.ui.groups.GroupsFragment
+import ru.g0rd1.peoplesfinder.ui.results.ResultsFragment
 
 @Module
 abstract class FragmentsModule {
@@ -13,5 +14,8 @@ abstract class FragmentsModule {
 
     @ContributesAndroidInjector(modules = [GroupsFragmentModule::class])
     abstract fun groupsFragment(): GroupsFragment
+
+    @ContributesAndroidInjector(modules = [ResultsFragmentModule::class])
+    abstract fun resultsFragment(): ResultsFragment
 
 }

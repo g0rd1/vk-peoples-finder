@@ -14,7 +14,6 @@ object UserTestUtil {
         birthDate: String? = null,
         city: User.City? = null,
         sex: Int? = null,
-        hasPhoto: Boolean? = null,
         photo: String? = null,
         lastSeen: User.LastSeen? = null,
         relation: Int? = null
@@ -29,7 +28,6 @@ object UserTestUtil {
                 birthDate,
                 city,
                 sex,
-                hasPhoto,
                 photo,
                 lastSeen,
                 relation
@@ -46,7 +44,6 @@ object UserTestUtil {
         birthDate: String? = null,
         city: User.City? = null,
         sex: Int? = null,
-        hasPhoto: Boolean? = null,
         photo: String? = null,
         lastSeen: User.LastSeen? = null,
         relation: Int? = null
@@ -60,7 +57,6 @@ object UserTestUtil {
             birthDate,
             city,
             sex,
-            hasPhoto,
             photo,
             lastSeen,
             relation

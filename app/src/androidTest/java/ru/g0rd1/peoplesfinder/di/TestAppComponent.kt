@@ -6,7 +6,6 @@ import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
 import ru.g0rd1.peoplesfinder.base.TestBaseApplication
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoaderTest
-import ru.g0rd1.peoplesfinder.di.activity.ActivitiesModule
 import ru.g0rd1.peoplesfinder.repo.LocalUserRepoAndLocalGroupRepoTest
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepoTest
 import javax.inject.Singleton
@@ -15,11 +14,11 @@ import javax.inject.Singleton
 @Component(
     modules = [
         AndroidSupportInjectionModule::class,
-        ActivitiesModule::class,
+        // ActivitiesModule::class,
         GlobalModule::class,
         TestReposModule::class,
         TestDatabaseModule::class,
-        VkAuthorizationModule::class,
+        // VkAuthorizationModule::class,
         TestGroupMembersLoaderModule::class
     ]
 )

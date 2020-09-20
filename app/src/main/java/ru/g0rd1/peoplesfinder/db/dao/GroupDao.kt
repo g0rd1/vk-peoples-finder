@@ -6,7 +6,6 @@ import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupCrossRefEntity
-import timber.log.Timber
 import java.util.*
 
 @Dao
@@ -16,24 +15,25 @@ abstract class GroupDao {
     abstract fun get(groupId: Int): Single<List<GroupEntity>>
 
     @Suppress("FunctionName")
-    @Query("SELECT * FROM `group` WHERE id = :groupId")
-    abstract fun _get(groupId: Int): List<GroupEntity>
+    @Query("SELECT * FROM `group`")
+    abstract fun _get(): List<GroupEntity>
 
     @Suppress("FunctionName")
     @Query("SELECT * FROM user JOIN user_group ON user_group.user_id = user.id WHERE user_group.group_id = :groupId")
     abstract fun _getGroupUsers(groupId: Int): List<UserEntity>
 
-    @Suppress("FunctionName")
-    @Query("SELECT * FROM `group`")
-    abstract fun _get(): List<GroupEntity>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(groupEntity: GroupEntity): Completable
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(groupEntities: List<GroupEntity>): Completable
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertIfNotExists(groupEntities: List<GroupEntity>): Completable
 
     @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun _insert(groupEntity: GroupEntity)
-
-    @Suppress("FunctionName")
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun _insert(groupEntities: List<GroupEntity>)
 
     @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -57,18 +57,6 @@ abstract class GroupDao {
         return groupEntities
     }
 
-    // @Transaction
-    // open fun getWithUsers(groupId: Int): List<GroupEntity> {
-    //     val groupEntities = _get(groupId)
-    //     groupEntities.forEach {
-    //         it.users = _getGroupUsers(it.id)
-    //     }
-    //     return groupEntities
-    // }
-
-    @Update
-    abstract fun update(groupEntity: GroupEntity): Completable
-
     @Update(onConflict = OnConflictStrategy.REPLACE)
     @Suppress("FunctionName")
     abstract fun _update(groupEntity: GroupEntity)
@@ -81,38 +69,17 @@ abstract class GroupDao {
     ): Completable
 
     @Transaction
-    open fun insertOrUpdate(groupEntity: GroupEntity) {
-        val currentGroupEntity = _get(groupEntity.id).firstOrNull()
-        Timber.d("currentGroupEntity: $currentGroupEntity")
-        if (currentGroupEntity == null) {
-            _insert(groupEntity)
-        } else {
-            val groupEntityForUpdate = groupEntity.copy(
-                membersCount = currentGroupEntity.membersCount,
-                loadedMembersCount = currentGroupEntity.loadedMembersCount,
-                allMembersLoadedDate = currentGroupEntity.allMembersLoadedDate
-            )
-            _update(groupEntityForUpdate)
-        }
-    }
-
-    @Transaction
-    open fun insertOrUpdate(groupEntities: List<GroupEntity>) {
-        groupEntities.forEach { insertOrUpdate(it) }
-    }
-
-    @Transaction
-    open fun insertOrUpdateWithUsers(groupEntity: GroupEntity, userIds: List<Int>) {
-        insertOrUpdate(groupEntity)
+    open fun insertWithUsers(groupEntity: GroupEntity, userIds: List<Int>) {
+        _insert(groupEntity)
         userIds.forEach {
             _insertRelation(UserGroupCrossRefEntity(it, groupEntity.id))
         }
     }
 
     @Transaction
-    open fun insertOrUpdateWithUsers(groupEntitiesWithUserIds: Map<GroupEntity, List<Int>>) {
+    open fun insertWithUsers(groupEntitiesWithUserIds: Map<GroupEntity, List<Int>>) {
         groupEntitiesWithUserIds.forEach { (groupEntity, userIds) ->
-            insertOrUpdateWithUsers(groupEntity, userIds)
+            insertWithUsers(groupEntity, userIds)
         }
     }
 }

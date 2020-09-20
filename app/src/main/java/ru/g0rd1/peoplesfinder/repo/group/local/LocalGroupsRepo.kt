@@ -12,7 +12,7 @@ interface LocalGroupsRepo {
 
     fun insert(groupEntities: List<GroupEntity>): Completable
 
-    fun update(groupEntity: GroupEntity): Completable
+    fun insertIfNotExists(groupEntities: List<GroupEntity>): Completable
 
     fun update(
         groupId: Int,
@@ -31,8 +31,6 @@ interface LocalGroupsRepo {
     fun insertWithUsers(groupEntitiesWithUserIds: Map<GroupEntity, List<Int>>): Completable
 
     fun get(groupId: Int): Single<Optional<GroupEntity?>>
-
-    // fun getWithUsers(groupId: Int): Single<Optional<GroupEntity?>>
 
     companion object {
         const val QUEUE = "QueueLocalGroupsRepo"

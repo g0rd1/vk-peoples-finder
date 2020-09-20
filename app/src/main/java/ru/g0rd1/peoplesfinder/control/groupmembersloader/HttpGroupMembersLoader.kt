@@ -9,7 +9,7 @@ import ru.g0rd1.peoplesfinder.base.scheduler.Schedulers
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoader.Status
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
-import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
 import timber.log.Timber
 import java.util.*
@@ -17,10 +17,10 @@ import java.util.*
 class HttpGroupMembersLoader(
     private val groupId: Int,
     private val schedulers: Schedulers,
-    private val vkGroupsRepo: VkGroupsRepo,
+    private val vkGroupsMembersRepo: VkGroupsMembersRepo,
     private val localUsersRepo: LocalUsersRepo,
     private val localGroupsRepo: LocalGroupsRepo,
-    private val regulator: GroupMembersLoader.Regulator,
+    // private val regulator: GroupMembersLoader.Regulator,
     groupMembersCount: Int,
     status: Status,
     loadedCount: Int = 0,
@@ -40,7 +40,15 @@ class HttpGroupMembersLoader(
         @Synchronized get
 
     @Volatile
-    private var lockWait = false
+    override var status: Status = status
+        @Synchronized set(value) {
+            field = value
+            onStatusChangeListeners.forEach { it(value) }
+            if (lockWait) {
+                lock.notifyAll()
+            }
+        }
+        @Synchronized get
 
     @Volatile
     override var loadedMembersCount: Int = loadedCount
@@ -49,6 +57,9 @@ class HttpGroupMembersLoader(
             onCountChangeListeners.forEach { it(value) }
         }
         @Synchronized get
+
+    @Volatile
+    private var lockWait = false
 
     private val onCountChangeListeners: MutableList<(count: Int) -> Unit> = mutableListOf()
 
@@ -62,21 +73,10 @@ class HttpGroupMembersLoader(
             .associateWith { it + DOWNLOAD_MEMBERS_STEP <= loadedCount }.toMutableMap()
         @Synchronized get
 
-    @Volatile
-    override var status: Status = status
-        @Synchronized set(value) {
-            field = value
-            onStatusChangeListeners.forEach { it(value) }
-            if (lockWait) {
-                lock.notifyAll()
-            }
-        }
-        @Synchronized get
-
     override fun pause() {
         if (status != Status.LOAD) return
         synchronized(lock) {
-            compositeDisposable.dispose().also { Timber.d("disposed in pause") }
+            compositeDisposable.dispose()
             status = Status.PAUSED
         }
     }
@@ -89,7 +89,7 @@ class HttpGroupMembersLoader(
                 lockWait = true
             }
             lockWait = false
-            val nextOffset = getNextOffset()
+            val nextOffset = getNextOffsetOrNull()
             if (nextOffset == null) {
                 finish()
                 return@block
@@ -159,42 +159,38 @@ class HttpGroupMembersLoader(
         }
     }
 
-    private fun getNextOffset(): Int? = queue.asSequence().firstOrNull { !it.value }?.key
+    @Suppress("RedundantAsSequence")
+    private fun getNextOffsetOrNull(): Int? = queue.asSequence().firstOrNull { !it.value }?.key
 
     private fun load(offset: Int) {
-        regulator.obtainPermissionToLoad(this)
         var loadedMembersCount = 0
         var allMembersLoadedDate: Date? = null
         if (status != Status.LOAD) return
-        regulator.obtainPermissionToLoad(this).andThen(
-            vkGroupsRepo.getGroupMembers(groupId.toString(), DOWNLOAD_MEMBERS_STEP, offset)
-                .flatMapCompletable { users ->
-                    Timber.d("users downloaded, users size: ${users.size}")
-                    Timber.d("start insert user with relation")
-                    localUsersRepo.insertWithGroups(users.associate {
-                        Pair(
-                            UserEntity(it),
-                            listOf(groupId)
-                        )
-                    })
-                        .andThen(Completable.defer {
-                            Completable.fromAction {
-                                Timber.d("finish insert user with relation")
-                                loadedMembersCount = offset + users.size
-                                allMembersLoadedDate = if (isOffsetLast()) {
-                                    Date()
-                                } else {
-                                    null
-                                }
-                                Timber.d("start update group info")
-                                Timber.d("debug: loadedMembersCount: $loadedMembersCount, allMembersLoadedDate: $allMembersLoadedDate, groupId: $groupId")
+        vkGroupsMembersRepo.getGroupMembers(groupId.toString(), DOWNLOAD_MEMBERS_STEP, offset)
+            .flatMapCompletable { users ->
+                Timber.d("users downloaded, users size: ${users.size}")
+                Timber.d("start insert user with relation")
+                localUsersRepo.insertWithGroups(
+                    users.map { UserEntity(it) }.associateWith { listOf(groupId) }
+                )
+                    .andThen(Completable.defer {
+                        Timber.d("in defer")
+                        Completable.fromAction {
+                            Timber.d("finish insert user with relation")
+                            Timber.d("start update group info")
+                            loadedMembersCount = offset + users.size
+                            allMembersLoadedDate = if (isOffsetLast()) {
+                                Date()
+                            } else {
+                                null
                             }
-                        })
-                }
-                .andThen(Completable.defer {
-                    localGroupsRepo.update(groupId, loadedMembersCount, allMembersLoadedDate)
-                })
-        )
+                            Timber.d("debug: loadedMembersCount: $loadedMembersCount, allMembersLoadedDate: $allMembersLoadedDate, groupId: $groupId")
+                        }
+                    })
+            }
+            .andThen(Completable.defer {
+                localGroupsRepo.update(groupId, loadedMembersCount, allMembersLoadedDate)
+            })
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.main())
             .subscribe(
@@ -203,7 +199,7 @@ class HttpGroupMembersLoader(
                     this.loadedMembersCount = loadedMembersCount
                     this.allMembersLoadedDate = allMembersLoadedDate
                     queue[offset] = true
-                    val nextOffset = getNextOffset()
+                    val nextOffset = getNextOffsetOrNull()
                     if (nextOffset == null) {
                         finish()
                     } else {
@@ -226,10 +222,11 @@ class HttpGroupMembersLoader(
     }
 
     private fun isOffsetLast(): Boolean {
-        return queue.values.count { !it } <= 1
+        return queue.values.count { !it } == 1
     }
 
     companion object {
-        private const val DOWNLOAD_MEMBERS_STEP = 25000
+        private const val DOWNLOAD_MEMBERS_STEP = 10000
     }
+
 }

@@ -12,10 +12,8 @@ import javax.inject.Singleton
 @Module
 abstract class DatabaseModule {
 
-    @Module
     companion object {
 
-        @JvmStatic
         @Provides
         @Singleton
         fun appDatabase(context: Context): Database =
@@ -23,12 +21,10 @@ abstract class DatabaseModule {
                 .addCallback(Database.onCreateCallback)
                 .build()
 
-        @JvmStatic
         @Provides
         @Singleton
         fun userDao(db: Database): UserDao = db.userDao()
 
-        @JvmStatic
         @Provides
         @Singleton
         fun groupDao(db: Database): GroupDao = db.groupDao()

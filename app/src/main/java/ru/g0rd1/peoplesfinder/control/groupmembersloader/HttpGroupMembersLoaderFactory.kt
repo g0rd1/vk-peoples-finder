@@ -3,17 +3,15 @@ package ru.g0rd1.peoplesfinder.control.groupmembersloader
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.base.scheduler.Schedulers
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
-import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
-import timber.log.Timber
 import javax.inject.Inject
 
 class HttpGroupMembersLoaderFactory @Inject constructor(
-    private val vkGroupsRepo: VkGroupsRepo,
+    private val vkGroupsMembersRepo: VkGroupsMembersRepo,
     private val schedulers: Schedulers,
     private val localUsersRepo: LocalUsersRepo,
-    private val localGroupsRepo: LocalGroupsRepo,
-    private val regulator: GroupMembersLoader.Regulator
+    private val localGroupsRepo: LocalGroupsRepo
 ) : GroupMembersLoader.Factory {
 
     override fun create(groupId: Int): Single<GroupMembersLoader> {
@@ -26,7 +24,6 @@ class HttpGroupMembersLoaderFactory @Inject constructor(
                 Single.just(groupEntity)
             }
         }.map { groupEntity ->
-            Timber.d("groupEntity: $groupEntity")
             val status = when {
                 groupEntity.allMembersLoadedDate != null -> GroupMembersLoader.Status.FINISH
                 groupEntity.loadedMembersCount == 0 -> GroupMembersLoader.Status.STOPPED
@@ -35,11 +32,10 @@ class HttpGroupMembersLoaderFactory @Inject constructor(
             HttpGroupMembersLoader(
                 groupId = groupId,
                 schedulers = schedulers,
-                vkGroupsRepo = vkGroupsRepo,
+                vkGroupsMembersRepo = vkGroupsMembersRepo,
                 localUsersRepo = localUsersRepo,
                 localGroupsRepo = localGroupsRepo,
                 groupMembersCount = groupEntity.membersCount,
-                regulator = regulator,
                 status = status,
                 loadedCount = groupEntity.loadedMembersCount,
                 allMembersLoadedDate = groupEntity.allMembersLoadedDate

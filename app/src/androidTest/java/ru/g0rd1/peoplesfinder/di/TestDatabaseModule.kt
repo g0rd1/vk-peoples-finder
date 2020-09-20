@@ -13,10 +13,8 @@ import javax.inject.Singleton
 @Module
 abstract class TestDatabaseModule : DatabaseModule() {
 
-    @Module
     companion object {
 
-        @JvmStatic
         @Provides
         @Singleton
         @Named("TEST")
@@ -25,16 +23,14 @@ abstract class TestDatabaseModule : DatabaseModule() {
                 .addCallback(Database.onCreateCallback)
                 .build()
 
-        @JvmStatic
-        @Provides
-        @Singleton
-        @Named("TEST")
-        fun userDao(@Named("TEST") db: Database): UserDao = db.userDao()
-
-        @JvmStatic
         @Provides
         @Singleton
         @Named("TEST")
         fun groupDao(@Named("TEST") db: Database): GroupDao = db.groupDao()
+
+        @Provides
+        @Singleton
+        @Named("TEST")
+        fun userDao(@Named("TEST") db: Database): UserDao = db.userDao()
     }
 }

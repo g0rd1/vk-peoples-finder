@@ -21,7 +21,7 @@ class ApiClientFactory @Inject constructor() {
 
         val client: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(interceptor)
-            .readTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .connectTimeout(30, TimeUnit.SECONDS)
             .build()
 

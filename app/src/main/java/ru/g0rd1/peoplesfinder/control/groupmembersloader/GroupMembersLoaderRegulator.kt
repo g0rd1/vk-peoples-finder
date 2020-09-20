@@ -9,9 +9,11 @@ import javax.inject.Inject
 class GroupMembersLoaderRegulator @Inject constructor() : GroupMembersLoader.Regulator {
 
     private val queue: BlockingQueue<GroupMembersLoader> = ArrayBlockingQueue(QUEUE_CAPACITY)
+    @Synchronized get
 
     private val map: MutableMap<GroupMembersLoader, (status: GroupMembersLoader.Status) -> Unit> =
         mutableMapOf()
+        @Synchronized get
 
     private val onStatusChangeListenerWithLoader: (status: GroupMembersLoader.Status, loader: GroupMembersLoader) -> Unit =
         { status, loader: GroupMembersLoader ->
@@ -26,16 +28,16 @@ class GroupMembersLoaderRegulator @Inject constructor() : GroupMembersLoader.Reg
 
     override fun obtainPermissionToLoad(loader: GroupMembersLoader): Completable {
         return Completable.fromAction {
-            Timber.d("obtainPermissionToLoad(loader: $loader) starts")
-            if (queue.contains(loader)
-                    .also { Timber.d("queue.contains(loader): $it") }
-            ) return@fromAction
-            Timber.d("put loader: $loader, size: ${queue.size}")
-            queue.put(loader)
-            Timber.d("putted loader: $loader, size: ${queue.size}")
-            val onStatusChangeListener = getOnStatusChangeListener(loader)
-            map[loader] = onStatusChangeListener
-            loader.addOnStatusChangeListener(onStatusChangeListener)
+//            Timber.d("obtainPermissionToLoad(loader: $loader) starts")
+//            if (queue.contains(loader)
+//                    .also { Timber.d("queue.contains(loader): $it") }
+//            ) return@fromAction
+//            Timber.d("put loader: $loader, size: ${queue.size}")
+//            queue.put(loader)
+//            Timber.d("putted loader: $loader, size: ${queue.size}")
+//            val onStatusChangeListener = getOnStatusChangeListener(loader)
+//            map[loader] = onStatusChangeListener
+//            loader.addOnStatusChangeListener(onStatusChangeListener)
         }
     }
 

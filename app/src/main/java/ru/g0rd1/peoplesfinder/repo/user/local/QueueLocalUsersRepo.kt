@@ -9,59 +9,99 @@ import java.util.concurrent.BlockingQueue
 class QueueLocalUsersRepo(localUsersRepo: LocalUsersRepo) :
     LocalUsersRepoDecorator(localUsersRepo) {
 
-    private val queue: BlockingQueue<Any> = ArrayBlockingQueue(QUEUE_CAPACITY)
+    private val queueMap: Map<OperationType, BlockingQueue<Any>> =
+        mapOf<OperationType, BlockingQueue<Any>>().withDefault {
+            ArrayBlockingQueue<Any>(QUEUE_CAPACITY)
+        }
 
     override fun insert(userEntity: UserEntity): Completable {
-        return getCompletableWithOfferToQueue(localUsersRepo.insert(userEntity))
+        return getWithOfferToQueue(localUsersRepo.insert(userEntity), OperationType.INSERT_ENTITY)
     }
 
     override fun insert(userEntities: List<UserEntity>): Completable {
-        return getCompletableWithOfferToQueue(localUsersRepo.insert(userEntities))
-    }
-
-    override fun delete(userEntity: UserEntity): Completable {
-        return getCompletableWithOfferToQueue(localUsersRepo.delete(userEntity))
-    }
-
-    override fun getUsers(): Single<List<UserEntity>> {
-        return getSingleWithOfferToQueue(localUsersRepo.getUsers())
-    }
-
-    override fun getUsersWithGroups(): Single<List<UserEntity>> {
-        return getSingleWithOfferToQueue(localUsersRepo.getUsersWithGroups())
-    }
-
-    override fun insertWithGroups(userEntity: UserEntity, groupIds: List<Int>): Completable {
-        return getCompletableWithOfferToQueue(localUsersRepo.insertWithGroups(userEntity, groupIds))
-    }
-
-    override fun insertWithGroups(userEntitiesWithGroupIds: Map<UserEntity, List<Int>>): Completable {
-        return getCompletableWithOfferToQueue(
-            localUsersRepo.insertWithGroups(
-                userEntitiesWithGroupIds
-            )
+        return getWithOfferToQueue(
+            localUsersRepo.insert(userEntities),
+            OperationType.INSERT_ENTITIES
         )
     }
 
-    private fun <T> getSingleWithOfferToQueue(single: Single<T>): Single<T> {
-        val singleWithActionsAfterTerminate = single.map {
-            queue.remove(single)
-            it
-        }
-            .doOnError { queue.remove(single) }
-        return Completable.fromAction { queue.put(single) }.andThen(singleWithActionsAfterTerminate)
+    override fun delete(userEntity: UserEntity): Completable {
+        return getWithOfferToQueue(localUsersRepo.delete(userEntity), OperationType.DELETE_ENTITY)
     }
 
-    private fun getCompletableWithOfferToQueue(completable: Completable): Completable {
-        val completableWithActionsAfterTerminate = completable.andThen {
-            queue.remove(completable)
+    override fun get(): Single<List<UserEntity>> {
+        return getWithOfferToQueue(localUsersRepo.get(), OperationType.GET_ENTITIES)
+    }
+
+    override fun getWithSameGroupsCount(): Single<List<UserEntity>> {
+        return getWithOfferToQueue(
+            localUsersRepo.getWithSameGroupsCount(),
+            OperationType.GET_ENTITIES_WITH_SAME_GROUPS_COUNT
+        )
+    }
+
+    override fun getWithGroups(): Single<List<UserEntity>> {
+        return getWithOfferToQueue(
+            localUsersRepo.getWithGroups(),
+            OperationType.GET_ENTITIES_WITH_GROUPS
+        )
+    }
+
+    override fun insertWithGroups(userEntity: UserEntity, groupIds: List<Int>): Completable {
+        return getWithOfferToQueue(
+            localUsersRepo.insertWithGroups(userEntity, groupIds),
+            OperationType.INSERT_ENTITY_WITH_GROUPS
+        )
+    }
+
+    override fun insertWithGroups(userEntitiesWithGroupIds: Map<UserEntity, List<Int>>): Completable {
+        return getWithOfferToQueue(
+            localUsersRepo.insertWithGroups(
+                userEntitiesWithGroupIds
+            ),
+            OperationType.INSERT_ENTITIES_WITH_GROUPS
+        )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> getWithOfferToQueue(source: T, operationType: OperationType): T {
+        return when (source) {
+            is Completable -> getCompletableWithOfferToQueue(source, operationType) as T
+            is Single<*> -> getSingleWithOfferToQueue(source, operationType) as T
+            else -> throw IllegalArgumentException("source must be Completable or Single")
         }
-            .doOnError { queue.remove(completable) }
-        return Completable.fromAction { queue.put(completable) }
-            .andThen(completableWithActionsAfterTerminate)
+    }
+
+    private fun <T> getSingleWithOfferToQueue(
+        single: Single<T>,
+        operationType: OperationType
+    ): Single<T> {
+        return Completable.fromAction { queueMap.getValue(operationType).put(single) }
+            .andThen(single)
+            .doAfterTerminate { queueMap.getValue(operationType).remove(single) }
+    }
+
+    private fun getCompletableWithOfferToQueue(
+        completable: Completable,
+        operationType: OperationType
+    ): Completable {
+        return Completable.fromAction { queueMap.getValue(operationType).put(completable) }
+            .andThen(completable)
+            .doAfterTerminate { queueMap.getValue(operationType).remove(completable) }
     }
 
     companion object {
-        private const val QUEUE_CAPACITY = 5
+        private const val QUEUE_CAPACITY = 1
+    }
+
+    private enum class OperationType {
+        INSERT_ENTITY,
+        INSERT_ENTITIES,
+        DELETE_ENTITY,
+        GET_ENTITIES,
+        GET_ENTITIES_WITH_SAME_GROUPS_COUNT,
+        GET_ENTITIES_WITH_GROUPS,
+        INSERT_ENTITY_WITH_GROUPS,
+        INSERT_ENTITIES_WITH_GROUPS
     }
 }

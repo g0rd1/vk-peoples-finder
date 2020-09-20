@@ -6,9 +6,13 @@ import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupCrossRefEntity
+import ru.g0rd1.peoplesfinder.db.query.UserEntityWithSameGroupsCountQuery
 
 @Dao
 abstract class UserDao {
+
+    @Query("SELECT * FROM (SELECT user_id, COUNT(group_id) as ${UserEntityWithSameGroupsCountQuery.SAME_GROUPS_COUNT_COLUMN_NAME} FROM `group` g JOIN `user_group` ug ON g.id = ug.group_id GROUP BY user_id ORDER BY COUNT(group_id) DESC) as jn JOIN user ON jn.user_id = user.id;")
+    abstract fun getWithSameGroupsCount(): Single<List<UserEntityWithSameGroupsCountQuery>>
 
     @Transaction
     open fun getWithGroups(): List<UserEntity> {
@@ -32,11 +36,15 @@ abstract class UserDao {
 
     @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun _insert(userEntity: UserEntity)
+    abstract fun insert(userEntity: UserEntity): Completable
 
     @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun _insert(userEntities: List<UserEntity>)
+    abstract fun insert(userEntities: List<UserEntity>): Completable
+
+    @Suppress("FunctionName")
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun _insert(userEntity: UserEntity)
 
     @Suppress("FunctionName")
     @Query("SELECT * FROM user")
@@ -48,41 +56,18 @@ abstract class UserDao {
     @Query("DELETE FROM user WHERE id = :userId")
     abstract fun delete(userId: Int): Completable
 
-    @Suppress("FunctionName")
-    @Query("SELECT * FROM user WHERE id = :userId")
-    abstract fun _get(userId: Int): List<UserEntity>
-
-    @Suppress("FunctionName")
-    @Update
-    abstract fun _update(userEntity: UserEntity)
-
     @Transaction
-    open fun insertOrUpdate(userEntity: UserEntity) {
-        val currentUserEntity = _get(userEntity.id).firstOrNull()
-        if (currentUserEntity == null) {
-            _insert(userEntity)
-        } else {
-            _update(userEntity)
-        }
-    }
-
-    @Transaction
-    open fun insertOrUpdate(userEntities: List<UserEntity>) {
-        userEntities.forEach { insertOrUpdate(it) }
-    }
-
-    @Transaction
-    open fun insertOrUpdateWithGroups(userEntity: UserEntity, groupIds: List<Int>) {
-        insertOrUpdate(userEntity)
+    open fun insertWithGroups(userEntity: UserEntity, groupIds: List<Int>) {
+        _insert(userEntity)
         groupIds.forEach {
             _insertRelation(UserGroupCrossRefEntity(userEntity.id, it))
         }
     }
 
     @Transaction
-    open fun insertOrUpdateWithGroups(userEntitiesWithGroupIds: Map<UserEntity, List<Int>>) {
+    open fun insertWithGroups(userEntitiesWithGroupIds: Map<UserEntity, List<Int>>) {
         userEntitiesWithGroupIds.forEach { (userEntity, groupIds) ->
-            insertOrUpdateWithGroups(userEntity, groupIds)
+            insertWithGroups(userEntity, groupIds)
         }
     }
 }

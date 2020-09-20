@@ -33,7 +33,7 @@ object GroupTestUtil {
         name: String = "",
         deactivated: String? = null,
         photo: String? = null,
-        type: String = "",
+        type: Group.Type = Group.Type.GROUP,
         membersCount: Int = 0
     ): Group {
         return Group(

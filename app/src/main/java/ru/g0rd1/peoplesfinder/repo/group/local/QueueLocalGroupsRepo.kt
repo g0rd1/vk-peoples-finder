@@ -21,8 +21,8 @@ class QueueLocalGroupsRepo(localGroupsRepo: LocalGroupsRepo) :
         return getCompletableWithOfferToQueue(localGroupsRepo.insert(groupEntities))
     }
 
-    override fun update(groupEntity: GroupEntity): Completable {
-        return getCompletableWithOfferToQueue(localGroupsRepo.update(groupEntity))
+    override fun insertIfNotExists(groupEntities: List<GroupEntity>): Completable {
+        return getCompletableWithOfferToQueue(localGroupsRepo.insertIfNotExists(groupEntities))
     }
 
     override fun update(
@@ -68,24 +68,18 @@ class QueueLocalGroupsRepo(localGroupsRepo: LocalGroupsRepo) :
     }
 
     private fun <T> getSingleWithOfferToQueue(single: Single<T>): Single<T> {
-        val singleWithActionsAfterTerminate = single.map {
-            queue.remove(single)
-            it
-        }
-            .doOnError { queue.remove(single) }
-        return Completable.fromAction { queue.put(single) }.andThen(singleWithActionsAfterTerminate)
+        return Completable.fromAction { queue.put(single) }
+            .andThen(single)
+            .doAfterTerminate { queue.remove(single) }
     }
 
     private fun getCompletableWithOfferToQueue(completable: Completable): Completable {
-        val completableWithActionsAfterTerminate = completable.andThen {
-            queue.remove(completable)
-        }
-            .doOnError { queue.remove(completable) }
         return Completable.fromAction { queue.put(completable) }
-            .andThen(completableWithActionsAfterTerminate)
+            .andThen(completable)
+            .doAfterTerminate { queue.remove(completable) }
     }
 
     companion object {
-        private const val QUEUE_CAPACITY = 5
+        private const val QUEUE_CAPACITY = 1
     }
 }

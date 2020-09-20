@@ -70,7 +70,7 @@ class LocalUserRepoAndLocalGroupRepoTest : InjectableTest() {
             actualInsertedGroup3Users.toTypedArray()
         )
         localGroupsRepo.delete(group1).blockingAwait()
-        val users = localUsersRepo.getUsersWithGroups().blockingGet()
+        val users = localUsersRepo.getWithGroups().blockingGet()
         val actualUser1GroupsAfterDelete =
             users.first { it.id == user1.id }.groups!!.sortedBy { it.id }
         val actualUser2GroupsAfterDelete =
@@ -109,7 +109,7 @@ class LocalUserRepoAndLocalGroupRepoTest : InjectableTest() {
         localGroupsRepo.insertWithUsers(group2, group2UserIds).blockingAwait()
         localGroupsRepo.insertWithUsers(group3, group3UserIds).blockingAwait()
         localUsersRepo.insert(listOf(user1, user2, user3)).blockingAwait()
-        val users = localUsersRepo.getUsersWithGroups().blockingGet()
+        val users = localUsersRepo.getWithGroups().blockingGet()
         val actualInsertedUser1Groups =
             users.first { it.id == user1.id }.groups!!.sortedBy { it.id }
         val actualInsertedUser2Groups =

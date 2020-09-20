@@ -17,17 +17,29 @@ data class Group(
     val photo: String?,
 
     @SerializedName("type")
-    val type: String,
+    val type: Type,
 
     @SerializedName("members_count")
     val membersCount: Int
 
 ) {
-    class Type {
-        companion object {
-            const val GROUP = "group"
-            const val PAGE = "page"
-            const val EVENT = "event"
-        }
+
+    enum class Type(val value: String) {
+        @SerializedName("group")
+        GROUP("group"),
+
+        @SerializedName("page")
+        PAGE("page"),
+
+        @SerializedName("event")
+        EVENT("event"),
     }
+
+    // class Type {
+    //     companion object {
+    //         const val GROUP = "group"
+    //         const val PAGE = "page"
+    //         const val EVENT = "event"
+    //     }
+    // }
 }

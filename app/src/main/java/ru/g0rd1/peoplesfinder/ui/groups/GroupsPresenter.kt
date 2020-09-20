@@ -1,6 +1,6 @@
 package ru.g0rd1.peoplesfinder.ui.groups
 
-import android.content.Context
+import android.annotation.SuppressLint
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -12,7 +12,6 @@ import ru.g0rd1.peoplesfinder.base.error.Error
 import ru.g0rd1.peoplesfinder.base.scheduler.Schedulers
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoader
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
-import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
@@ -27,21 +26,24 @@ class GroupsPresenter @Inject constructor(
     private val VKAccessRepo: VKAccessRepo,
     private val schedulers: Schedulers,
     private val errorHandler: Error.Handler,
-    private val context: Context,
     private val groupMembersLoaderManager: GroupMembersLoader.Manager
 ) : GroupsContract.Presenter {
 
     private lateinit var view: GroupsContract.View
 
-    private lateinit var vkGroups: List<Group>
-
-    private lateinit var groupViews: List<GroupView>
+    private lateinit var groupViewsWithLoaders: Map<GroupView, GroupMembersLoader>
 
     private lateinit var foundGroupViews: List<GroupView>
 
-    private lateinit var userGroup: List<GroupEntity>
+    private var groupsView: GroupsView = GroupsView()
 
-    private lateinit var groupMembersLoaders: List<GroupMembersLoader>
+    private lateinit var groupsMembersLoader: GroupsMembersSequentialLoader
+
+    private val groupViews: List<GroupView>
+        get() = groupViewsWithLoaders.keys.toList()
+
+    private val groupMembersLoaders: List<GroupMembersLoader>
+        get() = groupViewsWithLoaders.values.toList()
 
     private val searchSubject: Subject<String> = PublishSubject.create()
 
@@ -58,63 +60,56 @@ class GroupsPresenter @Inject constructor(
     private val groupLoadersWithOnAllMembersLoadedDateListeners: MutableMap<GroupMembersLoader, (date: Date?) -> Unit> =
         mutableMapOf()
 
+    // private val downloadProgressStatusListener: (status: GroupsMembersSequentialLoader.DownloadProgressStatus) -> Unit = { status ->
+    //
+    // }
+    //
+    // private val downloadStatusListener: (status: GroupsMembersSequentialLoader.DownloadStatus) -> Unit = { status ->
+    //
+    // }
+
     override fun setView(view: GroupsContract.View) {
         this.view = view
     }
 
+    @SuppressLint("CheckResult")
     override fun onStart() {
+        // Observable.interval(1, TimeUnit.SECONDS)
+        //     .subscribeOn(schedulers.io())
+        //     .observeOn(schedulers.main())
+        //     .subscribe{
+        //         Timber.d("groupsView: $groupsView")
+        //     }
+        view.setGroupsView(groupsView)
         observeQueryTextChange()
         view.hideContent()
         view.showLoader()
+        var vkGroupsIds: List<Int> = listOf()
         vkGroupsRepo.getGroups(VKAccessRepo.getUserId())
             .flatMapCompletable { groups ->
-                localGroupsRepo.insert(groups.map { GroupEntity(it) })
+                vkGroupsIds = groups.map { it.id }
+                localGroupsRepo.insertIfNotExists(groups.map { GroupEntity(it) })
             }
             .andThen(localGroupsRepo.get())
             .flatMap { groups ->
-                val single: Single<Pair<List<GroupEntity>, List<GroupMembersLoader>>> = Single.zip(
-                    Single.just(groups),
-                    groupMembersLoaderManager.getLoaders(groups.map { it.id }),
-                    BiFunction { t1, t2 -> Pair(t1, t2) })
-                single
+                Timber.d("groups: $groups")
+                getGroupEntitiesWithLoadersSingle(groups)
             }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.main())
             .subscribe(
-                { (groups, groupMembersLoaders) ->
-                    groupViews = groups.map { GroupView(it) }
+                { groupEntitiesWithLoaders: Map<GroupEntity, GroupMembersLoader> ->
+                    val sortedGroupEntitiesWithLoaders: Map<GroupEntity, GroupMembersLoader> =
+                        vkGroupsIds.associate { groupId ->
+                            groupEntitiesWithLoaders.toList().first { it.first.id == groupId }
+                        }
+                    groupViewsWithLoaders =
+                        sortedGroupEntitiesWithLoaders.mapKeys { GroupView(it.key) }
+                    groupsMembersLoader =
+                        GroupsMembersSequentialLoader(groupMembersLoaders, groupsView, schedulers)
+                    updateGroupViews()
                     view.setGroups(groupViews)
-                    groupMembersLoaders.forEach { groupMembersLoader ->
-                        val associatedGroupView = groupViews.first {
-                            groupMembersLoader.getGroupId() == it.id
-                        }
-                        Timber.d("groupView ${associatedGroupView.name}, status: ${associatedGroupView.status}, loadedMembersCount: ${associatedGroupView.loadedMembersCount}, allMembersLoadedDate: ${associatedGroupView.allMembersLoadedDate}")
-                        // associatedGroupView.status = groupMembersLoader.status
-                        // associatedGroupView.loadedMembersCount = groupMembersLoader.loadedMembersCount
-                        // associatedGroupView.allMembersLoadedDate = groupMembersLoader.allMembersLoadedDate
-                        val onCountChangeListener: (Int) -> Unit = {
-                            Timber.d("Loaded count changed for groupId: ${associatedGroupView.id}: $it")
-                            associatedGroupView.loadedMembersCount = it
-                        }
-                        val onStatusChangeListener: (GroupMembersLoader.Status) -> Unit = {
-                            associatedGroupView.status = it
-                        }
-                        val onAllMembersLoadedDateListener: (Date?) -> Unit = {
-                            associatedGroupView.allMembersLoadedDate = it
-                        }
-                        groupMembersLoader.addOnCountChangeListener(onCountChangeListener)
-                        groupMembersLoader.addOnStatusChangeListener(onStatusChangeListener)
-                        groupMembersLoader.addOnAllMembersLoadedDateListener(
-                            onAllMembersLoadedDateListener
-                        )
-                        groupLoadersWithOnCountChangeListeners[groupMembersLoader] =
-                            onCountChangeListener
-                        groupLoadersWithOnStatusChangeListeners[groupMembersLoader] =
-                            onStatusChangeListener
-                        groupLoadersWithOnAllMembersLoadedDateListeners[groupMembersLoader] =
-                            onAllMembersLoadedDateListener
-                    }
-                    this.groupMembersLoaders = groupMembersLoaders
+                    setUpListeners()
                     view.hideLoader()
                     view.showContent()
                 },
@@ -126,6 +121,56 @@ class GroupsPresenter @Inject constructor(
                 }
             )
             .addTo(compositeDisposable)
+    }
+
+    private fun updateGroupViews() {
+        groupViewsWithLoaders.forEach { (groupView, groupMembersLoader) ->
+            groupView.loadedMembersCount = groupMembersLoader.loadedMembersCount
+            groupView.status = groupMembersLoader.status
+            groupView.allMembersLoadedDate = groupMembersLoader.allMembersLoadedDate
+        }
+    }
+
+    private fun setUpListeners() {
+        groupViewsWithLoaders.forEach { (groupView, groupMembersLoader) ->
+            val onCountChangeListener: (Int) -> Unit = {
+                Timber.d("Loaded count changed for groupId: ${groupView.id}: $it")
+                groupView.loadedMembersCount = it
+            }
+            val onStatusChangeListener: (GroupMembersLoader.Status) -> Unit = {
+                Timber.d("status changed for groupId: ${groupView.id}: $it")
+                groupView.status = it
+            }
+            val onAllMembersLoadedDateListener: (Date?) -> Unit = {
+                Timber.d("date changed for groupId: ${groupView.id}: $it")
+                groupView.allMembersLoadedDate = it
+            }
+            groupMembersLoader.addOnCountChangeListener(onCountChangeListener)
+            groupMembersLoader.addOnStatusChangeListener(onStatusChangeListener)
+            groupMembersLoader.addOnAllMembersLoadedDateListener(
+                onAllMembersLoadedDateListener
+            )
+            groupLoadersWithOnCountChangeListeners[groupMembersLoader] =
+                onCountChangeListener
+            groupLoadersWithOnStatusChangeListeners[groupMembersLoader] =
+                onStatusChangeListener
+            groupLoadersWithOnAllMembersLoadedDateListeners[groupMembersLoader] =
+                onAllMembersLoadedDateListener
+        }
+    }
+
+    private fun getGroupEntitiesWithLoadersSingle(groups: List<GroupEntity>): Single<MutableMap<GroupEntity, GroupMembersLoader>>? {
+        val pairs: List<Single<Pair<GroupEntity, GroupMembersLoader>>> =
+            groups.map { groupEntity ->
+                Single.zip(
+                    Single.just(groupEntity),
+                    groupMembersLoaderManager.getLoader(groupEntity.id),
+                    BiFunction { t1: GroupEntity, t2: GroupMembersLoader -> Pair(t1, t2) }
+                )
+            }
+        return Observable.fromIterable(pairs)
+            .flatMap { it.toObservable() }
+            .toMap({ it.first }, { it.second })
     }
 
     private fun observeQueryTextChange() {
@@ -146,23 +191,6 @@ class GroupsPresenter @Inject constructor(
                     view.hideLoader()
                     view.hideContent()
                     errorHandler.handle(it) { searchSubject.onNext(queryText) }
-                }
-            )
-            .addTo(compositeDisposable)
-    }
-
-    private fun getVKGroups(onSuccess: ((groups: List<Group>) -> Unit)) {
-        vkGroupsRepo.getGroups(VKAccessRepo.getUserId())
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.main())
-            .subscribe(
-                { groups ->
-                    onSuccess(groups)
-                },
-                {
-                    view.hideContent()
-                    view.hideLoader()
-                    errorHandler.handle(it) { getVKGroups(onSuccess) }
                 }
             )
             .addTo(compositeDisposable)
@@ -192,9 +220,14 @@ class GroupsPresenter @Inject constructor(
         // TODO Действия по нажатию на группу. Возможно показывать более подробную информацию о группе.
     }
 
-    override fun onDownloadGroupMembersButtonClick() {
-        groupMembersLoaders.forEach { it.start() }
+    override fun onLoadOrPauseButtonClick() {
+        groupsMembersLoader.onStartOrPauseClicked()
+        // groupMembersLoaders.forEach { it.start() }
         // groupMembersLoaders.first().start()
+    }
+
+    override fun stopButtonClick() {
+        groupsMembersLoader.onStopButtonClicked()
     }
 
     companion object {

@@ -10,4 +10,9 @@
     <string name="fragment_groups_download_members_button_text">Загрузить участников групп</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fragment_groups_download_button_start_download">Начать загрузку</string>
+    <string name="fragment_groups_download_button_stop_download">Остановить загрузку</string>
+    <string name="fragment_groups_download_button_pause_download">Приостановить загрузку</string>
+    <string name="fragment_groups_download_button_continue_download">Продолжить загрузку</string>
+    <string name="fragment_groups_download_button_download_again">Загрузить заново</string>
 </resources>

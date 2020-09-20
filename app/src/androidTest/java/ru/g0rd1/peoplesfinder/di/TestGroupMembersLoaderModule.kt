@@ -8,7 +8,7 @@ import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoaderManag
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoaderRegulator
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.HttpGroupMembersLoaderFactory
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
-import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
 import javax.inject.Named
 import javax.inject.Singleton
@@ -16,11 +16,8 @@ import javax.inject.Singleton
 @Module
 abstract class TestGroupMembersLoaderModule : GroupMembersLoaderModule() {
 
-
-    @Module
     companion object {
 
-        @JvmStatic
         @Provides
         @Singleton
         @Named("TEST")
@@ -28,29 +25,24 @@ abstract class TestGroupMembersLoaderModule : GroupMembersLoaderModule() {
             return GroupMembersLoaderRegulator()
         }
 
-        @JvmStatic
         @Provides
         @Singleton
         @Named("TEST")
         fun factory(
             @Named("TEST")
-            vkGroupsRepo: VkGroupsRepo,
+            vkGroupsMembersRepo: VkGroupsMembersRepo,
             schedulers: Schedulers,
             @Named("TEST")
             localUsersRepo: LocalUsersRepo,
             @Named("TEST")
-            localGroupsRepo: LocalGroupsRepo,
-            @Named("TEST")
-            regulator: GroupMembersLoader.Regulator
+            localGroupsRepo: LocalGroupsRepo
         ): GroupMembersLoader.Factory = HttpGroupMembersLoaderFactory(
-            vkGroupsRepo,
+            vkGroupsMembersRepo,
             schedulers,
             localUsersRepo,
-            localGroupsRepo,
-            regulator
+            localGroupsRepo
         )
 
-        @JvmStatic
         @Provides
         @Singleton
         @Named("TEST")

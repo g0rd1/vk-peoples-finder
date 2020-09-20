@@ -12,9 +12,11 @@ interface LocalUsersRepo {
 
     fun delete(userEntity: UserEntity): Completable
 
-    fun getUsers(): Single<List<UserEntity>>
+    fun get(): Single<List<UserEntity>>
 
-    fun getUsersWithGroups(): Single<List<UserEntity>>
+    fun getWithSameGroupsCount(): Single<List<UserEntity>>
+
+    fun getWithGroups(): Single<List<UserEntity>>
 
     fun insertWithGroups(userEntity: UserEntity, groupIds: List<Int>): Completable
 

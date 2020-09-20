@@ -8,7 +8,9 @@ import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.DBLocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.QueueLocalGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.group.vk.HttpVkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.HttpVkGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.DBLocalUsersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
@@ -25,11 +27,15 @@ abstract class ReposModule {
 
     @Binds
     @Singleton
-    abstract fun groupsRepo(groupsRepo: DBLocalGroupsRepo): LocalGroupsRepo
+    abstract fun groupsMembersVkRepo(groupsMembersVkRepo: HttpVkGroupsMembersRepo): VkGroupsMembersRepo
 
     @Binds
     @Singleton
-    abstract fun usersRepo(usersRepo: DBLocalUsersRepo): LocalUsersRepo
+    abstract fun localGroupsRepo(localGroupsRepo: DBLocalGroupsRepo): LocalGroupsRepo
+
+    @Binds
+    @Singleton
+    abstract fun localUsersRepo(localUsersRepo: DBLocalUsersRepo): LocalUsersRepo
 
     @Binds
     @Singleton
@@ -37,7 +43,6 @@ abstract class ReposModule {
 
     companion object {
 
-        @JvmStatic
         @Singleton
         @Provides
         @Named(LocalUsersRepo.QUEUE)
@@ -45,7 +50,6 @@ abstract class ReposModule {
             return QueueLocalUsersRepo(localUsersRepo)
         }
 
-        @JvmStatic
         @Singleton
         @Provides
         @Named(LocalGroupsRepo.QUEUE)

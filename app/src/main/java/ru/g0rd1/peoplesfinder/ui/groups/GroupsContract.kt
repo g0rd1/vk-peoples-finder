@@ -8,6 +8,7 @@ interface GroupsContract {
         fun hideContent()
         fun showLoader()
         fun hideLoader()
+        fun setGroupsView(groupsView: GroupsView)
     }
 
     interface Presenter {
@@ -16,7 +17,8 @@ interface GroupsContract {
         fun onStop()
         fun onQueryTextChange(newText: String?)
         fun onGroupClick(groupView: GroupView)
-        fun onDownloadGroupMembersButtonClick()
+        fun onLoadOrPauseButtonClick()
+        fun stopButtonClick()
     }
 
 }

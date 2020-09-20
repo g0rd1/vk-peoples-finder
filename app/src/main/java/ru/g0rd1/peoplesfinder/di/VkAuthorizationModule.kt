@@ -14,10 +14,8 @@ abstract class VkAuthorizationModule {
     @Singleton
     abstract fun vkAuthorizationManager(vkAuthorizationManager: VkAuthorizationManager): VkAuthorizationContract.Manager
 
-    @Module
     companion object {
 
-        @JvmStatic
         @Provides
         fun vkAuthorizationHelper(
             vkAuthorizationManager: VkAuthorizationContract.Manager

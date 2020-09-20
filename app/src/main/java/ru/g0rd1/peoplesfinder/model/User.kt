@@ -28,9 +28,6 @@ data class User(
     @SerializedName("sex")
     val sex: Int?,
 
-    @SerializedName("has_photo")
-    val hasPhoto: Boolean?,
-
     @SerializedName("photo_200")
     val photo: String?,
 

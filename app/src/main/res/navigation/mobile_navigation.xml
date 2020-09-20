@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="ru.g0rd1.peoplesfinder.ui.notifications.NotificationsFragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.results.ResultsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications"/>
 

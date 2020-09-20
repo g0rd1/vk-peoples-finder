@@ -52,7 +52,7 @@ data class GroupEntity(
         group.name,
         group.deactivated,
         group.photo,
-        group.type,
+        group.type.value,
         group.membersCount,
         loadedMembersCount,
         allMembersLoadedDate

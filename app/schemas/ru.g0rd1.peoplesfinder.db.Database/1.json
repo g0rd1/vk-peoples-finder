@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7d30c57853fd7fa66b4bda487a171f99",
+    "identityHash": "f8d4a71e5dd47588a6f91086094474a6",
     "entities": [
       {
         "tableName": "group",
@@ -100,7 +100,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate` TEXT, `sex` INTEGER, `has_photo` INTEGER, `photo_200` TEXT, `relation` INTEGER, `cityid` INTEGER, `citytitle` TEXT, `last_seentime` INTEGER, `last_seenplatform` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate` TEXT, `sex` INTEGER, `photo_200` TEXT, `relation` INTEGER, `cityid` INTEGER, `citytitle` TEXT, `last_seentime` INTEGER, `last_seenplatform` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -141,12 +141,6 @@
           {
             "fieldPath": "sex",
             "columnName": "sex",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "hasPhoto",
-            "columnName": "has_photo",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -280,7 +274,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d30c57853fd7fa66b4bda487a171f99')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f8d4a71e5dd47588a6f91086094474a6')"
     ]
   }
 }

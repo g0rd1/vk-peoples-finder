@@ -32,9 +32,6 @@ data class UserEntity(
     @ColumnInfo(name = "sex")
     val sex: Int?,
 
-    @ColumnInfo(name = "has_photo")
-    val hasPhoto: Boolean?,
-
     @ColumnInfo(name = "photo_200")
     val photo: String?,
 
@@ -48,6 +45,9 @@ data class UserEntity(
     @Ignore
     var groups: List<GroupEntity>? = null
 
+    @Ignore
+    var sameGroupsCount: Int? = null
+
     constructor(user: User) : this(
         id = user.userId,
         firstName = user.firstName,
@@ -57,7 +57,6 @@ data class UserEntity(
         birthDate = user.birthDate,
         city = user.city,
         sex = user.sex,
-        hasPhoto = user.hasPhoto,
         photo = user.photo,
         lastSeen = user.lastSeen?.let { User.LastSeen(it.time, it.platform) },
         relation = user.relation
