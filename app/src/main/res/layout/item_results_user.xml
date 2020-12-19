@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="user"
-            type="ru.g0rd1.peoplesfinder.db.entity.UserEntity"/>
+            name="viewModel"
+            type="ru.g0rd1.peoplesfinder.ui.results.UserViewModel" />
 
     </data>
 
@@ -17,7 +17,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/avatar"
-            imageUrl="@{user.photo}"
+            imageUrl="@{viewModel.user.photo}"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_marginStart="8dp"
@@ -37,7 +37,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:text='@{user.firstName + " " + user.lastName}'
+            android:text='@{viewModel.user.firstName + " " + viewModel.user.lastName}'
             app:layout_constraintBottom_toBottomOf="@id/avatar"
             app:layout_constraintEnd_toStartOf="@+id/number_of_matches"
             app:layout_constraintStart_toEndOf="@+id/avatar"
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text='@{user.sameGroupsCount.toString()}'
+            android:text='@{String.valueOf(viewModel.sameGroupCount)}'
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

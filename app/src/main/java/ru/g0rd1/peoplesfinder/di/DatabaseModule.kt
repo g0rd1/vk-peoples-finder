@@ -6,7 +6,9 @@ import dagger.Module
 import dagger.Provides
 import ru.g0rd1.peoplesfinder.db.Database
 import ru.g0rd1.peoplesfinder.db.dao.GroupDao
+import ru.g0rd1.peoplesfinder.db.dao.GroupDataDao
 import ru.g0rd1.peoplesfinder.db.dao.UserDao
+import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
 import javax.inject.Singleton
 
 @Module
@@ -28,6 +30,14 @@ abstract class DatabaseModule {
         @Provides
         @Singleton
         fun groupDao(db: Database): GroupDao = db.groupDao()
+
+        @Provides
+        @Singleton
+        fun userGroupDao(db: Database): UserGroupDao = db.userGroupDao()
+
+        @Provides
+        @Singleton
+        fun groupDataDao(db: Database): GroupDataDao = db.groupDataDao()
 
     }
 

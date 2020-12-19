@@ -34,7 +34,7 @@ class LocalGroupsRepoTest : InjectableTest() {
     fun update() {
         val id = 1
         val group1 = getTestGroupEntity(id)
-        localGroupsRepo.insert(group1).blockingAwait()
+        localGroupsRepo.insertOrUpdate(group1).blockingAwait()
         val newLoadedMembersCount = 25000
         val newAllMembersLoadedDate = Date()
         localGroupsRepo.update(group1.id, newLoadedMembersCount, newAllMembersLoadedDate)

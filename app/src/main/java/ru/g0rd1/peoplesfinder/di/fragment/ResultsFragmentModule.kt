@@ -1,14 +1,18 @@
 package ru.g0rd1.peoplesfinder.di.fragment
 
+import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
-import ru.g0rd1.peoplesfinder.ui.results.ResultsContract
-import ru.g0rd1.peoplesfinder.ui.results.ResultsPresenter
+import dagger.multibindings.IntoMap
+import ru.g0rd1.peoplesfinder.di.ViewModelKey
+import ru.g0rd1.peoplesfinder.ui.results.ResultsViewModel
 
 @Module
 abstract class ResultsFragmentModule {
 
     @Binds
-    abstract fun presenter(presenter: ResultsPresenter): ResultsContract.Presenter
+    @IntoMap
+    @ViewModelKey(ResultsViewModel::class)
+    abstract fun viewModel(viewModel: ResultsViewModel): ViewModel
 
 }

@@ -1,4 +1,4 @@
-package ru.planeta.tv.refactor.base.util
+package ru.g0rd1.peoplesfinder.util
 
 import android.graphics.drawable.Drawable
 import android.util.TypedValue

@@ -9,9 +9,7 @@ import ru.g0rd1.peoplesfinder.repo.access.SharedPrefVKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.DBLocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
-import ru.g0rd1.peoplesfinder.repo.group.vk.TestVkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.TestVkGroupsRepo
-import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsMembersRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.DBLocalUsersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
@@ -27,11 +25,6 @@ abstract class TestReposModule : ReposModule() {
         @Singleton
         @Named("TEST")
         fun testGroupsVkRepo(): VkGroupsRepo = TestVkGroupsRepo()
-
-        @Provides
-        @Singleton
-        @Named("TEST")
-        fun testGroupsMembersVkRepo(): VkGroupsMembersRepo = TestVkGroupsMembersRepo()
 
         @Provides
         @Singleton

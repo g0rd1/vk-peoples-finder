@@ -1,53 +1,60 @@
 package ru.g0rd1.peoplesfinder.repo.user.local
 
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.Flowable
+import ru.g0rd1.peoplesfinder.common.PriorityQueueManagerFactory
 import ru.g0rd1.peoplesfinder.db.dao.UserDao
+import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
-import timber.log.Timber
+import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
+import ru.g0rd1.peoplesfinder.mapper.UserMapper
+import ru.g0rd1.peoplesfinder.model.User
+import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import javax.inject.Inject
 
 class DBLocalUsersRepo @Inject constructor(
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val userGroupDao: UserGroupDao,
+    private val userMapper: UserMapper,
+    private val priorityQueueManagerFactory: PriorityQueueManagerFactory
 ) : LocalUsersRepo {
 
-    override fun insert(userEntity: UserEntity): Completable =
-        userDao.insert(userEntity)
+    private val insertWithGroupsQueueManager = priorityQueueManagerFactory.create(1)
 
-    override fun insert(userEntities: List<UserEntity>): Completable =
-        userDao.insert(userEntities)
-
-    override fun delete(userEntity: UserEntity): Completable = userDao.delete(userEntity)
-
-    override fun get(): Single<List<UserEntity>> = userDao.get()
-
-    override fun getWithSameGroupsCount(): Single<List<UserEntity>> =
-        userDao.getWithSameGroupsCount().map { userEntitiesWithSameGroupsCounts ->
-            userEntitiesWithSameGroupsCounts.map {
-                it.user.apply {
-                    sameGroupsCount = it.sameGroupsCount
-                }
-            }
+    override fun getWithSameGroupsCount(): Flowable<Map<User, Int>> =
+        userDao.getWithSameGroupsCount(0, 50).map { userEntitiesWithSameGroupsCounts ->
+            userEntitiesWithSameGroupsCounts.associate { it.userEntity.toUser() to it.sameGroupsCount }
         }
 
-    override fun getWithGroups(): Single<List<UserEntity>> =
-        Single.fromCallable { userDao.getWithGroups() }
+    override fun insertWithGroups(usersWithGroupIds: Map<User, List<Int>>): Completable =
+        insertWithGroupsQueueManager.getQueuedCompletable(
+            Completable
+                .fromAction { userDao.insertOrUpdate(usersWithGroupIds.keys.toList().toEntities()) }
+                .andThen(
+                    Completable.fromAction {
+                        userGroupDao.insertOrUpdate(
+                            usersWithGroupIds.flatMap { (user, groupIds) ->
+                                groupIds.map { UserGroupEntity(user.id, it) }
+                            }
+                        )
+                    }
+                )
+        ).subscribeOnIo()
 
-    override fun insertWithGroups(userEntity: UserEntity, groupIds: List<Int>): Completable =
-        Completable.fromAction { userDao.insertWithGroups(userEntity, groupIds) }
 
-    override fun insertWithGroups(userEntitiesWithGroupIds: Map<UserEntity, List<Int>>): Completable =
-    // Completable.create { emitter ->
-    //     Timber.d("Completable.create start")
-    //     userDao.insertWithGroups(userEntitiesWithGroupIds)
-    //     Timber.d("Completable.create before onComplete")
-    //     emitter.onComplete()
-    //     emitter.
-    //     Timber.d("Completable.create after onComplete")
-        // }
-        Completable.fromAction {
-            Timber.d("start action")
-            userDao.insertWithGroups(userEntitiesWithGroupIds)
-            Timber.d("end action")
-        }
+    private fun List<User>.toEntities(): List<UserEntity> {
+        return this.map { it.toEntity() }
+    }
+
+    private fun User.toEntity(): UserEntity {
+        return userMapper.transformToEntity(this)
+    }
+
+    private fun List<UserEntity>.toUsers(): List<User> {
+        return this.map { it.toUser() }
+    }
+
+    private fun UserEntity.toUser(): User {
+        return userMapper.transform(this)
+    }
 }

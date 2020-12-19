@@ -1,18 +1,30 @@
 <resources>
     <string name="app_name">PeoplesFinder</string>
+
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <string name="authorization_label">AuthorizationFragment</string>
+    <string name="synchronize_label">SynchronizationFragment</string>
+    <string name="groups_label">Группы</string>
+    <string name="settings_label">Настройки</string>
+    <string name="results_label">Результаты</string>
+
     <string name="groups_menu_search_title">Поиск</string>
+
     <string name="retry">Повтор</string>
-    <string name="groups_fragment_groups_title_found_groups">Найденные группы:</string>
-    <string name="groups_fragment_groups_title_user_groups">Группы для поиска:</string>
+
     <string name="fragment_groups_download_members_button_text">Загрузить участников групп</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fragment_groups_download_button_start_download">Начать загрузку</string>
-    <string name="fragment_groups_download_button_stop_download">Остановить загрузку</string>
+    <string name="fragment_groups_download_button_cancel_download">Отменить загрузку</string>
+    <string name="fragment_groups_download_button_reload">Загрузить заново</string>
     <string name="fragment_groups_download_button_pause_download">Приостановить загрузку</string>
-    <string name="fragment_groups_download_button_continue_download">Продолжить загрузку</string>
-    <string name="fragment_groups_download_button_download_again">Загрузить заново</string>
+    <string name="fragment_groups_download_button_continue_load">Продолжить загрузку</string>
+    <string name="fragment_groups_error_text_no_access_to_group_members">Превышен суточный лимит на загрузку\nПопробуйте продолжить загрузку позже</string>
+    <string name="fragment_groups_error_text_unknown_error">Ошибка при загрузке\nПопробуйте загрузить ещё раз</string>
+
+    <string name="item_group_no_access_to_group_members">Нет доступа к информации</string>
+
+
 </resources>

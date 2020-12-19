@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="groupsView"
-            type="ru.g0rd1.peoplesfinder.ui.groups.GroupsView"/>
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.groups.GroupsViewModel" />
 
         <import type="android.view.View"/>
 
@@ -17,45 +17,132 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/start_or_pause_button"
+        <LinearLayout
+            android:id="@+id/buttons_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="@{groupsView.startOrPauseButtonText}"
-            app:layout_constraintBottom_toTopOf="@id/buttons_barrier"
-            app:layout_constraintEnd_toStartOf="@+id/stop_button"
-            app:layout_constraintHorizontal_bias="0.5"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="@string/fragment_groups_download_button_start_download"/>
+            app:visible="@{vm.buttonsVisible}">
 
-        <Button
-            android:id="@+id/stop_button"
-            android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pause_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:lines="2"
+                android:onClick="@{() -> vm.pauseLoad()}"
+                android:text="@string/fragment_groups_download_button_pause_download"
+                app:visible="@{vm.pauseButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/reload_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:lines="2"
+                android:onClick="@{() -> vm.reload()}"
+                android:text="@string/fragment_groups_download_button_reload"
+                app:visible="@{vm.reloadButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/continue_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:lines="2"
+                android:onClick="@{() -> vm.continueLoad()}"
+                android:text="@string/fragment_groups_download_button_continue_load"
+                app:visible="@{vm.continueButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:lines="2"
+                android:onClick="@{() -> vm.startLoad()}"
+                android:text="@string/fragment_groups_download_button_start_download"
+                app:visible="@{vm.startButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:lines="2"
+                android:onClick="@{() -> vm.cancelLoad()}"
+                android:text="@string/fragment_groups_download_button_cancel_download"
+                app:visible="@{vm.cancelButtonVisible}" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="@string/fragment_groups_download_button_stop_download"
-            android:visibility="@{groupsView.showStopButton ? View.VISIBLE : View.GONE}"
-            app:layout_constraintBottom_toTopOf="@id/buttons_barrier"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:max="@{vm.membersCount}"
+            android:progress="@{vm.loadedMembersCount}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/start_or_pause_button"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttons_container" />
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@{vm.errorText}"
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progressBar"
+            app:visible="@{vm.errorTextVisible}"
+            tools:text="Произошла ошибка при загрузке" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/groups"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:orientation="vertical"
+            app:items="@{vm.groupViewModels}"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/start_or_pause_button"
+            app:layout_constraintTop_toBottomOf="@id/errorText"
             tools:listitem="@layout/item_group"/>
 
         <ProgressBar
@@ -69,14 +156,6 @@
             app:layout_constraintStart_toStartOf="@id/groups"
             app:layout_constraintTop_toTopOf="@id/groups"
             tools:visibility="visible"/>
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/buttons_barrier"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="bottom"
-            app:constraint_referenced_ids="stop_button,start_or_pause_button"
-            tools:layout_editor_absoluteY="731dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,7 +1,7 @@
 package ru.g0rd1.peoplesfinder.apiservice.response
 
-import ru.g0rd1.peoplesfinder.model.User
+import ru.g0rd1.peoplesfinder.apiservice.model.ApiUser
 
 data class GetUserResponse(
-    val response: List<User>
+    val response: List<ApiUser>
 )

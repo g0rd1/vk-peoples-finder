@@ -1,14 +1,18 @@
 package ru.g0rd1.peoplesfinder.di.fragment
 
+import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
-import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationContract
-import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationPresenter
+import dagger.multibindings.IntoMap
+import ru.g0rd1.peoplesfinder.di.ViewModelKey
+import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationViewModel
 
 @Module
 abstract class AuthorizationFragmentModule {
 
     @Binds
-    abstract fun presenter(presenter: AuthorizationPresenter): AuthorizationContract.Presenter
+    @IntoMap
+    @ViewModelKey(AuthorizationViewModel::class)
+    abstract fun authorizationViewModel(viewModel: AuthorizationViewModel): ViewModel
 
 }

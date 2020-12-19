@@ -19,7 +19,6 @@ interface Error {
     interface View {
         fun showRetryButton()
         fun hideRetryButton()
-        fun setMessage(message: String)
         fun setRetry(retry: (() -> Unit))
         fun dismiss()
     }

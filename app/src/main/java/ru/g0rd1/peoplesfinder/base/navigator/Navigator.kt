@@ -4,8 +4,12 @@ import androidx.navigation.NavController
 
 interface Navigator {
 
-    fun setNavigator(navController: NavController)
-    fun authorize()
-    fun groups()
+    fun setNavigator(
+        navController: NavController,
+        showNavigationMenu: (showNavigationMenu: Boolean) -> Unit
+    )
 
+    fun authorization()
+    fun synchronization()
+    fun groups()
 }

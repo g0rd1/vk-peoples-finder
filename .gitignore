@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 /app/src/main/res/values/appinfo.xml
+/keystore/kestore.jks
+/app/kestore.jks
+/app/keystore.properties
+/keystore.properties
+/app/keystore.jks
+.idea

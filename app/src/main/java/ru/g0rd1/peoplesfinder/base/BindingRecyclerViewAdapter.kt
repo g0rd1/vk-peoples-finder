@@ -8,10 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V : Any>(@LayoutRes val layoutRes: Int) :
+abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(@LayoutRes val layoutRes: Int) :
     RecyclerView.Adapter<BindingRecyclerViewAdapter<VBD, V>.BindingViewHolder>() {
 
-    private val items: MutableList<V> = mutableListOf()
+    protected val items: MutableList<V> = mutableListOf()
 
     private var onItemClickListener: ((item: V) -> Unit)? = null
 
@@ -32,16 +32,16 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V : Any>(@Layou
     @CallSuper
     final override fun onBindViewHolder(holder: BindingViewHolder, position: Int) {
         holder.binding.root.tag = position
-        onBindViewHolder(holder.binding, position, items)
+        getSetViewModelToBindingFunction(holder.binding).invoke(items[position])
     }
 
-    protected abstract fun onBindViewHolder(holderBinding: VBD, position: Int, items: List<V>)
+    protected abstract fun getSetViewModelToBindingFunction(holderBinding: VBD): (V) -> Unit
 
     fun setOnItemClickListener(onItemClickListener: (position: V) -> Unit) {
         this.onItemClickListener = onItemClickListener
     }
 
-    fun setItems(items: List<V>) {
+    open fun setItems(items: List<V>) {
         val oldItemCount = itemCount
         this.items.clear()
         this.items.addAll(items)

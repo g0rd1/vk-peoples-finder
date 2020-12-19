@@ -6,10 +6,8 @@
     <data>
 
         <variable
-            name="groupView"
-            type="ru.g0rd1.peoplesfinder.ui.groups.GroupView"/>
-
-        <import type="ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoader.Status"/>
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.groups.GroupViewModel" />
 
     </data>
 
@@ -19,33 +17,44 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/avatar"
+            imageUrl="@{vm.photo}"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:scaleType="fitCenter"
-            imageUrl="@{groupView.photo}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars[0]"/>
+            tools:srcCompat="@tools:sample/avatars[0]" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            color="@{groupView.status == Status.ERROR ? @color/progress_bar_error : groupView.status == Status.FINISH ? @color/progress_bar_loaded : @color/progress_bar_load}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:max="@{groupView.membersCount}"
-            android:progress="@{groupView.loadedMembersCount}"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar"
-            app:layout_constraintEnd_toStartOf="@+id/delete"
-            app:layout_constraintStart_toEndOf="@+id/avatar"/>
+            android:max="@{vm.membersCount}"
+            android:progress="@{vm.loadedMembersCount}"
+            app:layout_constraintBottom_toBottomOf="@id/avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:visible="@{vm.hasAccessToMembers}" />
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/item_group_no_access_to_group_members"
+            app:layout_constraintBottom_toBottomOf="@id/avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:visible="@{!vm.hasAccessToMembers}" />
 
         <TextView
             android:id="@+id/groupName"
@@ -55,29 +64,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:text="@{groupView.name}"
-            app:layout_constraintBottom_toTopOf="@+id/progressBar"
-            app:layout_constraintEnd_toStartOf="@+id/delete"
-            app:layout_constraintStart_toEndOf="@+id/avatar"
-            app:layout_constraintTop_toTopOf="@+id/avatar"
-            tools:text="Название группы"/>
-
-        <ImageView
-            android:id="@+id/delete"
-            srcCompat="@{groupView.status == Status.PAUSED ? @drawable/ic_get_app : groupView.status == Status.FINISH ? @drawable/ic_refresh : @drawable/ic_stop}"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:adjustViewBounds="true"
-            android:padding="10dp"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@{vm.name}"
+            app:layout_constraintBottom_toTopOf="@id/progressBar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription"/>
-
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="@id/avatar"
+            tools:text="Название группы" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

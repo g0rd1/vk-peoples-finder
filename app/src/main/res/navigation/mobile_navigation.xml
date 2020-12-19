@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/login_fragment">
+    app:startDestination="@id/authorization_fragment">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="ru.g0rd1.peoplesfinder.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home"/>
-
-    <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="ru.g0rd1.peoplesfinder.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard"/>
-
-    <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="ru.g0rd1.peoplesfinder.ui.results.ResultsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications"/>
-
-    <fragment
-        android:id="@+id/login_fragment"
+        android:id="@+id/authorization_fragment"
         android:name="ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment"
-        android:label="LoginFragment"/>
+        android:label="@string/authorization_label" />
+
+    <fragment
+        android:id="@+id/synchronize_fragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.synchronization.SynchronizationFragment"
+        android:label="@string/synchronize_label" />
 
     <fragment
         android:id="@+id/groups_fragment"
         android:name="ru.g0rd1.peoplesfinder.ui.groups.GroupsFragment"
-        android:label="GroupsFragment"/>
+        android:label="@string/groups_label" />
+
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.settings.SettingsFragment"
+        android:label="@string/settings_label" />
+
+    <fragment
+        android:id="@+id/results_fragment"
+        android:name="ru.g0rd1.peoplesfinder.ui.results.ResultsFragment"
+        android:label="@string/results_label" />
+
 
 </navigation>

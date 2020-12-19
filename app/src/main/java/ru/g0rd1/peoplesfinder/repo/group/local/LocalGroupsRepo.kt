@@ -1,39 +1,32 @@
 package ru.g0rd1.peoplesfinder.repo.group.local
 
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
-import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
+import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.model.Optional
 import java.util.*
 
 interface LocalGroupsRepo {
 
-    fun insert(groupEntity: GroupEntity): Completable
+    fun updateLoadedMembersCount(id: Int, loadedMembersCount: Int): Completable
 
-    fun insert(groupEntities: List<GroupEntity>): Completable
+    fun updateAllMembersLoadedDate(id: Int, allMembersLoadedDate: Date?): Completable
 
-    fun insertIfNotExists(groupEntities: List<GroupEntity>): Completable
+    fun updateSequentialNumber(id: Int, sequentialNumber: Int): Completable
 
-    fun update(
-        groupId: Int,
-        loadedMembersCount: Int,
-        allMembersLoadedDate: Date? = null
-    ): Completable
+    fun updateHasAccessToMembers(id: Int, hasAccessToMembers: Boolean): Completable
 
-    fun delete(groupEntity: GroupEntity): Completable
+    fun insert(groups: List<Group>): Completable
 
-    fun get(): Single<List<GroupEntity>>
+    fun get(): Single<List<Group>>
 
-    fun getWithUsers(): Single<List<GroupEntity>>
+    fun get(groupId: Int): Single<Optional<Group>>
 
-    fun insertWithUsers(groupEntity: GroupEntity, userIds: List<Int>): Completable
+    fun deleteNotIn(ids: List<Int>): Completable
 
-    fun insertWithUsers(groupEntitiesWithUserIds: Map<GroupEntity, List<Int>>): Completable
+    fun deleteRelation(id: Int): Completable
 
-    fun get(groupId: Int): Single<Optional<GroupEntity?>>
-
-    companion object {
-        const val QUEUE = "QueueLocalGroupsRepo"
-    }
+    fun observeGroups(): Flowable<List<Group>>
 
 }

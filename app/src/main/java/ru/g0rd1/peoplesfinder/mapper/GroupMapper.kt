@@ -1,0 +1,64 @@
+package ru.g0rd1.peoplesfinder.mapper
+
+import ru.g0rd1.peoplesfinder.apiservice.model.ApiGroup
+import ru.g0rd1.peoplesfinder.db.entity.GroupDataEntity
+import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
+import ru.g0rd1.peoplesfinder.model.Group
+import javax.inject.Inject
+
+class GroupMapper @Inject constructor() {
+
+    fun transformToEntityAndGroupDataEntity(group: Group): Pair<GroupEntity, GroupDataEntity> {
+        return Pair(
+            GroupEntity(
+                id = group.id,
+                name = group.name,
+                deactivated = group.deactivated,
+                photo = group.photo,
+                type = group.type,
+                membersCount = group.membersCount,
+            ),
+            GroupDataEntity(
+                groupId = group.id,
+                loadedMembersCount = group.loadedMembersCount,
+                allMembersLoadedDate = group.allMembersLoadedDate,
+                sequentialNumber = group.sequentialNumber,
+                hasAccessToMembers = group.hasAccessToMembers
+            )
+        )
+    }
+
+    fun transform(groupEntity: GroupEntity, groupDataEntity: GroupDataEntity): Group {
+        return Group(
+            id = groupEntity.id,
+            name = groupEntity.name,
+            deactivated = groupEntity.deactivated,
+            photo = groupEntity.photo,
+            type = groupEntity.type,
+            membersCount = groupEntity.membersCount,
+            loadedMembersCount = groupDataEntity.loadedMembersCount,
+            allMembersLoadedDate = groupDataEntity.allMembersLoadedDate,
+            sequentialNumber = groupDataEntity.sequentialNumber,
+            hasAccessToMembers = groupDataEntity.hasAccessToMembers
+        )
+    }
+
+    fun transform(
+        apiGroup: ApiGroup,
+        sequentialNumber: Int
+    ): Group {
+        return Group(
+            id = apiGroup.id,
+            name = apiGroup.name,
+            deactivated = apiGroup.deactivated,
+            photo = apiGroup.photo,
+            type = apiGroup.type,
+            membersCount = apiGroup.membersCount,
+            loadedMembersCount = 0,
+            allMembersLoadedDate = null,
+            sequentialNumber = sequentialNumber,
+            hasAccessToMembers = true
+        )
+    }
+
+}

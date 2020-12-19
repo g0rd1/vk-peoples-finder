@@ -1,18 +1,36 @@
 package ru.g0rd1.peoplesfinder.db.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import ru.g0rd1.peoplesfinder.db.converter.DateConverter
+import java.util.*
 
-@Entity(tableName = "group_data")
+
+@Entity(
+    tableName = "group_data",
+    foreignKeys = [
+        ForeignKey(
+            onDelete = ForeignKey.CASCADE,
+            entity = GroupEntity::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("groupId")
+        )
+    ]
+)
+@TypeConverters(DateConverter::class)
 data class GroupDataEntity(
 
     @PrimaryKey
-    val groupId: Long,
+    val groupId: Int,
 
-    @ColumnInfo(name = "use_in_search")
-    val useInSearch: Boolean,
+    @ColumnInfo(name = "loaded_members_count")
+    val loadedMembersCount: Int,
 
-    @ColumnInfo(name = "members_loaded")
-    val membersLoaded: Boolean
+    @ColumnInfo(name = "all_members_loaded_date")
+    val allMembersLoadedDate: Date?,
+
+    @ColumnInfo(name = "sequential_number")
+    val sequentialNumber: Int,
+
+    @ColumnInfo(name = "has_access_to_members")
+    val hasAccessToMembers: Boolean
 )

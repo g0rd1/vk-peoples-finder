@@ -10,6 +10,9 @@ import ru.g0rd1.peoplesfinder.repo.group.GroupTestUtil.getTestGroupEntity
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.UserTestUtil.getTestUserEntity
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.PriorityBlockingQueue
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -46,7 +49,7 @@ class LocalUserRepoAndLocalGroupRepoTest : InjectableTest() {
         localUsersRepo.insertWithGroups(user1, user1GroupIds).blockingAwait()
         localUsersRepo.insertWithGroups(user2, user2GroupIds).blockingAwait()
         localUsersRepo.insertWithGroups(user3, user3GroupIds).blockingAwait()
-        localGroupsRepo.insert(listOf(group1, group2, group3)).blockingAwait()
+        localGroupsRepo.insertOrUpdate(listOf(group1, group2, group3)).blockingAwait()
         val groups = localGroupsRepo.getWithUsers().blockingGet()
         val actualInsertedGroup1Users =
             groups.first { it.id == group1.id }.users!!.sortedBy { it.id }
@@ -108,7 +111,7 @@ class LocalUserRepoAndLocalGroupRepoTest : InjectableTest() {
         localGroupsRepo.insertWithUsers(group1, group1UserIds).blockingAwait()
         localGroupsRepo.insertWithUsers(group2, group2UserIds).blockingAwait()
         localGroupsRepo.insertWithUsers(group3, group3UserIds).blockingAwait()
-        localUsersRepo.insert(listOf(user1, user2, user3)).blockingAwait()
+        localUsersRepo.insertOrUpdate(listOf(user1, user2, user3)).blockingAwait()
         val users = localUsersRepo.getWithGroups().blockingGet()
         val actualInsertedUser1Groups =
             users.first { it.id == user1.id }.groups!!.sortedBy { it.id }
@@ -154,6 +157,67 @@ class LocalUserRepoAndLocalGroupRepoTest : InjectableTest() {
             expectedGroup3UsersAfterDelete,
             actualGroup3UsersAfterDelete.toTypedArray()
         )
+    }
+
+    @Test
+    fun justtest() {
+        val queue: BlockingQueue<Int> = PriorityBlockingQueue(3)
+
+        // val queue: BlockingQueue<Int> = ArrayBlockingQueue(3)
+
+        queue.offer(1)
+        println("1 offer")
+        println(queue)
+
+        queue.offer(2)
+        println("2 offer")
+        println(queue)
+
+        queue.offer(3)
+        println("3 offer")
+        println(queue)
+
+        Thread {
+            println("In thread")
+            queue.put(10)
+            println("4 offer")
+            println(queue)
+
+            queue.put(9)
+            println("5 offer")
+            println(queue)
+
+            queue.put(8)
+            println("6 offer")
+            println(queue)
+
+        }.start()
+
+        Thread.sleep(TimeUnit.SECONDS.toMillis(5))
+
+        println(queue.take())
+        println("1 remove")
+        println(queue)
+
+        println(queue.take())
+        println("2 remove")
+        println(queue)
+
+        println(queue.take())
+        println("3 remove")
+        println(queue)
+
+        println(queue.take())
+        println("4 remove")
+        println(queue)
+
+        println(queue.take())
+        println("5 remove")
+        println(queue)
+
+        println(queue.take())
+        println("6 remove")
+        println(queue)
     }
 
     override fun inject(testAppComponent: TestAppComponent) {

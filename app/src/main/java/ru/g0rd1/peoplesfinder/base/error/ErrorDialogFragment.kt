@@ -9,12 +9,12 @@ import android.view.ViewGroup
 import android.view.Window
 import dagger.android.support.DaggerDialogFragment
 import ru.g0rd1.peoplesfinder.R
-import ru.g0rd1.peoplesfinder.databinding.ErrorBinding
+import ru.g0rd1.peoplesfinder.databinding.FragmentErrorBinding
 import javax.inject.Inject
 
 class ErrorDialogFragment : DaggerDialogFragment(), Error.View {
 
-    private var binding: ErrorBinding? = null
+    private var binding: FragmentErrorBinding? = null
 
     private var retry: (() -> Unit)? = null
 
@@ -25,11 +25,16 @@ class ErrorDialogFragment : DaggerDialogFragment(), Error.View {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         setStyle(STYLE_NO_FRAME, R.style.AppTheme)
         dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)
-        binding = ErrorBinding.inflate(inflater, container, false)
+        binding = FragmentErrorBinding.inflate(inflater, container, false)
         return binding!!.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding?.message?.text = arguments?.getString(MESSAGE)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -67,11 +72,20 @@ class ErrorDialogFragment : DaggerDialogFragment(), Error.View {
         binding?.retryButton?.visibility = View.INVISIBLE
     }
 
-    override fun setMessage(message: String) {
-        binding?.message?.text = message
-    }
-
     override fun setRetry(retry: () -> Unit) {
         this.retry = retry
+    }
+
+    companion object {
+
+        private const val MESSAGE = "message"
+
+        fun create(message: String): ErrorDialogFragment {
+            return ErrorDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putString(MESSAGE, message)
+                }
+            }
+        }
     }
 }

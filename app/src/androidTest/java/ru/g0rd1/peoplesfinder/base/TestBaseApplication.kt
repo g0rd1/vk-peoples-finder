@@ -27,7 +27,7 @@ open class TestBaseApplication : Application(), HasAndroidInjector {
 
     private val tokenTracker = object : VKTokenExpiredHandler {
         override fun onTokenExpired() {
-            navigator.authorize()
+            navigator.authorization()
         }
     }
 

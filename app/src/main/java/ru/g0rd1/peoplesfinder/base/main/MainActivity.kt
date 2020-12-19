@@ -2,6 +2,7 @@ package ru.g0rd1.peoplesfinder.base.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,12 +21,9 @@ import ru.g0rd1.peoplesfinder.base.navigator.Navigator
 import ru.g0rd1.peoplesfinder.databinding.ActivityMainBinding
 import javax.inject.Inject
 
-class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector, MainContract.View {
+class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector {
 
     private lateinit var binding: ActivityMainBinding
-
-    @Inject
-    lateinit var presenter: MainContract.Presenter
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
@@ -54,26 +52,29 @@ class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector, MainContract
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        vkAuthorizationManager.initiateHelper(this)
+
         binding = DataBindingUtil.setContentView(
             this,
             R.layout.activity_main
         )
 
         val navController = findNavController(R.id.nav_host_fragment)
-        navigator.setNavigator(navController)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        navigator.setNavigator(navController) {
+            binding.navView.visibility = if (it) View.VISIBLE else View.GONE
+        }
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home,
-                R.id.navigation_dashboard,
-                R.id.navigation_notifications
+                R.id.groups_fragment,
+                R.id.settings_fragment,
+                R.id.results_fragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
-        vkAuthorizationManager.initiateHelper(this)
-        presenter.setView(this)
+        if (savedInstanceState == null) {
+            navController.setGraph(R.navigation.mobile_navigation, intent.extras)
+        }
     }
 
     override fun androidInjector(): AndroidInjector<Any> {

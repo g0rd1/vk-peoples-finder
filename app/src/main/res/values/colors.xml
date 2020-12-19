@@ -7,4 +7,6 @@
     <color name="progress_bar_load">#2196F3</color>
     <color name="progress_bar_loaded">#009688</color>
     <color name="progress_bar_error">#E91E63</color>
+
+    <color name="red">#D50000</color>
 </resources>

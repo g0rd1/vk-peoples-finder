@@ -48,7 +48,12 @@ class GroupMembersLoaderTest : InjectableTest() {
         Timber.d("testRapidlyStartStopPauseClear() starts")
         val id = 1
         val groupMembersCount = 25000
-        localGroupsRepo.insert(getTestGroupEntity(id = id, membersCount = groupMembersCount))
+        localGroupsRepo.insertOrUpdate(
+            getTestGroupEntity(
+                id = id,
+                membersCount = groupMembersCount
+            )
+        )
             .blockingAwait()
         val groupsLoader = groupMembersLoaderManager.getLoader(id).blockingGet()
         Timber.d("groupsLoader: $groupsLoader")
@@ -66,7 +71,12 @@ class GroupMembersLoaderTest : InjectableTest() {
         Timber.d("testRapidlyStartStopPauseClear() starts")
         val id = 1
         val groupMembersCount = 25000
-        localGroupsRepo.insert(getTestGroupEntity(id = id, membersCount = groupMembersCount))
+        localGroupsRepo.insertOrUpdate(
+            getTestGroupEntity(
+                id = id,
+                membersCount = groupMembersCount
+            )
+        )
             .blockingAwait()
         val groupsLoader = groupMembersLoaderManager.getLoader(id).blockingGet()
         Timber.d("groupsLoader: $groupsLoader")
@@ -85,7 +95,7 @@ class GroupMembersLoaderTest : InjectableTest() {
         val lock = Object()
         var status = GroupMembersLoader.Status.STOPPED
         val actualCount = 50000
-        localGroupsRepo.insert(getTestGroupEntity(id = 0, membersCount = actualCount))
+        localGroupsRepo.insertOrUpdate(getTestGroupEntity(id = 0, membersCount = actualCount))
             .blockingAwait()
         var expectedCount = 0
         val groupsLoader = groupMembersLoaderManager.getLoader(0).blockingGet()
