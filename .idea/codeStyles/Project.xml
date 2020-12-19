@@ -19,10 +19,8 @@
       </option>
       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
     </JetCodeStyleSettings>
-    <XML>
-      <option name="XML_SPACE_INSIDE_EMPTY_TAG" value="false" />
-    </XML>
     <codeStyleSettings language="XML">
+      <option name="FORCE_REARRANGE_MODE" value="1" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>
@@ -136,8 +134,6 @@
     </codeStyleSettings>
     <codeStyleSettings language="kotlin">
       <option name="CODE_STYLE_DEFAULTS" value="KOTLIN_OFFICIAL" />
-      <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
-      <option name="LINE_COMMENT_ADD_SPACE" value="true" />
     </codeStyleSettings>
   </code_scheme>
 </component>
