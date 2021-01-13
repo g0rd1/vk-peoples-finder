@@ -12,6 +12,7 @@ import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.ui.synchronization.SynchronizationObserver
 import ru.g0rd1.peoplesfinder.util.observeOnUI
 import ru.g0rd1.peoplesfinder.util.parts
+import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -30,6 +31,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     override fun reload() {
+        loadStatusSubject.onNext(Status.CommandProcessing)
         disposables.clear()
         clearLoadData().andThen(load())
             .observeOnUI()
@@ -46,6 +48,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     override fun startOrContinue() {
+        loadStatusSubject.onNext(Status.CommandProcessing)
         disposables.clear()
         load()
             .observeOnUI()
@@ -62,11 +65,13 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     override fun pause() {
+        loadStatusSubject.onNext(Status.CommandProcessing)
         disposables.clear()
         loadStatusSubject.onNext(Status.Pause)
     }
 
     override fun cancel() {
+        loadStatusSubject.onNext(Status.CommandProcessing)
         disposables.clear()
         clearLoadData()
             .observeOnUI()
@@ -81,7 +86,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     override fun observeLoadStatus(): Observable<Status> {
-        return loadStatusSubject
+        return loadStatusSubject.subscribeOnIo()
     }
 
     private fun observeSynchronization() {
@@ -114,7 +119,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     private fun load(): Single<GroupMembersLoader.LoadResult> {
         return localGroupsRepo.get().flatMap { groups ->
             val loadSingles: List<Single<GroupMembersLoader.LoadResult>> =
-                groups.sortedBy { it.membersCount }
+                groups.sortedBy { it.sequentialNumber }
                     .map { groupMembersLoaderFactory.create(it.id) }
                     .map { it.load() }
                     .parts(MAX_GROUPS_LOADED_CONCURRENTLY)
@@ -159,7 +164,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     companion object {
-        const val MAX_GROUPS_LOADED_CONCURRENTLY = 3
+        const val MAX_GROUPS_LOADED_CONCURRENTLY = 5
     }
 
 }

@@ -9,13 +9,12 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.squareup.picasso.Picasso
 import ru.g0rd1.peoplesfinder.base.BindingRecyclerViewAdapter
 
 
 object DataBindingAdapter {
-
-    // TODO Поробовать убрать аннотацию @JvmStatic
 
     @JvmStatic
     @BindingAdapter(value = ["imageUrl", "placeholderImage", "errorImage"], requireAll = false)
@@ -25,35 +24,35 @@ object DataBindingAdapter {
         placeholderImage: Int?,
         errorImage: Int?
     ) {
-            Picasso.get().load(url).apply {
-                placeholderImage?.let { this.placeholder(it) }
-                errorImage?.let { this.error(it) }
-            }
-                .into(imageView)
+        Picasso.get().load(url).apply {
+            placeholderImage?.let { this.placeholder(it) }
+            errorImage?.let { this.error(it) }
+        }
+            .into(imageView)
+    }
+
+    @JvmStatic
+    @BindingAdapter("srcCompat")
+    fun setImageDrawable(view: ImageView, drawable: Drawable) {
+        view.setImageDrawable(drawable)
+    }
+
+    @JvmStatic
+    @BindingAdapter("color")
+    fun setProgressBarColor(
+        progressBar: ProgressBar,
+        colorRes: Int
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            progressBar.progressTintList = ColorStateList.valueOf(colorRes)
+        } else {
+            val progressDrawable = progressBar.progressDrawable.mutate()
+            @Suppress("DEPRECATION")
+            progressDrawable.setColorFilter(colorRes, PorterDuff.Mode.SRC_IN)
+            progressBar.progressDrawable = progressDrawable
         }
 
-        @JvmStatic
-        @BindingAdapter("srcCompat")
-        fun setImageDrawable(view: ImageView, drawable: Drawable) {
-            view.setImageDrawable(drawable)
-        }
-
-        @JvmStatic
-        @BindingAdapter("color")
-        fun setProgressBarColor(
-            progressBar: ProgressBar,
-            colorRes: Int
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                progressBar.progressTintList = ColorStateList.valueOf(colorRes)
-            } else {
-                val progressDrawable = progressBar.progressDrawable.mutate()
-                @Suppress("DEPRECATION")
-                progressDrawable.setColorFilter(colorRes, PorterDuff.Mode.SRC_IN)
-                progressBar.progressDrawable = progressDrawable
-            }
-
-        }
+    }
 
     @JvmStatic
     @BindingAdapter("items")
@@ -69,6 +68,18 @@ object DataBindingAdapter {
     @BindingAdapter("visible")
     fun setVisible(view: View, visible: Boolean) {
         view.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    @JvmStatic
+    @BindingAdapter("onRefreshListener")
+    fun setOnRefreshListener(
+        swipeRefreshLayout: SwipeRefreshLayout,
+        onRefreshListener: (() -> Unit)?
+    ) {
+        swipeRefreshLayout.setOnRefreshListener {
+            onRefreshListener?.invoke()
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
 
 }

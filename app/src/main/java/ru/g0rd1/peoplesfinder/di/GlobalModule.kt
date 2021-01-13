@@ -7,7 +7,7 @@ import ru.g0rd1.peoplesfinder.apiservice.ApiClient
 import ru.g0rd1.peoplesfinder.apiservice.ApiClientFactory
 import ru.g0rd1.peoplesfinder.apiservice.PriorityQueueApiClient
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
-import ru.g0rd1.peoplesfinder.base.navigator.Navigator
+import ru.g0rd1.peoplesfinder.base.navigator.SimpleAppNavigator
 import ru.g0rd1.peoplesfinder.common.AppResourceManager
 import ru.g0rd1.peoplesfinder.common.PriorityQueueManagerFactory
 import ru.g0rd1.peoplesfinder.common.ResourceManager
@@ -18,7 +18,7 @@ abstract class GlobalModule {
 
     @Binds
     @Singleton
-    abstract fun navigator(navigator: AppNavigator): Navigator
+    abstract fun navigator(navigator: SimpleAppNavigator): AppNavigator
 
     @Binds
     @Singleton

@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 class HttpVkGroupsRepo @Inject constructor(
     private val apiClient: ApiClient,
-    private val VKAccessRepo: VKAccessRepo,
+    private val vkAccessRepo: VKAccessRepo,
     private val userMapper: UserMapper,
     private val groupMapper: GroupMapper,
     private val vkErrorMapper: VkErrorMapper
@@ -26,14 +26,14 @@ class HttpVkGroupsRepo @Inject constructor(
     private var groupsCache: MutableMap<String, List<Group>> = mutableMapOf()
 
     override fun getGroups(): Single<List<Group>> {
-        return getGroups(VKAccessRepo.getUserId()).subscribeOnIo()
+        return getGroups(vkAccessRepo.getUserId().toString()).subscribeOnIo()
     }
 
     private fun getGroups(userId: String): Single<List<Group>> {
         if (groupsCache[userId] != null) return Single.just(groupsCache[userId])
         return apiClient.getGroups(
             userId = userId,
-            accessToken = VKAccessRepo.getUserToken(),
+            accessToken = vkAccessRepo.getUserToken(),
             count = DEFAULT_GROUP_COUNT
         ).flatMap {
             when {
@@ -69,7 +69,7 @@ class HttpVkGroupsRepo @Inject constructor(
         )
         return apiClient.getGroupMembers(
             code,
-            accessToken = VKAccessRepo.getUserToken()
+            accessToken = vkAccessRepo.getUserToken()
         )
             .map { response ->
                 when {

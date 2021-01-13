@@ -6,7 +6,7 @@ import com.vk.api.sdk.VKTokenExpiredHandler
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import ru.g0rd1.peoplesfinder.BuildConfig
-import ru.g0rd1.peoplesfinder.base.navigator.Navigator
+import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.base.timber.ReleaseTree
 import ru.g0rd1.peoplesfinder.di.DaggerAppComponent
 import timber.log.Timber
@@ -20,11 +20,11 @@ open class BaseApplication : Application(), HasAndroidInjector {
     open lateinit var androidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
-    open lateinit var navigator: Navigator
+    open lateinit var appNavigator: AppNavigator
 
     private val tokenTracker = object : VKTokenExpiredHandler {
         override fun onTokenExpired() {
-            navigator.authorization()
+            appNavigator.authorization()
         }
     }
 

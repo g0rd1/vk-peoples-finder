@@ -1,8 +1,14 @@
 package ru.g0rd1.peoplesfinder.ui.groups
 
-import androidx.databinding.*
+import androidx.databinding.ObservableArrayList
+import androidx.databinding.ObservableBoolean
+import androidx.databinding.ObservableField
+import androidx.databinding.ObservableInt
+import androidx.databinding.ObservableList
 import androidx.lifecycle.ViewModel
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.error.Error
@@ -21,25 +27,30 @@ class GroupsViewModel @Inject constructor(
     private val resourceManager: ResourceManager
 ) : ViewModel() {
 
-    val buttonsVisible: ObservableBoolean = ObservableBoolean(false)
-    val cancelButtonVisible: ObservableBoolean = ObservableBoolean(false)
-    val startButtonVisible: ObservableBoolean = ObservableBoolean(false)
-    val reloadButtonVisible: ObservableBoolean = ObservableBoolean(false)
-    val continueButtonVisible: ObservableBoolean = ObservableBoolean(false)
-    val pauseButtonVisible: ObservableBoolean = ObservableBoolean(false)
+    val showContent = ObservableBoolean(false)
+    val showLoader = ObservableBoolean(false)
 
-    val errorTextVisible: ObservableBoolean = ObservableBoolean(false)
+    val cancelButtonVisible = ObservableBoolean(false)
+    val startButtonVisible = ObservableBoolean(false)
+    val reloadButtonVisible = ObservableBoolean(false)
+    val continueButtonVisible = ObservableBoolean(false)
+    val pauseButtonVisible = ObservableBoolean(false)
+
+    val commandProcessing = ObservableBoolean(false)
+    val showCommandProcessingLoader = ObservableBoolean(false)
+
+    val errorTextVisible = ObservableBoolean(false)
     val errorText: ObservableField<String> = ObservableField("")
 
-    val membersCount: ObservableInt = ObservableInt(0)
-    val loadedMembersCount: ObservableInt = ObservableInt(0)
+    val membersCount = ObservableInt(0)
+    val loadedMembersCount = ObservableInt(0)
 
     val groupViewModels: ObservableList<GroupViewModel> = ObservableArrayList()
 
     private val disposables = CompositeDisposable()
 
-    init {
-        observer()
+    fun onStart() {
+        observe()
     }
 
     fun startLoad() {
@@ -62,7 +73,7 @@ class GroupsViewModel @Inject constructor(
         groupMembersLoaderManager.pause()
     }
 
-    private fun observer() {
+    private fun observe() {
         observeLoadStatus()
         observeGroups()
     }
@@ -72,25 +83,41 @@ class GroupsViewModel @Inject constructor(
             .observeOnUI()
             .subscribe(
                 {
-                    Timber.d("groupMembersLoader status: $it")
+                    setCommandProcessingLoaderVisibility(it is GroupMembersLoaderManager.Status.CommandProcessing)
                     when (it) {
                         GroupMembersLoaderManager.Status.Initial -> onInitialStatus()
                         GroupMembersLoaderManager.Status.Load -> onLoadStatus()
                         GroupMembersLoaderManager.Status.Pause -> onPauseStatus()
                         GroupMembersLoaderManager.Status.Finish -> onFinishStatus()
-                        GroupMembersLoaderManager.Status.Error.RateLimitReached -> {
-                            errorText.set(resourceManager.getString(R.string.fragment_groups_error_text_no_access_to_group_members))
-                            onErrorStatus()
-                        }
-                        is GroupMembersLoaderManager.Status.Error.Generic -> {
-                            errorText.set(resourceManager.getString(R.string.fragment_groups_error_text_unknown_error))
-                            onErrorStatus()
-                        }
+                        GroupMembersLoaderManager.Status.Error.RateLimitReached -> onRateLimitReachedError()
+                        is GroupMembersLoaderManager.Status.Error.Generic -> onGenericError()
+                        GroupMembersLoaderManager.Status.CommandProcessing -> onCommandProcessing()
                     }
                 },
                 Timber::e
             )
             .addTo(disposables)
+    }
+
+    private var changeProcessingLoaderVisibilityDisposable: Disposable? = null
+
+    private fun setCommandProcessingLoaderVisibility(visible: Boolean) {
+        changeProcessingLoaderVisibilityDisposable?.dispose()
+        if (!visible) {
+            showCommandProcessingLoader.set(false)
+            return
+        }
+        Single.timer(500, TimeUnit.MILLISECONDS)
+            .observeOnUI()
+            .subscribe(
+                { showCommandProcessingLoader.set(true) },
+                Timber::e
+            )
+            .also { changeProcessingLoaderVisibilityDisposable = it }
+    }
+
+    private fun onCommandProcessing() {
+        commandProcessing.set(true)
     }
 
     private fun onPauseStatus() {
@@ -100,6 +127,7 @@ class GroupsViewModel @Inject constructor(
         continueButtonVisible.set(true)
         pauseButtonVisible.set(false)
         errorTextVisible.set(false)
+        commandProcessing.set(false)
     }
 
     private fun onFinishStatus() {
@@ -109,6 +137,7 @@ class GroupsViewModel @Inject constructor(
         continueButtonVisible.set(false)
         pauseButtonVisible.set(false)
         errorTextVisible.set(false)
+        commandProcessing.set(false)
     }
 
     private fun onLoadStatus() {
@@ -118,6 +147,17 @@ class GroupsViewModel @Inject constructor(
         continueButtonVisible.set(false)
         pauseButtonVisible.set(true)
         errorTextVisible.set(false)
+        commandProcessing.set(false)
+    }
+
+    private fun onRateLimitReachedError() {
+        errorText.set(resourceManager.getString(R.string.fragment_groups_error_text_no_access_to_group_members))
+        onErrorStatus()
+    }
+
+    private fun onGenericError() {
+        errorText.set(resourceManager.getString(R.string.fragment_groups_error_text_unknown_error))
+        onErrorStatus()
     }
 
     private fun onErrorStatus() {
@@ -127,6 +167,7 @@ class GroupsViewModel @Inject constructor(
         continueButtonVisible.set(true)
         pauseButtonVisible.set(false)
         errorTextVisible.set(true)
+        commandProcessing.set(false)
     }
 
     private fun onInitialStatus() {
@@ -136,21 +177,24 @@ class GroupsViewModel @Inject constructor(
         continueButtonVisible.set(false)
         pauseButtonVisible.set(false)
         errorTextVisible.set(false)
+        commandProcessing.set(false)
     }
 
     private fun observeGroups() {
+        showLoader.set(true)
+        showContent.set(false)
         localGroupsRepo.observeGroups()
-            .throttleLast(GROUPS_UPDATE_INTERVAL_SECONDS, TimeUnit.SECONDS)
             .observeOnUI()
             .subscribe(
                 { groups ->
                     membersCount.set(groups.sumBy { it.membersCount })
                     loadedMembersCount.set(groups.sumBy { it.loadedMembersCount })
-                    buttonsVisible.set(true)
+                    showContent.set(true)
                     groupViewModels.clear()
                     groupViewModels.addAll(
-                        groups.sortedBy { it.membersCount }.map { group ->
+                        groups.sortedBy { it.sequentialNumber }.map { group ->
                             GroupViewModel(
+                                id = group.id,
                                 name = group.name,
                                 photo = group.photo,
                                 membersCount = group.membersCount,
@@ -159,8 +203,12 @@ class GroupsViewModel @Inject constructor(
                             )
                         }
                     )
+                    showLoader.set(false)
+                    showContent.set(true)
                 },
                 {
+                    showLoader.set(false)
+                    showContent.set(false)
                     errorHandler.handle(it, ::observeGroups)
                 }
             )
@@ -171,7 +219,4 @@ class GroupsViewModel @Inject constructor(
         disposables.clear()
     }
 
-    companion object {
-        private const val GROUPS_UPDATE_INTERVAL_SECONDS = 1L
-    }
 }

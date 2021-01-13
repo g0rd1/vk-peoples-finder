@@ -1,15 +1,11 @@
 <resources>
     <string name="app_name">PeoplesFinder</string>
 
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-
     <string name="authorization_label">AuthorizationFragment</string>
     <string name="synchronize_label">SynchronizationFragment</string>
     <string name="groups_label">Группы</string>
     <string name="settings_label">Настройки</string>
-    <string name="results_label">Результаты</string>
+    <string name="results_label">Люди</string>
 
     <string name="groups_menu_search_title">Поиск</string>
 
@@ -26,5 +22,8 @@
 
     <string name="item_group_no_access_to_group_members">Нет доступа к информации</string>
 
+    <string name="fragment_results_no_results_load_not_started">Здесь будут отображаться пользователи с группами как у вас</string>
+    <string name="fragment_results_no_results_load_started">Пользователи с группами как у вас пока не найдены</string>
+    <string name="fragment_results_no_results_load_finished">К сожалению результаты отсутствуют</string>
 
 </resources>

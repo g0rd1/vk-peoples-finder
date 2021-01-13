@@ -7,20 +7,11 @@ import javax.inject.Inject
 
 class GroupsAdapter @Inject constructor() :
     BindingRecyclerViewAdapter<ItemGroupBinding, GroupViewModel>(
-        R.layout.item_group
+        R.layout.item_group,
+        GroupsDiffCallbackFactory()
     ) {
 
     override fun getSetViewModelToBindingFunction(holderBinding: ItemGroupBinding): (GroupViewModel) -> Unit =
         holderBinding::setVm
 
-    override fun setItems(items: List<GroupViewModel>) {
-        val oldItems = this.items.toList()
-        this.items.clear()
-        this.items.addAll(items)
-        oldItems.forEachIndexed { index, groupViewModel ->
-            if (groupViewModel != this.items[index]) {
-                notifyItemChanged(index)
-            }
-        }
-    }
 }

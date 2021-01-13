@@ -26,4 +26,13 @@ class GroupsFragment : DaggerFragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+    }
+
+    companion object {
+        fun create() = GroupsFragment()
+    }
+
 }

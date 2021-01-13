@@ -23,6 +23,8 @@ class DBLocalGroupsRepo @Inject constructor(
     private val groupMapper: GroupMapper
 ) : LocalGroupsRepo {
 
+    private var groupCache: List<Group>? = null
+
     override fun updateLoadedMembersCount(id: Int, loadedMembersCount: Int): Completable =
         groupDataDao.updateLoadedMembersCount(id, loadedMembersCount).subscribeOnIo()
 
@@ -61,13 +63,19 @@ class DBLocalGroupsRepo @Inject constructor(
         userGroupDao.delete(id).subscribeOnIo()
 
     override fun observeGroups(): Flowable<List<Group>> {
-        return groupDao.getGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
-            GroupEntitiesAndGroupDataEntities.map {
-                groupMapper.transform(
-                    it.groupEntity,
-                    it.groupDataEntity
-                )
+        val groupsFlowable =
+            groupDao.getGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+                GroupEntitiesAndGroupDataEntities.map {
+                    groupMapper.transform(
+                        it.groupEntity,
+                        it.groupDataEntity
+                    )
+                }.also { groupCache = it }
             }
+        return if (groupCache != null) {
+            Flowable.concat(Flowable.just(groupCache), groupsFlowable)
+        } else {
+            groupsFlowable
         }
     }
 

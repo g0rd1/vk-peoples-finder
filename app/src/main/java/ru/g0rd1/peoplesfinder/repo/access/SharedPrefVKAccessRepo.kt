@@ -20,13 +20,12 @@ class SharedPrefVKAccessRepo @Inject constructor(
             ?: throw IllegalStateException("No token in shared preferences")
     }
 
-    override fun setUserId(id: String) {
-        sharedPreferences.edit().putString(USER_ID_KEY, id).apply()
+    override fun setUserId(id: Int) {
+        sharedPreferences.edit().putInt(USER_ID_KEY, id).apply()
     }
 
-    override fun getUserId(): String {
-        return sharedPreferences.getString(USER_ID_KEY, null)
-            ?: throw IllegalStateException("No id in shared preferences")
+    override fun getUserId(): Int {
+        return sharedPreferences.getInt(USER_ID_KEY, -1)
     }
 
     companion object {

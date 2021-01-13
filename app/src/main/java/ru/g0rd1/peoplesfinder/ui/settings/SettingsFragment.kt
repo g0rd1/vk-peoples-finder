@@ -25,4 +25,13 @@ class SettingsFragment : DaggerFragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+    }
+
+    companion object {
+        fun create() = SettingsFragment()
+    }
+
 }

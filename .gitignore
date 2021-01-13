@@ -19,3 +19,4 @@
 /keystore.properties
 /app/keystore.jks
 .idea
+/app/release/

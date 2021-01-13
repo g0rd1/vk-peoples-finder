@@ -1,7 +1,7 @@
 package ru.g0rd1.peoplesfinder.repo.user.local
 
 import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.common.PriorityQueueManagerFactory
 import ru.g0rd1.peoplesfinder.db.dao.UserDao
 import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
@@ -16,15 +16,18 @@ class DBLocalUsersRepo @Inject constructor(
     private val userDao: UserDao,
     private val userGroupDao: UserGroupDao,
     private val userMapper: UserMapper,
-    private val priorityQueueManagerFactory: PriorityQueueManagerFactory
+    priorityQueueManagerFactory: PriorityQueueManagerFactory
 ) : LocalUsersRepo {
 
     private val insertWithGroupsQueueManager = priorityQueueManagerFactory.create(1)
 
-    override fun getWithSameGroupsCount(): Flowable<Map<User, Int>> =
-        userDao.getWithSameGroupsCount(0, 50).map { userEntitiesWithSameGroupsCounts ->
-            userEntitiesWithSameGroupsCounts.associate { it.userEntity.toUser() to it.sameGroupsCount }
-        }
+    override fun getWithSameGroupsCount(): Single<Map<User, Int>> {
+        return userDao.getWithSameGroupsCount(0, 50)
+            .map { userEntitiesWithSameGroupsCounts ->
+                userEntitiesWithSameGroupsCounts
+                    .associate { it.userEntity.toUser() to it.sameGroupsCount }
+            }.subscribeOnIo()
+    }
 
     override fun insertWithGroups(usersWithGroupIds: Map<User, List<Int>>): Completable =
         insertWithGroupsQueueManager.getQueuedCompletable(

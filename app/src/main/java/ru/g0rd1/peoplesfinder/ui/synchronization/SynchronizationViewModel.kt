@@ -5,21 +5,25 @@ import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import ru.g0rd1.peoplesfinder.base.error.ErrorHandler
+import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
 import ru.g0rd1.peoplesfinder.util.observeOnUI
+import timber.log.Timber
 import javax.inject.Inject
 
 class SynchronizationViewModel @Inject constructor(
     private val localGroupsRepo: LocalGroupsRepo,
     private val vkGroupsRepo: VkGroupsRepo,
+    private val errorHandler: ErrorHandler,
     private val synchronizationObserver: SynchronizationObserver,
-    private val errorHandler: ErrorHandler
+    private val appNavigator: AppNavigator
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
 
-    init {
+    fun onStart() {
+        Timber.d("TEST SynchronizationViewModel init")
         synchronize()
     }
 
@@ -41,6 +45,7 @@ class SynchronizationViewModel @Inject constructor(
             .subscribe(
                 {
                     synchronizationObserver.synchronized()
+                    appNavigator.groups()
                 },
                 {
                     errorHandler.handle(it, ::synchronize)

@@ -21,9 +21,18 @@ class ResultsFragment : DaggerFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentResultsBinding.inflate(inflater, container, false)
-        binding.users.adapter = UsersAdapter()
+        binding.users.adapter = ResultsAdapter()
         binding.vm = viewModel
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.onStart()
+    }
+
+    companion object {
+        fun create() = ResultsFragment()
     }
 
 }

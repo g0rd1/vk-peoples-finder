@@ -5,7 +5,7 @@ interface VKAccessRepo {
     fun setUserToken(token: String)
     fun getUserToken(): String
 
-    fun setUserId(id: String)
-    fun getUserId(): String
+    fun setUserId(id: Int)
+    fun getUserId(): Int
 
 }

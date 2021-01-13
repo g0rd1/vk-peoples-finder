@@ -2,7 +2,6 @@ package ru.g0rd1.peoplesfinder.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import io.reactivex.Flowable
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.query.UserEntityWithSameGroupsCountQuery
@@ -14,7 +13,7 @@ abstract class UserDao : BaseDao<UserEntity>() {
     abstract fun getWithSameGroupsCount(
         offset: Int,
         count: Int
-    ): Flowable<List<UserEntityWithSameGroupsCountQuery>>
+    ): Single<List<UserEntityWithSameGroupsCountQuery>>
 
     @Query("SELECT * FROM user")
     abstract fun get(): Single<List<UserEntity>>

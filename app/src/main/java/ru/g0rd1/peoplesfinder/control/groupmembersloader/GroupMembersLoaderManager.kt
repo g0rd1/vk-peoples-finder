@@ -15,6 +15,7 @@ interface GroupMembersLoaderManager {
         object Load : Status()
         object Pause : Status()
         object Finish : Status()
+        object CommandProcessing : Status()
         sealed class Error : Status() {
             object RateLimitReached : Error()
             data class Generic(val throwable: Throwable) : Error()

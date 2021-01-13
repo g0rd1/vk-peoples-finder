@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/groups_fragment"
-        android:icon="@drawable/ic_home_black"
+        android:icon="@drawable/ic_supervised_user_circle"
         android:title="@string/groups_label" />
 
     <item
         android:id="@+id/settings_fragment"
-        android:icon="@drawable/ic_dashboard_black"
+        android:icon="@drawable/ic_rule"
         android:title="@string/settings_label" />
 
     <item
         android:id="@+id/results_fragment"
-        android:icon="@drawable/ic_notifications"
+        android:icon="@drawable/ic_person"
         android:title="@string/results_label" />
 
 </menu>

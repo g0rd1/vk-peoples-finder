@@ -6,6 +6,7 @@ import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
 import ru.g0rd1.peoplesfinder.base.auhorization.VkAuthorizationContract
 import ru.g0rd1.peoplesfinder.base.error.Error
+import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import javax.inject.Inject
 
@@ -13,14 +14,14 @@ class AuthorizationViewModel @Inject constructor(
     private val vkAccessRepo: VKAccessRepo,
     private val vkAuthorizationHelper: VkAuthorizationContract.Helper,
     private val errorHandler: Error.Handler,
-    private val authorizationObserver: AuthorizationObserver
+    private val appNavigator: AppNavigator
 ) : ViewModel() {
 
-    init {
-        if (!VK.isLoggedIn()) {
-            authorize()
+    fun onStart() {
+        if (VK.isLoggedIn()) {
+            appNavigator.synchronization()
         } else {
-            authorizationObserver.authorized()
+            authorize()
         }
     }
 
@@ -28,9 +29,9 @@ class AuthorizationViewModel @Inject constructor(
         vkAuthorizationHelper.authorize(object : VKAuthCallback {
 
             override fun onLogin(token: VKAccessToken) {
-                vkAccessRepo.setUserId(token.userId.toString())
+                vkAccessRepo.setUserId(token.userId)
                 vkAccessRepo.setUserToken(token.accessToken)
-                authorizationObserver.authorized()
+                appNavigator.synchronization()
             }
 
             override fun onLoginFailed(errorCode: Int) {

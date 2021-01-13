@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="ru.g0rd1.peoplesfinder.ui.results.UserViewModel" />
+            type="ru.g0rd1.peoplesfinder.ui.results.ResultViewModel" />
 
     </data>
 
@@ -17,7 +17,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/avatar"
-            imageUrl="@{viewModel.user.photo}"
+            app:imageUrl="@{viewModel.user.photo}"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_marginStart="8dp"

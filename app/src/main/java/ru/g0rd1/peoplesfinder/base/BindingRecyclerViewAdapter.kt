@@ -6,12 +6,16 @@ import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import ru.g0rd1.peoplesfinder.common.AppDiffCallbackFactory
 
-abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(@LayoutRes val layoutRes: Int) :
-    RecyclerView.Adapter<BindingRecyclerViewAdapter<VBD, V>.BindingViewHolder>() {
+abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
+    @LayoutRes private val layoutRes: Int,
+    private val diffCallbackFactory: AppDiffCallbackFactory<V>
+) : RecyclerView.Adapter<BindingRecyclerViewAdapter<VBD, V>.BindingViewHolder>() {
 
-    protected val items: MutableList<V> = mutableListOf()
+    private val items: MutableList<V> = mutableListOf()
 
     private var onItemClickListener: ((item: V) -> Unit)? = null
 
@@ -41,18 +45,13 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(@LayoutRes v
         this.onItemClickListener = onItemClickListener
     }
 
-    open fun setItems(items: List<V>) {
-        val oldItemCount = itemCount
+    fun setItems(items: List<V>) {
+        val oldItems = this.items.toList()
         this.items.clear()
         this.items.addAll(items)
-
-        notifyItemRangeRemoved(0, oldItemCount)
-        notifyItemRangeInserted(0, itemCount)
+        val diffResult = DiffUtil.calculateDiff(diffCallbackFactory.create(oldItems, items))
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    fun addItems(items: List<V>) {
-        val oldCount = itemCount
-        this.items.addAll(items)
-        notifyItemRangeInserted(oldCount, items.size)
-    }
+
 }
