@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.userDetail.UserDetailViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/arrowLeft"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_arrow_left"
+            android:visibility="@{vm.arrowVisible ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toTopOf="@id/groupIconContainer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:id="@+id/arrowRight"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_arrow_right"
+            android:visibility="@{vm.arrowVisible ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintBottom_toTopOf="@id/groupIconContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/groupIconContainer"
+            app:layout_constraintEnd_toStartOf="@id/arrowRight"
+            app:layout_constraintStart_toEndOf="@id/arrowLeft"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:scaleType="centerInside"
+                    app:layout_constraintDimensionRatio="1:1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars[0]" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/infoContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/avatar">
+
+                    <TextView
+                        android:id="@+id/nameTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_name_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:visible="@{vm.userName != null}"
+                        tools:text="@string/user_name_title" />
+
+                    <TextView
+                        android:id="@+id/nameValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userName}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/nameTitle"
+                        app:layout_constraintTop_toTopOf="@id/nameTitle"
+                        app:visible="@{vm.userName != null}"
+                        tools:text="Иванов Иван" />
+
+                    <TextView
+                        android:id="@+id/ageTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_age_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/nameValue"
+                        app:visible="@{vm.userAge != null}"
+                        tools:text="@string/user_age_title" />
+
+                    <TextView
+                        android:id="@+id/ageValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userAge}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/ageTitle"
+                        app:layout_constraintTop_toTopOf="@id/ageTitle"
+                        app:visible="@{vm.userAge != null}"
+                        tools:text="25" />
+
+                    <TextView
+                        android:id="@+id/sexTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_sex_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/ageValue"
+                        app:visible="@{vm.userSex != null}"
+                        tools:text="@string/user_sex_title" />
+
+                    <TextView
+                        android:id="@+id/sexValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userSex}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/sexTitle"
+                        app:layout_constraintTop_toTopOf="@id/sexTitle"
+                        app:visible="@{vm.userSex != null}"
+                        tools:text="Мужской" />
+
+                    <TextView
+                        android:id="@+id/relationTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_relation_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/sexValue"
+                        app:visible="@{vm.userRelation != null}"
+                        tools:text="@string/user_relation_title" />
+
+                    <TextView
+                        android:id="@+id/relationValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userRelation}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/relationTitle"
+                        app:layout_constraintTop_toTopOf="@id/relationTitle"
+                        app:visible="@{vm.userRelation != null}"
+                        tools:text="В активном поиске" />
+
+                    <TextView
+                        android:id="@+id/countryTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_country_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/relationValue"
+                        app:visible="@{vm.userCountry != null}"
+                        tools:text="@string/user_country_title" />
+
+                    <TextView
+                        android:id="@+id/countryValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userCountry}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/countryTitle"
+                        app:layout_constraintTop_toTopOf="@id/countryTitle"
+                        app:visible="@{vm.userCountry != null}"
+                        tools:text="Россия" />
+
+                    <TextView
+                        android:id="@+id/cityTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text='@{@string/user_city_title + ":"}'
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/countryValue"
+                        app:visible="@{vm.userCity != null}"
+                        tools:text="@string/user_city_title" />
+
+                    <TextView
+                        android:id="@+id/cityValue"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@{vm.userCity}"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cityTitle"
+                        app:layout_constraintTop_toTopOf="@id/cityTitle"
+                        app:visible="@{vm.userCity != null}"
+                        tools:text="Москва" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/toUserPageButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/dialog_user_detail_to_user_page_button_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/infoContainer" />
+
+                <TextView
+                    android:id="@+id/sameGroupsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="32dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/toUserPageButton"
+                    app:visible="@{!vm.sameGroups.empty}"
+                    tools:text="10 групп совпадающих с пользователем:" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/sameGroups"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:items="@{vm.sameGroups}"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/sameGroupsTitle"
+                    app:visible="@{!vm.sameGroups.empty}"
+                    tools:listitem="@layout/item_user_detail_same_group" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </ScrollView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/groupIconContainer"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/viewed"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="@{vm.isViewed ? 1.0F : 0.2F}"
+                    android:src="@drawable/ic_visibility"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/blocked"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.2" />
+
+                <ImageView
+                    android:id="@+id/blocked"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="@{vm.isBlocked ? 1.0F : 0.2F}"
+                    android:src="@drawable/ic_block"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/favorite"
+                    app:layout_constraintStart_toEndOf="@id/viewed"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.2" />
+
+                <ImageView
+                    android:id="@+id/favorite"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="@{vm.isFavorite ? 1.0F : 0.2F}"
+                    android:src="@drawable/ic_star"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/blocked"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_percent="0.2" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

@@ -17,32 +17,50 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/avatar"
-            app:imageUrl="@{viewModel.user.photo}"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:scaleType="fitCenter"
+            app:imageUrl="@{viewModel.user.photo100}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars[0]"/>
+            tools:srcCompat="@tools:sample/avatars[0]" />
 
-        <TextView
-            android:id="@+id/groupName"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:text='@{viewModel.user.firstName + " " + viewModel.user.lastName}'
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="@id/avatar"
             app:layout_constraintEnd_toStartOf="@+id/number_of_matches"
             app:layout_constraintStart_toEndOf="@+id/avatar"
-            app:layout_constraintTop_toTopOf="@+id/avatar"
-            tools:text="Имя Фамилия"/>
+            app:layout_constraintTop_toTopOf="@+id/avatar">
+
+            <TextView
+                android:id="@+id/userFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:text='@{viewModel.user.firstName}'
+                tools:text="Имя" />
+
+            <TextView
+                android:id="@+id/userLastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:text='@{viewModel.user.lastName}'
+                tools:text="Фамилия" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/number_of_matches"
@@ -53,7 +71,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="14"/>
+            tools:text="14" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

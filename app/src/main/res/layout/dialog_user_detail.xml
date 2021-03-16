@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.userDetail.UserDetailViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/info"
+            layout="@layout/dialog_user_detail_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:visible="@{vm.infoVisible}"
+            app:vm="@{vm}" />
+
+        <include
+            layout="@layout/dialog_user_detail_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:visible="@{vm.loadingVisible}"
+            app:vm="@{vm}" />
+
+        <include
+            layout="@layout/error_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:visible="@{vm.errorVisible}"
+            app:retryFunction="@{vm.retryFunction}"
+            app:errorText="@{vm.errorText}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

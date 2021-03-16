@@ -4,6 +4,13 @@ sealed class Optional<T> {
     class Empty<T> : Optional<T>()
     data class Value<T>(val value: T) : Optional<T>()
 
+    fun getValueOrNull(): T? {
+        return when (this) {
+            is Empty -> null
+            is Value -> this.value
+        }
+    }
+
     companion object {
         fun <T> create(value: T?): Optional<T> {
             value ?: return Empty()
@@ -13,5 +20,6 @@ sealed class Optional<T> {
         fun <T> empty(): Optional<T> {
             return Empty()
         }
+
     }
 }

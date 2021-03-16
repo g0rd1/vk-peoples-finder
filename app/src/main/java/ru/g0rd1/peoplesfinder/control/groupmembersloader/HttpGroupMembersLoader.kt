@@ -3,8 +3,8 @@ package ru.g0rd1.peoplesfinder.control.groupmembersloader
 import io.reactivex.Completable
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoader.LoadResult
-import ru.g0rd1.peoplesfinder.model.GetGroupMembersResult
 import ru.g0rd1.peoplesfinder.model.Optional
+import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.model.error.VkError
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
@@ -18,6 +18,7 @@ class HttpGroupMembersLoader(
     private val localGroupsRepo: LocalGroupsRepo,
 ) : GroupMembersLoader {
 
+    @Volatile
     private var accessDenied = false
 
     override fun load(): Single<LoadResult> {
@@ -61,9 +62,9 @@ class HttpGroupMembersLoader(
         return vkGroupsRepo.getGroupMembers(groupId.toString(), DOWNLOAD_MEMBERS_STEP, offset)
             .flatMap { getMembersResult ->
                 when (getMembersResult) {
-                    is GetGroupMembersResult.Success -> {
+                    is VkResult.Success -> {
                         localUsersRepo.insertWithGroups(
-                            getMembersResult.users.associateWith { listOf(groupId) }
+                            getMembersResult.data.associateWith { listOf(groupId) }
                         ).andThen(
                             localGroupsRepo.updateLoadedMembersCount(
                                 groupId,
@@ -73,14 +74,14 @@ class HttpGroupMembersLoader(
                             Single.just(LoadResult.Success)
                         )
                     }
-                    is GetGroupMembersResult.Error.Vk -> {
+                    is VkResult.Error.ApiVk -> {
                         when (getMembersResult.error) {
                             is VkError.Unknown,
-                            VkError.RateLimitReached -> Single.just(
+                            is VkError.RateLimitReached -> Single.just(
                                 LoadResult.Error.Vk(getMembersResult.error)
                             )
-                            VkError.TooManyRequestsPerSecond -> loadWithOffset(offset)
-                            VkError.AccessDenied -> Completable.fromAction {
+                            is VkError.TooManyRequestsPerSecond -> loadWithOffset(offset)
+                            is VkError.AccessDenied -> Completable.fromAction {
                                 accessDenied = true
                             }
                                 .andThen(
@@ -89,7 +90,7 @@ class HttpGroupMembersLoader(
                                 .andThen(Single.just(LoadResult.Success))
                         }
                     }
-                    is GetGroupMembersResult.Error.Generic -> {
+                    is VkResult.Error.Generic -> {
                         Single.just(LoadResult.Error.Generic(getMembersResult.throwable))
                     }
                 }

@@ -7,8 +7,8 @@ data class ApiVkError(
     val code: Int,
 
     @SerializedName("error_msg")
-    override val message: String
-) : Exception() {
+    val message: String
+) {
 
     object Code {
         const val TOO_MANY_REQUESTS_PER_SECOND = 6

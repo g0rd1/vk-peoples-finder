@@ -5,10 +5,7 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import ru.g0rd1.peoplesfinder.db.Database
-import ru.g0rd1.peoplesfinder.db.dao.GroupDao
-import ru.g0rd1.peoplesfinder.db.dao.GroupDataDao
-import ru.g0rd1.peoplesfinder.db.dao.UserDao
-import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
+import ru.g0rd1.peoplesfinder.db.dao.*
 import javax.inject.Singleton
 
 @Module
@@ -38,6 +35,10 @@ abstract class DatabaseModule {
         @Provides
         @Singleton
         fun groupDataDao(db: Database): GroupDataDao = db.groupDataDao()
+
+        @Provides
+        @Singleton
+        fun userTypeDao(db: Database): UserTypeDao = db.userTypeDao()
 
     }
 

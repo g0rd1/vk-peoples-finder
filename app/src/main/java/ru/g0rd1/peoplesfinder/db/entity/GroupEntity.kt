@@ -3,14 +3,11 @@ package ru.g0rd1.peoplesfinder.db.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import ru.g0rd1.peoplesfinder.common.GroupType
-import ru.g0rd1.peoplesfinder.db.converter.GroupConverter
+import ru.g0rd1.peoplesfinder.common.enums.GroupType
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity.Companion.TABLE_NAME
 
 @Entity(tableName = TABLE_NAME)
-@TypeConverters(GroupConverter::class)
-data class GroupEntity(
+data class GroupEntity constructor(
 
     @PrimaryKey
     @ColumnInfo(name = Column.ID)

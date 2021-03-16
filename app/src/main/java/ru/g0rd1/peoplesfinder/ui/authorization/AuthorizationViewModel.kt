@@ -35,7 +35,7 @@ class AuthorizationViewModel @Inject constructor(
             }
 
             override fun onLoginFailed(errorCode: Int) {
-                errorHandler.handle(Exception("Ошибка авторизации")) { authorize() }
+//                errorHandler.handle(Exception("Ошибка авторизации")) { authorize() }
             }
 
         })

@@ -14,7 +14,8 @@ abstract class ActivitiesModule {
         modules = [
             MainActivityModule::class,
             FragmentsModule::class,
-            ErrorModule::class
+            ErrorModule::class,
+            AssistedInjectionModule::class
         ]
     )
     abstract fun contributesMainActivity(): MainActivity

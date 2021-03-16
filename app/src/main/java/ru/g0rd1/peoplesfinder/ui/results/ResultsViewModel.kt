@@ -57,32 +57,32 @@ class ResultsViewModel @Inject constructor(
     }
 
     private fun observerUpdateResult() {
-        updateResultsSubject
-            .throttleLatest(1000, TimeUnit.MILLISECONDS)
-            .doOnEach {
-                Timber.d("TEST: doOnEach before throttle")
-                if (userViewModels.isEmpty()) {
-                    showLoader.set(true).also { Timber.d("TEST: showLoader true") }
-                }
-            }
-            .flatMapSingle { localUserRepo.getWithSameGroupsCount() }
-            .observeOnUI()
-            .subscribe(
-                { usersToSameGroupCount ->
-                    userViewModels.clear()
-                    userViewModels.addAll(
-                        usersToSameGroupCount.map { (user, sameGroupCount) ->
-                            ResultViewModel(user, sameGroupCount)
-                        }.filterNot { it.user.id == vkAccessRepo.getUserId() }
-                    )
-                    showLoader.set(false).also { Timber.d("TEST: showLoader false") }
-                },
-                {
-                    showLoader.set(false).also { Timber.d("TEST: showLoader false") }
-                    Timber.e(it)
-                }
-            )
-            .addTo(disposables)
+//        updateResultsSubject
+//            .throttleLatest(1000, TimeUnit.MILLISECONDS)
+//            .doOnEach {
+//                Timber.d("TEST: doOnEach before throttle")
+//                if (userViewModels.isEmpty()) {
+//                    showLoader.set(true).also { Timber.d("TEST: showLoader true") }
+//                }
+//            }
+//            .flatMapSingle { localUserRepo.getWithSameGroupsCount() }
+//            .observeOnUI()
+//            .subscribe(
+//                { usersToSameGroupCount ->
+//                    userViewModels.clear()
+//                    userViewModels.addAll(
+//                        usersToSameGroupCount.map { (user, sameGroupCount) ->
+//                            ResultViewModel(user, sameGroupCount)
+//                        }.filterNot { it.user.id == vkAccessRepo.getUserId() }
+//                    )
+//                    showLoader.set(false).also { Timber.d("TEST: showLoader false") }
+//                },
+//                {
+//                    showLoader.set(false).also { Timber.d("TEST: showLoader false") }
+//                    Timber.e(it)
+//                }
+//            )
+//            .addTo(disposables)
     }
 
     private fun observeLoadStatus() {

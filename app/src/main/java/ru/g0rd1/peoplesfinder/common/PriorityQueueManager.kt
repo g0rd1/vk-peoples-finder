@@ -38,7 +38,7 @@ class PriorityQueueManager(capacity: Int) {
             .addTo(disposables)
     }
 
-    fun <T> getQueuedSingle(single: Single<T>, priority: Int = 0): Single<T> {
+    fun <T> getQueuedSingle(single: Single<T>, priority: Int): Single<T> {
         return Single.fromCallable { PriorityId(UUID.randomUUID().toString(), priority) }
             .flatMap { priorityId ->
                 Completable.fromAction {
@@ -59,7 +59,7 @@ class PriorityQueueManager(capacity: Int) {
             }
     }
 
-    fun getQueuedCompletable(completable: Completable, priority: Int = 0): Completable {
+    fun getQueuedCompletable(completable: Completable, priority: Int): Completable {
         return Single.just(PriorityId(UUID.randomUUID().toString(), priority))
             .flatMapCompletable { priorityId ->
                 Completable.fromAction {

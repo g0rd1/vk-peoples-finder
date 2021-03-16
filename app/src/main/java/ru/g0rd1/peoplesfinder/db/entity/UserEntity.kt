@@ -1,50 +1,61 @@
 package ru.g0rd1.peoplesfinder.db.entity
 
-import androidx.room.*
-import ru.g0rd1.peoplesfinder.common.UserCity
-import ru.g0rd1.peoplesfinder.common.UserLastSeen
-import ru.g0rd1.peoplesfinder.common.UserRelation
-import ru.g0rd1.peoplesfinder.common.UserSex
-import ru.g0rd1.peoplesfinder.db.converter.UserConverter
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import ru.g0rd1.peoplesfinder.common.enums.Relation
+import ru.g0rd1.peoplesfinder.common.enums.Sex
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity.Companion.TABLE_NAME
+import ru.g0rd1.peoplesfinder.model.City
+import ru.g0rd1.peoplesfinder.model.Country
 
 @Entity(tableName = TABLE_NAME)
-@TypeConverters(UserConverter::class)
+//@TypeConverters(UserConverter::class)
 data class UserEntity(
 
     @PrimaryKey
     @ColumnInfo(name = Column.ID)
-    val id: Int,
+    var id: Int,
 
     @ColumnInfo(name = "first_name")
-    val firstName: String,
+    var firstName: String,
 
     @ColumnInfo(name = "last_name")
-    val lastName: String,
+    var lastName: String,
 
     @ColumnInfo(name = "deactivated")
-    val deactivated: String?,
+    var deactivated: String?,
 
     @ColumnInfo(name = "is_closed")
-    val isClosed: Boolean,
+    var isClosed: Boolean,
 
     @ColumnInfo(name = "bdate")
-    val birthDate: String?,
+    var birthday: String?,
+
+    @ColumnInfo(name = "age")
+    var age: Int?,
+
+    @Embedded(prefix = "country_")
+    var country: Country?,
 
     @Embedded(prefix = "city_")
-    val city: UserCity?,
+    var city: City?,
 
     @ColumnInfo(name = "sex")
-    val sex: UserSex?,
-
-    @ColumnInfo(name = "photo_200")
-    val photo: String?,
-
-    @Embedded(prefix = "last_seen_")
-    val lastSeen: UserLastSeen?,
+    var sex: Sex?,
 
     @ColumnInfo(name = "relation")
-    val relation: UserRelation?
+    var relation: Relation?,
+
+    @ColumnInfo(name = "has_photo")
+    var hasPhoto: Boolean?,
+
+    @ColumnInfo(name = "photo_100")
+    var photo100: String?,
+
+    @ColumnInfo(name = "photo_max")
+    var photoMax: String?
 ) {
 
     object Column {

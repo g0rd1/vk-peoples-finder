@@ -29,4 +29,6 @@ interface LocalGroupsRepo {
 
     fun observeGroups(): Flowable<List<Group>>
 
+    fun getSameGroupsWithUser(userId: Int): Single<List<Group>>
+
 }

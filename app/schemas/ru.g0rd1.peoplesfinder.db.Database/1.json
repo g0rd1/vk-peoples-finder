@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ceb35ca2fc05e8841f0971037a9815b4",
+    "identityHash": "be6242c520caef4a2e47293e7094d14f",
     "entities": [
       {
         "tableName": "group",
@@ -112,7 +112,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate` TEXT, `sex` TEXT, `photo_200` TEXT, `relation` TEXT, `city_id` INTEGER, `city_title` TEXT, `last_seen_time` INTEGER, `last_seen_platform` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate` TEXT, `age` INTEGER, `sex` TEXT, `relation` TEXT, `has_photo` INTEGER, `photo_100` TEXT, `photo_max` TEXT, `country_id` INTEGER, `country_title` TEXT, `city_id` INTEGER, `city_title` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -145,9 +145,15 @@
             "notNull": true
           },
           {
-            "fieldPath": "birthDate",
+            "fieldPath": "birthday",
             "columnName": "bdate",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "age",
+            "columnName": "age",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -157,14 +163,38 @@
             "notNull": false
           },
           {
-            "fieldPath": "photo",
-            "columnName": "photo_200",
+            "fieldPath": "relation",
+            "columnName": "relation",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "relation",
-            "columnName": "relation",
+            "fieldPath": "hasPhoto",
+            "columnName": "has_photo",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "photo100",
+            "columnName": "photo_100",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "photoMax",
+            "columnName": "photo_max",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country.id",
+            "columnName": "country_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country.title",
+            "columnName": "country_title",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -177,18 +207,6 @@
           {
             "fieldPath": "city.title",
             "columnName": "city_title",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "lastSeen.time",
-            "columnName": "last_seen_time",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "lastSeen.platform",
-            "columnName": "last_seen_platform",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -228,12 +246,65 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "user_type",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "user_user_type",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER NOT NULL, `user_type_id` INTEGER NOT NULL, PRIMARY KEY(`user_id`, `user_type_id`))",
+        "fields": [
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userTypeId",
+            "columnName": "user_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "user_id",
+            "user_type_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ceb35ca2fc05e8841f0971037a9815b4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be6242c520caef4a2e47293e7094d14f')"
     ]
   }
 }

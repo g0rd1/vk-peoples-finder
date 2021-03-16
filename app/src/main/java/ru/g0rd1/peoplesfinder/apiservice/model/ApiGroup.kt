@@ -1,7 +1,7 @@
 package ru.g0rd1.peoplesfinder.apiservice.model
 
 import com.google.gson.annotations.SerializedName
-import ru.g0rd1.peoplesfinder.common.GroupType
+import ru.g0rd1.peoplesfinder.common.enums.GroupType
 
 data class ApiGroup(
 

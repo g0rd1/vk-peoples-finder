@@ -7,6 +7,7 @@ import ru.g0rd1.peoplesfinder.ui.groups.GroupsFragment
 import ru.g0rd1.peoplesfinder.ui.results.ResultsFragment
 import ru.g0rd1.peoplesfinder.ui.settings.SettingsFragment
 import ru.g0rd1.peoplesfinder.ui.synchronization.SynchronizationFragment
+import ru.g0rd1.peoplesfinder.ui.userDetail.UserDetailDialog
 
 @Module
 abstract class FragmentsModule {
@@ -25,5 +26,8 @@ abstract class FragmentsModule {
 
     @ContributesAndroidInjector(modules = [SynchronizationFragmentModule::class])
     abstract fun synchronizationFragment(): SynchronizationFragment
+
+    @ContributesAndroidInjector(modules = [UserDetailFragmentModule::class])
+    abstract fun userDetail(): UserDetailDialog
 
 }

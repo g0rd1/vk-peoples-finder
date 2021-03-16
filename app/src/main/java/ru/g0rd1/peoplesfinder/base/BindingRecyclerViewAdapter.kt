@@ -15,9 +15,9 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
     private val diffCallbackFactory: AppDiffCallbackFactory<V>
 ) : RecyclerView.Adapter<BindingRecyclerViewAdapter<VBD, V>.BindingViewHolder>() {
 
-    private val items: MutableList<V> = mutableListOf()
+    private var items: List<V> = listOf()
 
-    private var onItemClickListener: ((item: V) -> Unit)? = null
+    private var onItemClickListener: ((position: Int) -> Unit)? = null
 
     inner class BindingViewHolder(val binding: VBD) : RecyclerView.ViewHolder(binding.root)
 
@@ -26,7 +26,7 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
             LayoutInflater.from(parent.context), layoutRes, parent, false
         )
         binding.root.setOnClickListener {
-            onItemClickListener?.invoke(items[binding.root.tag as Int])
+            onItemClickListener?.invoke(binding.root.tag as Int)
         }
         return BindingViewHolder(binding)
     }
@@ -41,17 +41,16 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
 
     protected abstract fun getSetViewModelToBindingFunction(holderBinding: VBD): (V) -> Unit
 
-    fun setOnItemClickListener(onItemClickListener: (position: V) -> Unit) {
+    fun setOnItemClickListener(onItemClickListener: (position: Int) -> Unit) {
         this.onItemClickListener = onItemClickListener
     }
 
+    @Synchronized
     fun setItems(items: List<V>) {
         val oldItems = this.items.toList()
-        this.items.clear()
-        this.items.addAll(items)
+        this.items = items
         val diffResult = DiffUtil.calculateDiff(diffCallbackFactory.create(oldItems, items))
         diffResult.dispatchUpdatesTo(this)
     }
-
 
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -14,10 +16,263 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/ageTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_settings_age_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/ageValueContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/ageTitle">
+
+            <!--suppress AndroidUnknownAttribute -->
+            <Spinner
+                android:id="@+id/ageFrom"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fragment_settings_view_height"
+                android:selectedItemPosition="@={vm.selectedAgeFromPosition}"
+                app:items="@{vm.ageFromItems}" />
+
+            <TextView
+                android:id="@+id/dash"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fragment_settings_view_height"
+                android:gravity="center"
+                android:text="@string/dash" />
+
+            <!--suppress AndroidUnknownAttribute -->
+            <Spinner
+                android:id="@+id/ageTo"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/fragment_settings_view_height"
+                android:selectedItemPosition="@={vm.selectedAgeToPosition}"
+                app:items="@{vm.ageToItems}" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/ageDivider"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/settings_label" />
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/ageTitle" />
+
+        <TextView
+            android:id="@+id/sexTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_settings_sex_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ageTitle" />
+
+        <!--suppress AndroidUnknownAttribute -->
+        <Spinner
+            android:id="@+id/sexValue"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:selectedItemPosition="@={vm.selectedSexPosition}"
+            app:items="@{vm.sexItems}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/sexTitle" />
+
+        <View
+            android:id="@+id/sexDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/sexTitle" />
+
+        <TextView
+            android:id="@+id/relationTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_settings_relation_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sexTitle" />
+
+        <!--suppress AndroidUnknownAttribute -->
+        <Spinner
+            android:id="@+id/relationValue"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:selectedItemPosition="@={vm.selectedRelationPosition}"
+            app:items="@{vm.relationItems}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/relationTitle" />
+
+        <View
+            android:id="@+id/relationDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/relationTitle" />
+
+        <TextView
+            android:id="@+id/countryTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:labelFor="@id/countryValue"
+            android:text="@string/fragment_settings_country_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relationTitle" />
+
+        <TextView
+            android:id="@+id/countryValue"
+            style="@style/Widget.AppCompat.Spinner.DropDown"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{vm.country}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/countryTitle"
+            tools:text="Россия" />
+
+        <View
+            android:id="@+id/countryDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/countryTitle" />
+
+        <TextView
+            android:id="@+id/cityTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:labelFor="@id/cityValue"
+            android:text="@string/fragment_settings_city_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/countryTitle"
+            app:visible="@{vm.cityVisible}"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/cityValue"
+            style="@style/Widget.AppCompat.Spinner.DropDown"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{vm.city}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/cityTitle"
+            app:visible="@{vm.cityVisible}"
+            tools:text="Москва"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/cityDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/cityTitle" />
+
+        <TextView
+            android:id="@+id/hasPhotoTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:labelFor="@id/hasPhotoCheckBox"
+            android:text="@string/fragment_settings_has_photo_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cityTitle" />
+
+        <CheckBox
+            android:id="@+id/hasPhotoCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:checked="@{vm.hasPhoto}"
+            android:onClick="@{() -> vm.hasPhotoClicked()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/hasPhotoTitle" />
+
+        <View
+            android:id="@+id/hasPhotoDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/hasPhotoTitle" />
+
+        <TextView
+            android:id="@+id/requiredGroupsTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:text="@string/fragment_settings_required_groups_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/hasPhotoTitle" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/requiredGroupsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{vm.requiredGroupIdsCount > 0 ? @plurals/groups_choosed(vm.requiredGroupIdsCount, vm.requiredGroupIdsCount) : @string/fragment_settings_requiredGroupsButton_zero_groups_choosed}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/requiredGroupsTitle"
+            tools:text="Выбрать" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.45" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

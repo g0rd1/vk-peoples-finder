@@ -9,4 +9,5 @@
     <color name="progress_bar_error">#E91E63</color>
 
     <color name="red">#D50000</color>
+    <color name="green">#00C853</color>
 </resources>

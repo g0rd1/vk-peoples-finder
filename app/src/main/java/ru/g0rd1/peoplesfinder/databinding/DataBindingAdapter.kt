@@ -1,12 +1,12 @@
 package ru.g0rd1.peoplesfinder.databinding
 
+import android.R
 import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
-import android.widget.ImageView
-import android.widget.ProgressBar
+import android.widget.*
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -56,12 +56,15 @@ object DataBindingAdapter {
 
     @JvmStatic
     @BindingAdapter("items")
-    fun <T> setItems(
-        recyclerView: RecyclerView,
-        items: List<T>
-    ) {
+    fun <T> RecyclerView.setItems(items: List<T>) {
         @Suppress("UNCHECKED_CAST")
-        (recyclerView.adapter as BindingRecyclerViewAdapter<*, T>).setItems(items)
+        (this.adapter as BindingRecyclerViewAdapter<*, T>).setItems(items)
+    }
+
+    @JvmStatic
+    @BindingAdapter("onItemClick")
+    fun RecyclerView.onItemClick(onItemClick: (position: Int) -> Unit) {
+        (this.adapter as BindingRecyclerViewAdapter<*, *>).setOnItemClickListener(onItemClick)
     }
 
     @JvmStatic
@@ -79,6 +82,25 @@ object DataBindingAdapter {
         swipeRefreshLayout.setOnRefreshListener {
             onRefreshListener?.invoke()
             swipeRefreshLayout.isRefreshing = false
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("items")
+    fun Spinner.setItems(items: List<Any>?) {
+        if (items != null) {
+            val arrayAdapter = ArrayAdapter(context, R.layout.simple_spinner_item, items)
+            // arrayAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+            adapter = arrayAdapter
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("items")
+    fun AutoCompleteTextView.setItems(items: List<Any>?) {
+        if (items != null) {
+            val arrayAdapter = ArrayAdapter(context, R.layout.simple_spinner_item, items)
+            setAdapter(arrayAdapter)
         }
     }
 

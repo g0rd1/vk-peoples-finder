@@ -11,6 +11,7 @@ import ru.g0rd1.peoplesfinder.base.navigator.SimpleAppNavigator
 import ru.g0rd1.peoplesfinder.common.AppResourceManager
 import ru.g0rd1.peoplesfinder.common.PriorityQueueManagerFactory
 import ru.g0rd1.peoplesfinder.common.ResourceManager
+import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import javax.inject.Singleton
 
 @Module
@@ -30,10 +31,12 @@ abstract class GlobalModule {
         @Singleton
         fun apiClient(
             apiClientFactory: ApiClientFactory,
+            vkAccessRepo: VKAccessRepo,
             priorityQueueManagerFactory: PriorityQueueManagerFactory
         ): ApiClient =
             PriorityQueueApiClient(
                 apiClientFactory.create(),
+                vkAccessRepo,
                 priorityQueueManagerFactory.create(API_CLIENT_QUEUE_CAPACITY)
             )
 

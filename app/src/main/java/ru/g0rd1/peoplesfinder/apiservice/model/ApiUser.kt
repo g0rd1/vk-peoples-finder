@@ -1,10 +1,8 @@
 package ru.g0rd1.peoplesfinder.apiservice.model
 
 import com.google.gson.annotations.SerializedName
-import ru.g0rd1.peoplesfinder.common.UserCity
-import ru.g0rd1.peoplesfinder.common.UserLastSeen
-import ru.g0rd1.peoplesfinder.common.UserRelation
-import ru.g0rd1.peoplesfinder.common.UserSex
+import ru.g0rd1.peoplesfinder.common.enums.Relation
+import ru.g0rd1.peoplesfinder.common.enums.Sex
 
 data class ApiUser(
 
@@ -24,21 +22,27 @@ data class ApiUser(
     val isClosed: Boolean,
 
     @SerializedName("bdate")
-    val birthDate: String?,
+    val birthday: String?,
+
+    @SerializedName("country")
+    val country: ApiCountry?,
 
     @SerializedName("city")
-    val city: UserCity?,
+    val city: ApiCity?,
 
     @SerializedName("sex")
-    val sex: UserSex?,
+    val sex: Sex?,
 
-    @SerializedName("photo_200")
-    val photo: String?,
-
-    @SerializedName("last_seen")
-    val lastSeen: UserLastSeen?,
+    @SerializedName("has_photo")
+    val hasPhoto: Int,
 
     @SerializedName("relation")
-    val relation: UserRelation?
+    val relation: Relation?,
+
+    @SerializedName("photo_100")
+    val photo100: String?,
+
+    @SerializedName("photo_max")
+    val photoMax: String?
 
 )

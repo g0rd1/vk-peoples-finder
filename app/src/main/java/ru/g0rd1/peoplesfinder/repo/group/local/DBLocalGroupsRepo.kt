@@ -1,6 +1,5 @@
 package ru.g0rd1.peoplesfinder.repo.group.local
 
-import androidx.room.EmptyResultSetException
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -32,7 +31,7 @@ class DBLocalGroupsRepo @Inject constructor(
         groupDataDao.updateAllMembersLoadedDate(id, allMembersLoadedDate).subscribeOnIo()
 
     override fun updateSequentialNumber(id: Int, sequentialNumber: Int): Completable =
-        groupDataDao.updateSequentialNumber(id, sequentialNumber)
+        groupDataDao.updateSequentialNumber(id, sequentialNumber).subscribeOnIo()
 
     override fun updateHasAccessToMembers(id: Int, hasAccessToMembers: Boolean): Completable =
         groupDataDao.updateHasAccessToMembers(id, hasAccessToMembers).subscribeOnIo()
@@ -44,16 +43,14 @@ class DBLocalGroupsRepo @Inject constructor(
     }
 
     override fun get(): Single<List<Group>> {
-        return Single.zip(
-            groupDao.get(),
-            groupDataDao.get(),
-            { t1: List<GroupEntity>, t2: List<GroupDataEntity> -> Pair(t1, t2) }
-        ).map { (groupEntities, groupDataEntities) ->
-            groupEntities.map { groupEntity ->
-                val groupDataEntity = groupDataEntities.first { it.groupId == groupEntity.id }
-                groupMapper.transform(groupEntity, groupDataEntity)
+        return groupDao.getGroupAndGroupData()
+            .map { groupEntityAndGroupDataEntities ->
+                groupEntityAndGroupDataEntities.map { (groupEntity, groupDataEntity) ->
+                    groupMapper.transform(groupEntity, groupDataEntity)
+                }
             }
-        }.subscribeOnIo()
+            .switchIfEmpty(Single.just(listOf()))
+            .subscribeOnIo()
     }
 
     override fun deleteNotIn(ids: List<Int>): Completable =
@@ -64,7 +61,7 @@ class DBLocalGroupsRepo @Inject constructor(
 
     override fun observeGroups(): Flowable<List<Group>> {
         val groupsFlowable =
-            groupDao.getGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+            groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
                 GroupEntitiesAndGroupDataEntities.map {
                     groupMapper.transform(
                         it.groupEntity,
@@ -77,30 +74,32 @@ class DBLocalGroupsRepo @Inject constructor(
         } else {
             groupsFlowable
         }
+            .subscribeOnIo()
+    }
+
+    override fun getSameGroupsWithUser(userId: Int): Single<List<Group>> {
+        return groupDao.getSameGroupAndGroupDataWithUser(userId)
+            .map { groupEntityAndGroupDataEntities ->
+                groupEntityAndGroupDataEntities.map { (groupEntity, groupDataEntity) ->
+                    groupMapper.transform(groupEntity, groupDataEntity)
+                }
+            }
+            .switchIfEmpty(Single.just(listOf()))
+            .subscribeOnIo()
     }
 
     override fun get(groupId: Int): Single<Optional<Group>> {
-        return Single.zip(
-            groupDao.get(groupId),
-            groupDataDao.get(groupId),
-            { t1: List<GroupEntity>, t2: List<GroupDataEntity> -> Pair(t1, t2) }
-        )
-            .map { (groupEntities, groupDataEntities) ->
+        return groupDao.getGroupAndGroupData(groupId)
+            .map { GroupEntitiesAndGroupDataEntities ->
                 Optional.create(
-                    groupEntities.firstOrNull()?.let { groupEntity ->
-                        val groupDataEntity =
-                            groupDataEntities.first { it.groupId == groupEntity.id }
-                        groupMapper.transform(groupEntity, groupDataEntity)
-                    }
+                    GroupEntitiesAndGroupDataEntities.firstOrNull()
+                        ?.let { (groupEntity, groupDataEntity) ->
+                            groupMapper.transform(groupEntity, groupDataEntity)
+                        }
                 )
             }
-            .onErrorResumeNext { error ->
-                if (error is EmptyResultSetException) {
-                    Single.just(Optional.empty())
-                } else {
-                    Single.error(error)
-                }
-            }.subscribeOnIo()
+            .switchIfEmpty(Single.just(Optional.empty()))
+            .subscribeOnIo()
     }
 
     private fun List<Group>.toEntities(): List<GroupEntity> {

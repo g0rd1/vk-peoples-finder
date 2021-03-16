@@ -1,6 +1,6 @@
 package ru.g0rd1.peoplesfinder.model
 
-import ru.g0rd1.peoplesfinder.common.GroupType
+import ru.g0rd1.peoplesfinder.common.enums.GroupType
 import java.util.*
 
 data class Group(

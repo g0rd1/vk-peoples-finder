@@ -4,20 +4,13 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.TypeConverters
 import io.reactivex.Completable
-import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.db.converter.DateConverter
 import ru.g0rd1.peoplesfinder.db.entity.GroupDataEntity
 import java.util.*
 
 @Dao
-@TypeConverters(DateConverter::class)
+//@TypeConverters(DateConverter::class)
 abstract class GroupDataDao : BaseDao<GroupDataEntity>() {
-
-    @Query("SELECT * FROM `group_data` WHERE groupId = :id")
-    abstract fun get(id: Int): Single<List<GroupDataEntity>>
-
-    @Query("SELECT * FROM `group_data`")
-    abstract fun get(): Single<List<GroupDataEntity>>
 
     @Query("UPDATE `group_data` SET loaded_members_count = :loadedMembersCount WHERE groupId = :id")
     abstract fun updateLoadedMembersCount(

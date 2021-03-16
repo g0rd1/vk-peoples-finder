@@ -13,9 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <androidx.constraintlayout.widget.Group
             android:id="@+id/syncInProgressGroup"
+            app:visible="@{vm.showLoading}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="textView,progressBar" />
@@ -43,6 +43,14 @@
             app:layout_constraintTop_toBottomOf="@+id/textView"
             app:layout_constraintVertical_chainStyle="packed" />
 
+        <include
+            android:id="@+id/error"
+            layout="@layout/error_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:errorText="@{vm.errorText}"
+            app:retryFunction="@{() -> vm.retry()}"
+            app:visible="@{vm.showError}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

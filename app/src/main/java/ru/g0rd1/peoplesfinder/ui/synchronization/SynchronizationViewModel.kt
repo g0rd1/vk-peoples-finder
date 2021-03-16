@@ -1,45 +1,47 @@
 package ru.g0rd1.peoplesfinder.ui.synchronization
 
-import androidx.lifecycle.ViewModel
+import androidx.databinding.ObservableBoolean
+import androidx.databinding.ObservableField
 import io.reactivex.Completable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import ru.g0rd1.peoplesfinder.base.error.ErrorHandler
+import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
+import ru.g0rd1.peoplesfinder.model.Group
+import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
+import ru.g0rd1.peoplesfinder.util.exhaustive
 import ru.g0rd1.peoplesfinder.util.observeOnUI
-import timber.log.Timber
 import javax.inject.Inject
 
 class SynchronizationViewModel @Inject constructor(
     private val localGroupsRepo: LocalGroupsRepo,
     private val vkGroupsRepo: VkGroupsRepo,
-    private val errorHandler: ErrorHandler,
     private val synchronizationObserver: SynchronizationObserver,
     private val appNavigator: AppNavigator
-) : ViewModel() {
+) : BaseViewModel() {
 
-    private val disposables = CompositeDisposable()
+    val showError = ObservableBoolean()
+    val errorText = ObservableField<String>()
 
-    fun onStart() {
-        Timber.d("TEST SynchronizationViewModel init")
+    val showLoading = ObservableBoolean()
+
+    override fun onStart() {
+        synchronize()
+    }
+
+    fun retry() {
         synchronize()
     }
 
     private fun synchronize() {
+        showLoading.set(true)
         vkGroupsRepo.getGroups()
-            .flatMapCompletable { groups ->
-
-                localGroupsRepo.insert(groups)
-                    .andThen(localGroupsRepo.deleteNotIn(groups.map { it.id }))
-                    .andThen(
-                        Completable.concat(
-                            groups.mapIndexed { index, group ->
-                                localGroupsRepo.updateSequentialNumber(group.id, index)
-                            }
-                        )
-                    )
+            .flatMapCompletable { groupsResult ->
+                when (groupsResult) {
+                    is VkResult.Error.ApiVk -> Completable.fromAction { handleError() }
+                    is VkResult.Error.Generic -> Completable.fromAction { handleError() }
+                    is VkResult.Success -> getSyncGroupsWithRepoCompletable(groupsResult.data)
+                }.exhaustive
             }
             .observeOnUI()
             .subscribe(
@@ -48,15 +50,28 @@ class SynchronizationViewModel @Inject constructor(
                     appNavigator.groups()
                 },
                 {
-                    errorHandler.handle(it, ::synchronize)
+                    handleError()
                 }
             )
-            .addTo(disposables)
+            .disposeLater()
     }
 
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
+    private fun getSyncGroupsWithRepoCompletable(groups: List<Group>): Completable {
+        return localGroupsRepo.insert(groups)
+            .andThen(localGroupsRepo.deleteNotIn(groups.map { it.id }))
+            .andThen(
+                Completable.concat(
+                    groups.mapIndexed { index, group ->
+                        localGroupsRepo.updateSequentialNumber(group.id, index)
+                    }
+                )
+            )
     }
+
+    private fun handleError() {
+        showLoading.set(false)
+        showError.set(true)
+        errorText.set("Ошибка синхронизации с серверами Вконтакте")
+    }
+
 }

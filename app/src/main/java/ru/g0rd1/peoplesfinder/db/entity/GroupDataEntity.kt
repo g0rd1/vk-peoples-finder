@@ -1,12 +1,17 @@
 package ru.g0rd1.peoplesfinder.db.entity
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import ru.g0rd1.peoplesfinder.db.converter.DateConverter
+import ru.g0rd1.peoplesfinder.db.entity.GroupDataEntity.Companion.TABLE_NAME
 import java.util.*
 
 
 @Entity(
-    tableName = "group_data",
+    tableName = TABLE_NAME,
     foreignKeys = [
         ForeignKey(
             onDelete = ForeignKey.CASCADE,
@@ -16,7 +21,7 @@ import java.util.*
         )
     ]
 )
-@TypeConverters(DateConverter::class)
+//@TypeConverters(DateConverter::class)
 data class GroupDataEntity(
 
     @PrimaryKey
@@ -33,4 +38,10 @@ data class GroupDataEntity(
 
     @ColumnInfo(name = "has_access_to_members")
     val hasAccessToMembers: Boolean
-)
+) {
+
+    companion object {
+        const val TABLE_NAME = "group_data"
+    }
+
+}

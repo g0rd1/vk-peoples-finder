@@ -1,40 +1,29 @@
 package ru.g0rd1.peoplesfinder.db.converter
 
 import androidx.room.TypeConverter
-import ru.g0rd1.peoplesfinder.common.UserLastSeen
-import ru.g0rd1.peoplesfinder.common.UserRelation
-import ru.g0rd1.peoplesfinder.common.UserSex
+import ru.g0rd1.peoplesfinder.common.enums.Relation
+import ru.g0rd1.peoplesfinder.common.enums.Sex
 
 class UserConverter {
 
     @TypeConverter
-    fun fromPlatform(platform: UserLastSeen.Platform?): String? {
-        return platform?.toString()
+    fun fromSex(sex: Sex?): String? {
+        return sex?.name
     }
 
     @TypeConverter
-    fun toPlatform(value: String?): UserLastSeen.Platform? {
-        return value?.let { UserLastSeen.Platform.valueOf(it) }
+    fun toSex(value: String?): Sex? {
+        return value?.let { Sex.valueOf(it) }
     }
 
     @TypeConverter
-    fun fromSex(sex: UserSex?): String? {
-        return sex?.toString()
+    fun fromRelation(relation: Relation?): String? {
+        return relation?.name
     }
 
     @TypeConverter
-    fun toSex(value: String?): UserSex? {
-        return value?.let { UserSex.valueOf(it) }
-    }
-
-    @TypeConverter
-    fun fromRelation(relation: UserRelation?): String? {
-        return relation?.toString()
-    }
-
-    @TypeConverter
-    fun toRelation(value: String?): UserRelation? {
-        return value?.let { UserRelation.valueOf(it) }
+    fun toRelation(value: String?): Relation? {
+        return value?.let { Relation.valueOf(it) }
     }
 
 }

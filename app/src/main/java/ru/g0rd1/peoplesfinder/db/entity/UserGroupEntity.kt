@@ -24,6 +24,5 @@ data class UserGroupEntity(
 
     companion object {
         const val TABLE_NAME = "user_group"
-
     }
 }

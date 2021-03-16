@@ -1,15 +1,16 @@
 package ru.g0rd1.peoplesfinder.util
 
-import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
+import io.reactivex.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 fun <T> Single<T>.observeOnUI(): Single<T> = this.observeOn(AndroidSchedulers.mainThread())
 
 fun <T> Single<T>.subscribeOnIo(): Single<T> = this.subscribeOn(Schedulers.io())
+
+fun <T> Maybe<T>.observeOnUI(): Maybe<T> = this.observeOn(AndroidSchedulers.mainThread())
+
+fun <T> Maybe<T>.subscribeOnIo(): Maybe<T> = this.subscribeOn(Schedulers.io())
 
 @Suppress("UNCHECKED_CAST")
 fun <T, R> Iterable<Single<T>>.zip(function: (Iterable<T>) -> R): Single<R> =

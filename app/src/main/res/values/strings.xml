@@ -1,4 +1,23 @@
 <resources>
+
+    <plurals name="groups">
+        <item quantity="zero">%1$d групп</item>
+        <item quantity="one">%1$d группа</item>
+        <item quantity="two">%1$d группы</item>
+        <item quantity="few">%1$d групп</item>
+        <item quantity="many">%1$d групп</item>
+        <item quantity="other">%1$d групп</item>
+    </plurals>
+
+    <plurals name="groups_choosed">
+        <item quantity="zero">Выбрано %1$d групп</item>
+        <item quantity="one">Выбрана %1$d группа</item>
+        <item quantity="two">Выбраны %1$d группы</item>
+        <item quantity="few">Выбраны %1$d группы</item>
+        <item quantity="many">Выбраны %1$d групп</item>
+        <item quantity="other">Выбраны %1$d групп</item>
+    </plurals>
+
     <string name="app_name">PeoplesFinder</string>
 
     <string name="authorization_label">AuthorizationFragment</string>
@@ -9,7 +28,7 @@
 
     <string name="groups_menu_search_title">Поиск</string>
 
-    <string name="retry">Повтор</string>
+    <string name="retry">Попробовать ещё раз</string>
 
     <string name="fragment_groups_download_members_button_text">Загрузить участников групп</string>
     <string name="fragment_groups_download_button_start_download">Начать загрузку</string>
@@ -25,5 +44,56 @@
     <string name="fragment_results_no_results_load_not_started">Здесь будут отображаться пользователи с группами как у вас</string>
     <string name="fragment_results_no_results_load_started">Пользователи с группами как у вас пока не найдены</string>
     <string name="fragment_results_no_results_load_finished">К сожалению результаты отсутствуют</string>
+
+    <string name="unknown_error">Произошла неизветсная ошибка</string>
+
+    <string name="dialog_user_detail_all_users_with_filters_shown">Были просмотрены все пользователи с указанными фильтрами</string>
+    <string name="dialog_user_detail_no_users_with_filters">Не найдено пользователей соответсвующих указанным фильтрам</string>
+
+    <string name="user_name_title">Имя</string>
+    <string name="user_age_title">Возраст</string>
+    <string name="user_sex_title">Пол</string>
+    <string name="user_relation_title">Семейное положение</string>
+    <string name="user_country_title">Страна</string>
+    <string name="user_city_title">Город</string>
+
+    <string name="dialog_user_detail_same_groups_title">%s совпадающих с пользователем:</string>
+    <string name="dialog_user_detail_to_user_page_button_text">Перейти на страницу</string>
+
+    <string name="user_relation_not_specified">не указано</string>
+    <string name="user_relation_single_sex_male">не женат</string>
+    <string name="user_relation_single_sex_female">не замужем</string>
+    <string name="user_relation_single_sex_not_specified">не женат/не замужем</string>
+    <string name="user_relation_in_a_relationship_sex_male">Усть друг</string>
+    <string name="user_relation_in_a_relationship_sex_female">есть подруга</string>
+    <string name="user_relation_in_a_relationship_sex_not_specified">есть друг/есть подруга</string>
+    <string name="user_relation_engaged_sex_male">помолвлен</string>
+    <string name="user_relation_engaged_sex_female">помолвлена</string>
+    <string name="user_relation_engaged_sex_not_specified">помолвлен/помолвлена</string>
+    <string name="user_relation_married_sex_male">женат</string>
+    <string name="user_relation_married_sex_female">замужем</string>
+    <string name="user_relation_married_sex_not_specified">женат/замужем</string>
+    <string name="user_relation_it_is_complicated">всё сложно</string>
+    <string name="user_relation_actively_searching">в активном поиске</string>
+    <string name="user_relation_in_love_sex_male">влюблён</string>
+    <string name="user_relation_in_love_sex_female">влюблена</string>
+    <string name="user_relation_in_love_sex_not_specified">влюблён/влюблена</string>
+    <string name="user_relation_in_a_civil_union">в гражданском браке</string>
+    <string name="user_relation_any">любое</string>
+
+    <string name="user_sex_male">мужской</string>
+    <string name="user_sex_female">женский</string>
+    <string name="user_sex_not_specified">пол не указан</string>
+    <string name="user_sex_any">любой</string>
+    <string name="fragment_settings_country_title">Страна</string>
+    <string name="fragment_settings_city_title">Город</string>
+    <string name="fragment_settings_has_photo_title">С фотографией</string>
+    <string name="fragment_settings_required_groups_title">Обязательные совпадающие группы</string>
+    <string name="fragment_settings_relation_title">Семейное положение</string>
+    <string name="fragment_settings_sex_title">Пол</string>
+    <string name="fragment_settings_age_title">Возраст</string>
+    <string name="dash">-</string>
+
+    <string name="fragment_settings_requiredGroupsButton_zero_groups_choosed" />
 
 </resources>
