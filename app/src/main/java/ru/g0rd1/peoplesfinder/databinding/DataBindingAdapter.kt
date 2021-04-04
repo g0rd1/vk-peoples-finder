@@ -12,7 +12,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.viewpager2.widget.ViewPager2
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.BindingRecyclerViewAdapter
 import ru.g0rd1.peoplesfinder.common.AppSpinnerAdapter
@@ -28,15 +28,11 @@ object DataBindingAdapter {
         placeholderImage: Int?,
         errorImage: Int?,
     ) {
-        Picasso.get().load(url).apply {
-            if (placeholderImage != null) {
-                this.placeholder(placeholderImage)
-            } else {
-                this.placeholder(R.drawable.drawable_background)
-            }
-            placeholderImage?.let { this.placeholder(it) }
-            errorImage?.let { this.error(it) }
-        }
+        if (url.isNullOrEmpty()) return
+        Glide.with(imageView.context)
+            .load(url)
+            .placeholder(placeholderImage ?: R.drawable.drawable_background)
+            .error(errorImage ?: R.drawable.drawable_background)
             .into(imageView)
     }
 
