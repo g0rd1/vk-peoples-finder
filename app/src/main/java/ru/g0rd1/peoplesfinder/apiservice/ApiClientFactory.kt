@@ -5,6 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import ru.g0rd1.peoplesfinder.BuildConfig
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -12,12 +13,12 @@ class ApiClientFactory @Inject constructor() {
 
     fun create(): ApiClient {
         val interceptor = HttpLoggingInterceptor()
-        // interceptor.level = if (BuildConfig.DEBUG)
-        //     HttpLoggingInterceptor.Level.BODY
-        // else
-        //     HttpLoggingInterceptor.Level.BASIC
+        interceptor.level = if (BuildConfig.DEBUG)
+            HttpLoggingInterceptor.Level.BASIC
+        else
+            HttpLoggingInterceptor.Level.BASIC
 
-        interceptor.level = HttpLoggingInterceptor.Level.BASIC
+        // interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
         val client: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(interceptor)

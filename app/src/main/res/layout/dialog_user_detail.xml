@@ -12,7 +12,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
 
         <include
             android:id="@+id/info"
@@ -33,9 +34,9 @@
             layout="@layout/error_screen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:visible="@{vm.errorVisible}"
+            app:errorText="@{vm.errorText}"
             app:retryFunction="@{vm.retryFunction}"
-            app:errorText="@{vm.errorText}" />
+            app:visible="@{vm.errorVisible}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

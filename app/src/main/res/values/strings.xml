@@ -18,13 +18,23 @@
         <item quantity="other">Выбраны %1$d групп</item>
     </plurals>
 
+    <plurals name="groups_same">
+        <item quantity="zero">%1$d совпадающих групп</item>
+        <item quantity="one">%1$d совпадающая группа</item>
+        <item quantity="two">%1$d совпадающие группы</item>
+        <item quantity="few">%1$d совпадающие группы</item>
+        <item quantity="many">%1$d совпадающих групп</item>
+        <item quantity="other">%1$d совпадающих групп</item>
+    </plurals>
+
     <string name="app_name">PeoplesFinder</string>
 
     <string name="authorization_label">AuthorizationFragment</string>
     <string name="synchronize_label">SynchronizationFragment</string>
     <string name="groups_label">Группы</string>
     <string name="settings_label">Настройки</string>
-    <string name="results_label">Люди</string>
+    <string name="user_detail_label">Люди</string>
+    <string name="lists_label">Люди</string>
 
     <string name="groups_menu_search_title">Поиск</string>
 
@@ -45,7 +55,7 @@
     <string name="fragment_results_no_results_load_started">Пользователи с группами как у вас пока не найдены</string>
     <string name="fragment_results_no_results_load_finished">К сожалению результаты отсутствуют</string>
 
-    <string name="unknown_error">Произошла неизветсная ошибка</string>
+    <string name="unknown_error">Неизветсная ошибка</string>
 
     <string name="dialog_user_detail_all_users_with_filters_shown">Были просмотрены все пользователи с указанными фильтрами</string>
     <string name="dialog_user_detail_no_users_with_filters">Не найдено пользователей соответсвующих указанным фильтрам</string>
@@ -64,7 +74,7 @@
     <string name="user_relation_single_sex_male">не женат</string>
     <string name="user_relation_single_sex_female">не замужем</string>
     <string name="user_relation_single_sex_not_specified">не женат/не замужем</string>
-    <string name="user_relation_in_a_relationship_sex_male">Усть друг</string>
+    <string name="user_relation_in_a_relationship_sex_male">есть друг</string>
     <string name="user_relation_in_a_relationship_sex_female">есть подруга</string>
     <string name="user_relation_in_a_relationship_sex_not_specified">есть друг/есть подруга</string>
     <string name="user_relation_engaged_sex_male">помолвлен</string>
@@ -88,12 +98,35 @@
     <string name="fragment_settings_country_title">Страна</string>
     <string name="fragment_settings_city_title">Город</string>
     <string name="fragment_settings_has_photo_title">С фотографией</string>
+    <string name="fragment_settings_not_closed_title">Страница не закрыта</string>
     <string name="fragment_settings_required_groups_title">Обязательные совпадающие группы</string>
     <string name="fragment_settings_relation_title">Семейное положение</string>
     <string name="fragment_settings_sex_title">Пол</string>
     <string name="fragment_settings_age_title">Возраст</string>
     <string name="dash">-</string>
 
-    <string name="fragment_settings_requiredGroupsButton_zero_groups_choosed" />
+    <string name="any_feminine">любая</string>
+    <string name="any_masculine">любой</string>
+    <string name="any_neuter">любое</string>
+
+    <string name="fragment_settings_requiredGroupsButton_zero_groups_choosed">Выбрать</string>
+    <string name="dialog_single_choose_cancel_choice">Отменить выбор</string>
+    <string name="dialog_single_choose_no_results_message">Нет результатов по данному запросу</string>
+
+    <string name="choose_county_dialog_title">Выбор страны</string>
+    <string name="choose_county_dialog_search_text_hint">Начните вводить название страны</string>
+
+    <string name="choose_city_dialog_title">Выбор города</string>
+    <string name="choose_city_dialog_search_text_hint">Начните вводить название города</string>
+
+    <string name="choose_required_groups_dialog_title">Выбор групп</string>
+    <string name="choose_required_groups_dialog_search_text_hint">Начните вводить название группы</string>
+
+    <string name="fragment_photos_viewing_title">%s из %s</string>
+
+    <string name="fragment_photos_viewing_no_photos_error">Нет фотографий</string>
+    <string name="dialog_multichoose_drop_choice">Сбросить</string>
+    <string name="dialog_multichoose_confirm_choice">Выбрать</string>
+    <string name="dialog_multichoose_no_results_message">Нет результатов по данному запросу</string>
 
 </resources>

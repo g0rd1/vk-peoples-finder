@@ -5,7 +5,7 @@ import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserTypeEntity
 import ru.g0rd1.peoplesfinder.model.User
 import ru.g0rd1.peoplesfinder.model.UserType
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 class UserMapper @Inject constructor(
@@ -20,8 +20,7 @@ class UserMapper @Inject constructor(
             lastName = apiUser.lastName,
             deactivated = apiUser.deactivated,
             isClosed = apiUser.isClosed,
-            birthday = apiUser.birthday,
-            age = birthdayToAge(apiUser.birthday),
+            birthday = birthdayRawToLocalDate(apiUser.birthdayRaw),
             country = apiUser.country?.let { countryMapper.transform(it) },
             city = apiUser.city?.let { cityMapper.transform(it) },
             sex = apiUser.sex,
@@ -39,8 +38,7 @@ class UserMapper @Inject constructor(
             lastName = userEntity.lastName,
             deactivated = userEntity.deactivated,
             isClosed = userEntity.isClosed,
-            birthday = userEntity.birthday,
-            age = userEntity.age,
+            birthday= userEntity.birthday,
             country = userEntity.country,
             city = userEntity.city,
             sex = userEntity.sex,
@@ -59,7 +57,6 @@ class UserMapper @Inject constructor(
             deactivated = user.deactivated,
             isClosed = user.isClosed,
             birthday = user.birthday,
-            age = user.age,
             country = user.country,
             city = user.city,
             sex = user.sex,
@@ -77,34 +74,19 @@ class UserMapper @Inject constructor(
         )
     }
 
-    private fun birthdayToAge(birthday: String?): Int? {
-        birthday ?: return null
-        val birthdayParts = birthday.split(".")
+    private fun birthdayRawToLocalDate(birthdayRaw: String?): LocalDate? {
+        birthdayRaw ?: return null
+        val birthdayParts = birthdayRaw.split(".")
         if (birthdayParts.size != 3) return null
-        return getAge(
-            year = birthdayParts[2].toInt(),
-            month = birthdayParts[1].toInt(),
-            day = birthdayParts[0].toInt()
-        )
-    }
-
-    private fun getAge(year: Int, month: Int, day: Int): Int {
-        val birthday = Calendar.getInstance()
-        val today = Calendar.getInstance()
-        birthday.set(year, month, day)
-        return if (today[Calendar.YEAR] <= birthday[Calendar.YEAR]) {
-            0
-        } else if (today[Calendar.MONTH] < birthday[Calendar.MONTH]) {
-            today[Calendar.YEAR] - birthday[Calendar.YEAR] - 1
-        } else if (today[Calendar.MONTH] == birthday[Calendar.MONTH]) {
-            if (today[Calendar.DAY_OF_MONTH] < birthday[Calendar.DAY_OF_MONTH]) {
-                today[Calendar.YEAR] - birthday[Calendar.YEAR] - 1
-            } else {
-                today[Calendar.YEAR] - birthday[Calendar.YEAR]
-            }
-        } else {
-            today[Calendar.YEAR] - birthday[Calendar.YEAR]
-        }
+        if (birthdayParts.any { it.isBlank() }) return null
+        val year = birthdayParts[2].toLong()
+        val month = birthdayParts[1].toLong()
+        val dayOfMonth = birthdayParts[0].toLong()
+        val epochDate: LocalDate = LocalDate.ofEpochDay(0)
+        return epochDate
+            .plusYears(year - epochDate.year)
+            .plusMonths(month - epochDate.monthValue)
+            .plusDays(dayOfMonth - epochDate.dayOfMonth)
     }
 
 }

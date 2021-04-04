@@ -12,21 +12,21 @@ import ru.g0rd1.peoplesfinder.common.AppDiffCallbackFactory
 
 abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
     @LayoutRes private val layoutRes: Int,
-    private val diffCallbackFactory: AppDiffCallbackFactory<V>
+    private val diffCallbackFactory: AppDiffCallbackFactory<V>,
+    private val itemClickListener: ItemClickListener<V>? = null
 ) : RecyclerView.Adapter<BindingRecyclerViewAdapter<VBD, V>.BindingViewHolder>() {
 
     private var items: List<V> = listOf()
 
-    private var onItemClickListener: ((position: Int) -> Unit)? = null
-
     inner class BindingViewHolder(val binding: VBD) : RecyclerView.ViewHolder(binding.root)
 
+    @Suppress("UNCHECKED_CAST")
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder {
         val binding: VBD = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context), layoutRes, parent, false
         )
         binding.root.setOnClickListener {
-            onItemClickListener?.invoke(binding.root.tag as Int)
+            itemClickListener?.onItemClick(binding.root.tag as V)
         }
         return BindingViewHolder(binding)
     }
@@ -35,15 +35,11 @@ abstract class BindingRecyclerViewAdapter<VBD : ViewDataBinding, V>(
 
     @CallSuper
     final override fun onBindViewHolder(holder: BindingViewHolder, position: Int) {
-        holder.binding.root.tag = position
+        holder.binding.root.tag = items[position]
         getSetViewModelToBindingFunction(holder.binding).invoke(items[position])
     }
 
     protected abstract fun getSetViewModelToBindingFunction(holderBinding: VBD): (V) -> Unit
-
-    fun setOnItemClickListener(onItemClickListener: (position: Int) -> Unit) {
-        this.onItemClickListener = onItemClickListener
-    }
 
     @Synchronized
     fun setItems(items: List<V>) {

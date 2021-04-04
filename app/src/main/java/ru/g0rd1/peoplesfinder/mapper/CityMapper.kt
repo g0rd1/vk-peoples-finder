@@ -9,7 +9,8 @@ class CityMapper @Inject constructor() {
     fun transform(apiCity: ApiCity): City {
         return City(
             id = apiCity.id,
-            title = apiCity.title
+            title = apiCity.title,
+            important = apiCity.important != null
         )
     }
 

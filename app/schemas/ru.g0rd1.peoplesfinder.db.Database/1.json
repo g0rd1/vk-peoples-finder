@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "be6242c520caef4a2e47293e7094d14f",
+    "identityHash": "2b6e1b134e3acf1293db13453ddc4043",
     "entities": [
       {
         "tableName": "group",
@@ -112,7 +112,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate` TEXT, `age` INTEGER, `sex` TEXT, `relation` TEXT, `has_photo` INTEGER, `photo_100` TEXT, `photo_max` TEXT, `country_id` INTEGER, `country_title` TEXT, `city_id` INTEGER, `city_title` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate_epoch_days` INTEGER, `sex` TEXT, `relation` TEXT, `has_photo` INTEGER, `photo_100` TEXT, `photo_max` TEXT, `country_id` INTEGER, `country_title` TEXT, `city_id` INTEGER, `city_title` TEXT, `city_important` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -146,13 +146,7 @@
           },
           {
             "fieldPath": "birthday",
-            "columnName": "bdate",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "age",
-            "columnName": "age",
+            "columnName": "bdate_epoch_days",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -208,6 +202,12 @@
             "fieldPath": "city.title",
             "columnName": "city_title",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "city.important",
+            "columnName": "city_important",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
@@ -304,7 +304,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be6242c520caef4a2e47293e7094d14f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b6e1b134e3acf1293db13453ddc4043')"
     ]
   }
 }

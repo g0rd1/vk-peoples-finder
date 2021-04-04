@@ -6,6 +6,7 @@ import ru.g0rd1.peoplesfinder.mapper.VkResultMapper
 import ru.g0rd1.peoplesfinder.model.Country
 import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.vk.VkRepo
+import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import javax.inject.Inject
 
 class HttpCountryRepo @Inject constructor(
@@ -37,7 +38,7 @@ class HttpCountryRepo @Inject constructor(
             } else {
                 vkResult
             }
-        }
+        }.subscribeOnIo()
     }
 
     private fun getCountriesStartWithQuery(

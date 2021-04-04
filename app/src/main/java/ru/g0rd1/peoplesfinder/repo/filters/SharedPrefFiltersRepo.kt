@@ -4,38 +4,46 @@ import android.content.Context
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.repo.SimpleSharedPrefRepo
 import javax.inject.Inject
 
 class SharedPrefFiltersRepo @Inject constructor(
-    context: Context
+    context: Context,
 ) : SimpleSharedPrefRepo(SHARED_PREF_NAME, context), FiltersRepo {
 
-    private val filterParametersSubject: Subject<FilterParameters> = BehaviorSubject.createDefault(getFilterParameters())
+    private val filterParametersSubject: Subject<FilterParameters> =
+        BehaviorSubject.createDefault(getFilterParameters())
 
     override fun setAgeFrom(ageFrom: FilterParameters.Age) {
-        putObject(AGE_FROM_KEY, ageFrom)
+        putString(AGE_FROM_KEY, Json.encodeToString(ageFrom))
         filterParametersSubject.onNext(getFilterParameters())
     }
 
     override fun setAgeTo(ageTo: FilterParameters.Age) {
-        putObject(AGE_TO_KEY, ageTo)
+        putString(AGE_TO_KEY, Json.encodeToString(ageTo))
         filterParametersSubject.onNext(getFilterParameters())
     }
 
+    override fun setSex(sex: FilterParameters.Sex) {
+        putString(SEX_KEY, Json.encodeToString(sex))
+    }
+
     override fun setRelation(relation: FilterParameters.Relation) {
-        putObject(RELATION_KEY, relation)
+        putString(RELATION_KEY, Json.encodeToString(relation))
         filterParametersSubject.onNext(getFilterParameters())
     }
 
     override fun setCountry(country: FilterParameters.Country) {
-        putObject(COUNTRY_KEY, country)
+        putString(COUNTRY_KEY, Json.encodeToString(country))
         filterParametersSubject.onNext(getFilterParameters())
     }
 
     override fun setCity(city: FilterParameters.City) {
-        putObject(CITY_KEY, city)
+        putString(CITY_KEY, Json.encodeToString(city))
         filterParametersSubject.onNext(getFilterParameters())
     }
 
@@ -44,21 +52,57 @@ class SharedPrefFiltersRepo @Inject constructor(
         filterParametersSubject.onNext(getFilterParameters())
     }
 
+    override fun setNotClosed(notClosed: Boolean) {
+        putBoolean(NOT_CLOSED_KEY, notClosed)
+        filterParametersSubject.onNext(getFilterParameters())
+    }
+
     override fun setRequiredGroupIds(requiredGroupIds: List<Int>) {
-        putList(REQUIRED_GROUPS_KEY, requiredGroupIds)
+        putList(REQUIRED_GROUPS_KEY, requiredGroupIds, Int::class.java)
         filterParametersSubject.onNext(getFilterParameters())
     }
 
     override fun getFilterParameters(): FilterParameters {
         return FilterParameters(
-            ageFrom = getObject(AGE_FROM_KEY, FilterParameters.Age.Any),
-            ageTo = getObject(AGE_TO_KEY, FilterParameters.Age.Any),
-            sex = getObject(SEX_KEY, FilterParameters.Sex.ANY),
-            relation = getObject(RELATION_KEY, FilterParameters.Relation.ANY),
-            country = getObject(COUNTRY_KEY, FilterParameters.Country.Any),
-            city = getObject(CITY_KEY, FilterParameters.City.Any),
+            ageFrom = Json.decodeFromString(
+                getString(
+                    AGE_FROM_KEY,
+                    Json.encodeToString<FilterParameters.Age>(FilterParameters.Age.Any)
+                )
+            ),
+            ageTo = Json.decodeFromString(
+                getString(
+                    AGE_TO_KEY,
+                    Json.encodeToString<FilterParameters.Age>(FilterParameters.Age.Any)
+                )
+            ),
+            sex = Json.decodeFromString(
+                getString(
+                    SEX_KEY,
+                    Json.encodeToString<FilterParameters.Sex>(FilterParameters.Sex.Any)
+                )
+            ),
+            relation = Json.decodeFromString(
+                getString(
+                    RELATION_KEY,
+                    Json.encodeToString<FilterParameters.Relation>(FilterParameters.Relation.Any)
+                )
+            ),
+            country = Json.decodeFromString(
+                getString(
+                    COUNTRY_KEY,
+                    Json.encodeToString<FilterParameters.Country>(FilterParameters.Country.Any)
+                )
+            ),
+            city = Json.decodeFromString(
+                getString(
+                    CITY_KEY,
+                    Json.encodeToString<FilterParameters.City>(FilterParameters.City.Any)
+                )
+            ),
             hasPhoto = getBoolean(HAS_PHOTO_KEY, false),
-            requiredGroupIds = getList(REQUIRED_GROUPS_KEY)
+            notClosed = getBoolean(NOT_CLOSED_KEY, false),
+            requiredGroupIds = getList(REQUIRED_GROUPS_KEY, listOf(), Int::class.java)
         )
     }
 
@@ -75,6 +119,7 @@ class SharedPrefFiltersRepo @Inject constructor(
         private const val COUNTRY_KEY = "COUNTRY_KEY"
         private const val CITY_KEY = "CITY_KEY"
         private const val HAS_PHOTO_KEY = "HAS_PHOTO_KEY"
+        private const val NOT_CLOSED_KEY = "NOT_CLOSED_KEY"
         private const val REQUIRED_GROUPS_KEY = "REQUIRED_GROUPS_KEY"
     }
 

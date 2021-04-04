@@ -6,6 +6,7 @@ import ru.g0rd1.peoplesfinder.mapper.VkResultMapper
 import ru.g0rd1.peoplesfinder.model.City
 import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.vk.VkRepo
+import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import javax.inject.Inject
 
 class HttpCityRepo @Inject constructor(
@@ -21,9 +22,9 @@ class HttpCityRepo @Inject constructor(
             query = query,
         ).map { apiVkResult ->
             vkResultMapper.transform(apiVkResult) { apiCities ->
-                apiCities.map { cityMapper.transform(it) }
+                apiCities.map { cityMapper.transform(it) }.sortedByDescending { it.important }
             }
-        }
+        }.subscribeOnIo()
     }
 
 }

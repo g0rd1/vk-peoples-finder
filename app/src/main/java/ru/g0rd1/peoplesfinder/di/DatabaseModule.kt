@@ -4,18 +4,22 @@ import android.content.Context
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import ru.g0rd1.peoplesfinder.db.Database
 import ru.g0rd1.peoplesfinder.db.dao.*
 import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 abstract class DatabaseModule {
 
     companion object {
 
         @Provides
         @Singleton
-        fun appDatabase(context: Context): Database =
+        fun appDatabase(@ApplicationContext context: Context): Database =
             Room.databaseBuilder(context, Database::class.java, "database")
                 .addCallback(Database.onCreateCallback)
                 .build()

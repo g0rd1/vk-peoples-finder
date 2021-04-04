@@ -12,8 +12,13 @@
         android:title="@string/settings_label" />
 
     <item
-        android:id="@+id/results_fragment"
+        android:id="@+id/user_detail_fragment"
         android:icon="@drawable/ic_person"
-        android:title="@string/results_label" />
+        android:title="@string/user_detail_label" />
+
+    <item
+        android:id="@+id/lists_fragment"
+        android:icon="@drawable/ic_list"
+        android:title="@string/lists_label" />
 
 </menu>

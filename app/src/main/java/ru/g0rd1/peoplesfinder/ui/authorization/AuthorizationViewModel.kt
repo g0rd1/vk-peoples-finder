@@ -1,23 +1,25 @@
 package ru.g0rd1.peoplesfinder.ui.authorization
 
-import androidx.lifecycle.ViewModel
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
+import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.auhorization.VkAuthorizationContract
 import ru.g0rd1.peoplesfinder.base.error.Error
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import javax.inject.Inject
 
+@HiltViewModel
 class AuthorizationViewModel @Inject constructor(
     private val vkAccessRepo: VKAccessRepo,
     private val vkAuthorizationHelper: VkAuthorizationContract.Helper,
     private val errorHandler: Error.Handler,
-    private val appNavigator: AppNavigator
-) : ViewModel() {
+    private val appNavigator: AppNavigator,
+) : BaseViewModel() {
 
-    fun onStart() {
+    override fun onStart() {
         if (VK.isLoggedIn()) {
             appNavigator.synchronization()
         } else {
@@ -35,7 +37,7 @@ class AuthorizationViewModel @Inject constructor(
             }
 
             override fun onLoginFailed(errorCode: Int) {
-//                errorHandler.handle(Exception("Ошибка авторизации")) { authorize() }
+                errorHandler.handle(Exception("Ошибка авторизации")) { authorize() }
             }
 
         })

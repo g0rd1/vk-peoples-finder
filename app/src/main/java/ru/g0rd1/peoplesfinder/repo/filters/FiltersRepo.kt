@@ -9,6 +9,8 @@ interface FiltersRepo {
 
     fun setAgeTo(ageTo: FilterParameters.Age)
 
+    fun setSex(sex: FilterParameters.Sex)
+
     fun setRelation(relation: FilterParameters.Relation)
 
     fun setCountry(country: FilterParameters.Country)
@@ -16,6 +18,8 @@ interface FiltersRepo {
     fun setCity(city: FilterParameters.City)
 
     fun setHasPhoto(hasPhoto: Boolean)
+
+    fun setNotClosed(notClosed: Boolean)
 
     fun setRequiredGroupIds(requiredGroupIds: List<Int>)
 

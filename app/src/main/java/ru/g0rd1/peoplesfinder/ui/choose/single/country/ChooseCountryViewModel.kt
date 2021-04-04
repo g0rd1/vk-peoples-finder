@@ -1,6 +1,9 @@
 package ru.g0rd1.peoplesfinder.ui.choose.single.country
 
+import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
+import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.model.Country
 import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.VkResult
@@ -14,10 +17,16 @@ import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class ChooseCountryViewModel @Inject constructor(
     private val filtersRepo: FiltersRepo,
-    private val countryRepo: CountryRepo
+    private val countryRepo: CountryRepo,
+    resourceManager: ResourceManager,
 ) : SingleChooseViewModel<Country>() {
+
+    override val title: String = resourceManager.getString(R.string.choose_county_dialog_title)
+    override val searchTextHint: String =
+        resourceManager.getString(R.string.choose_county_dialog_search_text_hint)
 
     val closeEvent = SingleLiveEvent<Unit>()
 
@@ -68,14 +77,18 @@ class ChooseCountryViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(position: Int) {
-        items.get()?.get(position)
-            ?.let { filtersRepo.setCountry(FilterParameters.Country.Specific(it.data as Country)) }
+    override fun onItemClick(item: SingleChooseItemViewModel<Country>) {
+        filtersRepo.setCountry(FilterParameters.Country.Specific(item.data))
         closeEvent.call()
     }
 
     override fun cancelChoice() {
+        filtersRepo.setCity(FilterParameters.City.Any)
         filtersRepo.setCountry(FilterParameters.Country.Any)
+        closeEvent.call()
+    }
+
+    override fun close() {
         closeEvent.call()
     }
 

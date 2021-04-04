@@ -4,8 +4,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
-import ru.g0rd1.peoplesfinder.util.observeOnUI
-import ru.g0rd1.peoplesfinder.util.subscribeOnIo
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
@@ -32,8 +31,7 @@ class PriorityQueueManager(capacity: Int) {
 
     init {
         jobDistribution
-            .subscribeOnIo()
-            .observeOnUI()
+            .subscribeOn(Schedulers.newThread())
             .subscribe {}
             .addTo(disposables)
     }
@@ -45,13 +43,13 @@ class PriorityQueueManager(capacity: Int) {
                     try {
                         priorityIdToWaitQueue[priorityId] = ArrayBlockingQueue(1)
                         priorityQueue.put(priorityId)
-                        priorityIdToWaitQueue[priorityId]?.take()
+                        priorityIdToWaitQueue[priorityId]!!.take()
                         priorityIdToWaitQueue.remove(priorityId)
                         jobQueue.put(priorityId)
                     } catch (t: Throwable) {
                         jobQueue.remove(priorityId)
                     }
-                }
+                }.subscribeOn(Schedulers.newThread())
                     .andThen(single)
                     .doFinally {
                         jobQueue.remove(priorityId)
@@ -72,7 +70,7 @@ class PriorityQueueManager(capacity: Int) {
                     } catch (t: Throwable) {
                         jobQueue.remove(priorityId)
                     }
-                }.onErrorComplete()
+                }.subscribeOn(Schedulers.newThread())
                     .andThen(completable)
                     .doFinally {
                         jobQueue.remove(priorityId)
@@ -84,9 +82,9 @@ class PriorityQueueManager(capacity: Int) {
         disposables.clear()
     }
 
-    private data class PriorityId(val id: String, val priority: Int) : Comparable<PriorityId> {
+    data class PriorityId(val id: String, val priority: Int) : Comparable<PriorityId> {
         override fun compareTo(other: PriorityId): Int {
-            return this.priority - other.priority
+            return this.priority.compareTo(other.priority)
         }
 
     }

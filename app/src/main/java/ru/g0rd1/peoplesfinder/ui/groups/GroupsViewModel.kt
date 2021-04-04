@@ -1,16 +1,13 @@
 package ru.g0rd1.peoplesfinder.ui.groups
 
-import androidx.databinding.ObservableArrayList
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
-import androidx.databinding.ObservableList
-import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Single
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.addTo
 import ru.g0rd1.peoplesfinder.R
+import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.error.Error
 import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoaderManager
@@ -20,12 +17,13 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@HiltViewModel
 class GroupsViewModel @Inject constructor(
     private val groupMembersLoaderManager: GroupMembersLoaderManager,
     private val localGroupsRepo: LocalGroupsRepo,
     private val errorHandler: Error.Handler,
     private val resourceManager: ResourceManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     val showContent = ObservableBoolean(false)
     val showLoader = ObservableBoolean(false)
@@ -45,11 +43,9 @@ class GroupsViewModel @Inject constructor(
     val membersCount = ObservableInt(0)
     val loadedMembersCount = ObservableInt(0)
 
-    val groupViewModels: ObservableList<GroupViewModel> = ObservableArrayList()
+    val groupViewModels: ObservableField<List<GroupViewModel>> = ObservableField()
 
-    private val disposables = CompositeDisposable()
-
-    fun onStart() {
+    override fun onStart() {
         observe()
     }
 
@@ -95,8 +91,7 @@ class GroupsViewModel @Inject constructor(
                     }
                 },
                 Timber::e
-            )
-            .addTo(disposables)
+            ).disposeLater()
     }
 
     private var changeProcessingLoaderVisibilityDisposable: Disposable? = null
@@ -190,8 +185,7 @@ class GroupsViewModel @Inject constructor(
                     membersCount.set(groups.sumBy { it.membersCount })
                     loadedMembersCount.set(groups.sumBy { it.loadedMembersCount })
                     showContent.set(true)
-                    groupViewModels.clear()
-                    groupViewModels.addAll(
+                    groupViewModels.set(
                         groups.sortedBy { it.sequentialNumber }.map { group ->
                             GroupViewModel(
                                 id = group.id,
@@ -211,12 +205,7 @@ class GroupsViewModel @Inject constructor(
                     showContent.set(false)
                     errorHandler.handle(it, ::observeGroups)
                 }
-            )
-            .addTo(disposables)
-    }
-
-    override fun onCleared() {
-        disposables.clear()
+            ).disposeLater()
     }
 
 }

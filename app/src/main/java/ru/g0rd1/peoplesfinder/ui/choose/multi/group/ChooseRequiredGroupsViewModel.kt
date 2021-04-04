@@ -1,6 +1,9 @@
 package ru.g0rd1.peoplesfinder.ui.choose.multi.group
 
+import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
+import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
@@ -11,10 +14,16 @@ import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class ChooseRequiredGroupsViewModel @Inject constructor(
     private val filtersRepo: FiltersRepo,
-    private val groupsRepo: LocalGroupsRepo
+    private val groupsRepo: LocalGroupsRepo,
+    resourceManager: ResourceManager,
 ) : MultichooseViewModel<Group>() {
+
+    override val title: String = resourceManager.getString(R.string.choose_required_groups_dialog_title)
+    override val searchTextHint: String =
+        resourceManager.getString(R.string.choose_required_groups_dialog_search_text_hint)
 
     val closeEvent = SingleLiveEvent<Unit>()
 
@@ -26,8 +35,10 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
     private fun observe() {
         observeSearchText()
             .doOnEach { loaderVisible.set(true) }
-            .flatMapSingle {
-                groupsRepo.get()
+            .flatMapSingle { searchText ->
+                groupsRepo.get().map {  groups ->
+                    groups.filter { it.name.contains(searchText, ignoreCase = true) }
+                }
             }
             .subscribeOnIo()
             .observeOnUI()
@@ -43,7 +54,7 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
                                 name = group.name,
                                 id = group.id,
                                 choosed = requiredGroups.any { it == group.id },
-                                imageUrl = null
+                                imageUrl = group.photo
                             )
                         }
                     )
@@ -52,10 +63,10 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(position: Int) {
+    override fun onItemClick(item: MultichooseItemViewModel<Group>) {
         items.set(
-            items.get()?.mapIndexed { index, item ->
-                if (position == index) item.copy(choosed = !item.choosed) else item
+            items.get()?.map {
+                if (it.id == item.id) it.copy(choosed = !item.choosed) else it
             }
         )
     }
@@ -69,6 +80,11 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
         filtersRepo.setRequiredGroupIds(
             items.get()?.filter { it.choosed }?.map { (it.data as Group).id } ?: listOf()
         )
+        closeEvent.call()
+    }
+
+    override fun close() {
+        closeEvent.call()
     }
 
 }

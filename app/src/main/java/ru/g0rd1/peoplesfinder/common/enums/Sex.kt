@@ -18,9 +18,9 @@ enum class Sex {
     @StringRes
     fun getStringResource(): Int {
         return when (this) {
-            NOT_SPECIFIED -> R.string.user_sex_male
+            NOT_SPECIFIED -> R.string.user_sex_not_specified
             FEMALE -> R.string.user_sex_female
-            MALE -> R.string.user_sex_not_specified
+            MALE -> R.string.user_sex_male
         }
     }
 }

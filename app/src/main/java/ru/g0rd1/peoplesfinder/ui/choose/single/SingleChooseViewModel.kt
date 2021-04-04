@@ -4,12 +4,13 @@ import androidx.annotation.CallSuper
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
+import ru.g0rd1.peoplesfinder.base.ItemClickListener
 import java.util.concurrent.TimeUnit
 
-abstract class SingleChooseViewModel<T> : BaseViewModel() {
+abstract class SingleChooseViewModel<T> : BaseViewModel(), ItemClickListener<SingleChooseItemViewModel<T>> {
 
     val searchText = ObservableField<String>()
 
@@ -17,15 +18,17 @@ abstract class SingleChooseViewModel<T> : BaseViewModel() {
 
     val items = ObservableField<List<SingleChooseItemViewModel<*>>>(listOf())
 
-    private val searchTextSubject: Subject<String> = PublishSubject.create()
-
-    abstract val cancelChoiceVisible: Boolean
-
     val errorText = ObservableField("")
 
     val errorVisible = ObservableBoolean()
 
-    val onItemClick: (Int) -> Unit = ::onItemClick
+    abstract val cancelChoiceVisible: Boolean
+
+    abstract val title: String
+
+    abstract val searchTextHint: String
+
+    private val searchTextSubject: Subject<String> = BehaviorSubject.createDefault("")
 
     @CallSuper
     override fun onStart() {
@@ -52,9 +55,9 @@ abstract class SingleChooseViewModel<T> : BaseViewModel() {
         errorVisible.set(false)
     }
 
-    abstract fun onItemClick(position: Int)
-
     abstract fun cancelChoice()
+
+    abstract fun close()
 
     private val onSearchTextChanged = object : Observable.OnPropertyChangedCallback() {
         override fun onPropertyChanged(sender: Observable?, propertyId: Int) {

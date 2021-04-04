@@ -1,5 +1,6 @@
 package ru.g0rd1.peoplesfinder.control.groupmembersloader
 
+import ru.g0rd1.peoplesfinder.common.PriorityQueueManager
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo

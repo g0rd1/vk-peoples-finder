@@ -15,7 +15,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@android:color/white">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/title"
@@ -33,18 +34,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
+                    android:onClick="@{() -> vm.close()}"
                     android:padding="8dp"
                     android:src="@drawable/ic_arrow_back"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:singleLine="true"
-                    android:text="Выберите город"
+                    android:text="@{vm.title}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/cancelChoice"
                     app:layout_constraintStart_toEndOf="@id/back"
@@ -57,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:onClick="@{() -> vm.cancelChoice()}"
                     android:padding="8dp"
-                    android:text="Отменить выбор"
+                    android:text="@string/dialog_single_choose_cancel_choice"
                     android:textColor="@color/red"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -83,9 +86,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:text="@={vm.searchText}" />
+                android:hint="@{vm.searchTextHint}"
+                android:inputType="text"
+                android:text="@={vm.searchText}"
+                tools:hint="Начните вводить название города"
+                tools:ignore="Autofill" />
 
         </androidx.cardview.widget.CardView>
 
@@ -93,14 +98,12 @@
             android:id="@+id/searchResults"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
             app:items="@{vm.items}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/searchTextContainer"
-            app:onItemClick="@{vm.onItemClick}"
             app:visible="@{!vm.items.empty}"
             tools:listitem="@layout/item_choose">
 
@@ -108,13 +111,16 @@
 
         <TextView
             android:id="@+id/noResultsMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="Нет результатов по данному запросу"
-            app:layout_constraintEnd_toEndOf="@+id/searchResults"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:text="@string/dialog_single_choose_no_results_message"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/searchTextContainer"
+            app:layout_constraintTop_toBottomOf="@id/searchTextContainer"
             app:visible="@{vm.items.empty}" />
 
         <ProgressBar

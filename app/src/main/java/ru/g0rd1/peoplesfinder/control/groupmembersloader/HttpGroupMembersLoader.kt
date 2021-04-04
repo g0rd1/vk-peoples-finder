@@ -9,7 +9,7 @@ import ru.g0rd1.peoplesfinder.model.error.VkError
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
-import java.util.*
+import java.time.LocalDate
 
 class HttpGroupMembersLoader(
     private val groupId: Int,
@@ -27,35 +27,39 @@ class HttpGroupMembersLoader(
                 is Optional.Empty -> Single.just(LoadResult.Error.Generic(Throwable("Нет группы с id $groupId")))
                 is Optional.Value -> {
                     localGroupsRepo.updateHasAccessToMembers(groupId, true)
-                        .andThen(load(it.value.loadedMembersCount, it.value.membersCount))
+                        .andThen(
+                            load(
+                                it.value.loadedMembersCount,
+                                it.value.membersCount,
+                            )
+                        )
                 }
             }
         }
     }
 
-    private fun load(offset: Int, membersCount: Int): Single<LoadResult> {
-        return if (offset <= membersCount) {
+    private fun load(lasOffset: Int, membersCount: Int): Single<LoadResult> {
+        val singles = (lasOffset..membersCount step DOWNLOAD_MEMBERS_STEP).map { offset ->
             Single.fromCallable { accessDenied }.flatMap { accessDenied ->
                 if (accessDenied) {
                     Single.just(LoadResult.Success)
                 } else {
-                    loadWithOffset(offset).flatMap { loadResult ->
-                        if (loadResult == LoadResult.Success) {
-                            load(
-                                offset + DOWNLOAD_MEMBERS_STEP,
-                                membersCount
-                            )
-                        } else {
-                            Single.just(loadResult)
-                        }
-                    }
+                    loadWithOffset(offset)
                 }
             }
-        } else {
-            localGroupsRepo.updateAllMembersLoadedDate(groupId, Date()).andThen(
-                Single.just(LoadResult.Success)
-            )
         }
+        return Single.concat(singles)
+            .skipWhile { it is LoadResult.Success }
+            .first(LoadResult.Success)
+            .flatMap {
+                if (it is LoadResult.Success) {
+                    localGroupsRepo.updateAllMembersLoadedDate(groupId, LocalDate.now()).andThen(
+                        Single.just(LoadResult.Success)
+                    )
+                } else {
+                    Single.just(it)
+                }
+            }
     }
 
     private fun loadWithOffset(offset: Int): Single<LoadResult> {
@@ -77,7 +81,8 @@ class HttpGroupMembersLoader(
                     is VkResult.Error.ApiVk -> {
                         when (getMembersResult.error) {
                             is VkError.Unknown,
-                            is VkError.RateLimitReached -> Single.just(
+                            is VkError.RateLimitReached,
+                            -> Single.just(
                                 LoadResult.Error.Vk(getMembersResult.error)
                             )
                             is VkError.TooManyRequestsPerSecond -> loadWithOffset(offset)
@@ -98,7 +103,7 @@ class HttpGroupMembersLoader(
     }
 
     companion object {
-        private const val DOWNLOAD_MEMBERS_STEP = 10000
+        private const val DOWNLOAD_MEMBERS_STEP = 1000
     }
 
 }

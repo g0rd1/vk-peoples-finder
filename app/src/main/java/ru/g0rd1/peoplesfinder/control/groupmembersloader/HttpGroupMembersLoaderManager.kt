@@ -1,6 +1,7 @@
 package ru.g0rd1.peoplesfinder.control.groupmembersloader
 
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -11,7 +12,6 @@ import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.ui.synchronization.SynchronizationObserver
 import ru.g0rd1.peoplesfinder.util.observeOnUI
-import ru.g0rd1.peoplesfinder.util.parts
 import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class HttpGroupMembersLoaderManager @Inject constructor(
     private val groupMembersLoaderFactory: GroupMembersLoader.Factory,
     private val localGroupsRepo: LocalGroupsRepo,
-    private val synchronizationObserver: SynchronizationObserver
+    private val synchronizationObserver: SynchronizationObserver,
 ) : GroupMembersLoaderManager {
 
     private val loadStatusSubject: BehaviorSubject<Status> = BehaviorSubject.create()
@@ -118,18 +118,13 @@ class HttpGroupMembersLoaderManager @Inject constructor(
 
     private fun load(): Single<GroupMembersLoader.LoadResult> {
         return localGroupsRepo.get().flatMap { groups ->
-            val loadSingles: List<Single<GroupMembersLoader.LoadResult>> =
-                groups.sortedBy { it.sequentialNumber }
-                    .map { groupMembersLoaderFactory.create(it.id) }
-                    .map { it.load() }
-                    .parts(MAX_GROUPS_LOADED_CONCURRENTLY)
-                    .map { listOfSingles: List<Single<GroupMembersLoader.LoadResult>> ->
-                        Single.concat(listOfSingles)
-                            .skipWhile { it is GroupMembersLoader.LoadResult.Success }
-                            .first(GroupMembersLoader.LoadResult.Success)
-                    }
+            val loadSingles: List<Single<GroupMembersLoader.LoadResult>> = groups
+                .sortedBy { it.sequentialNumber }
+                .map { groupMembersLoaderFactory.create(it.id).load() }
             Completable.fromAction { loadStatusSubject.onNext(Status.Load) }.andThen(
-                Single.merge(loadSingles)
+                Flowable
+                    .fromIterable(loadSingles)
+                    .flatMap({ it.toFlowable() }, MAX_GROUPS_LOADED_CONCURRENTLY)
                     .skipWhile { it is GroupMembersLoader.LoadResult.Success }
                     .first(GroupMembersLoader.LoadResult.Success)
             )
@@ -164,7 +159,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     }
 
     companion object {
-        const val MAX_GROUPS_LOADED_CONCURRENTLY = 5
+        const val MAX_GROUPS_LOADED_CONCURRENTLY = 10
     }
 
 }

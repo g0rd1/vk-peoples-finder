@@ -7,12 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import dagger.android.support.DaggerDialogFragment
+import androidx.fragment.app.DialogFragment
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.databinding.FragmentErrorBinding
 import javax.inject.Inject
 
-class ErrorDialogFragment : DaggerDialogFragment(), Error.View {
+class ErrorDialogFragment : DialogFragment(), Error.View {
 
     private var binding: FragmentErrorBinding? = null
 

@@ -40,20 +40,20 @@ open class SimpleSharedPrefRepo(repoName: String, context: Context): SharedPrefR
         return sharedPreferences.getBoolean(key, defValue)
     }
 
-    override fun <T> putObject(key: String, value: T) {
-        sharedPreferences.edit().putString(key, Gson().toJson(value)).commit()
+    override fun <T> putObject(key: String, value: T, clazz: Class<T>) {
+        sharedPreferences.edit().putString(key, Gson().toJson(value, clazz)).commit()
     }
 
-    override fun <T> getObject(key: String, defValue: T): T {
-        val type = object : TypeToken<T>() {}.type
-        return Gson().fromJson(sharedPreferences.getString(key, null), type) ?: defValue
+    override fun <T> getObject(key: String, defValue: T, clazz: Class<T>): T {
+        return Gson().fromJson(sharedPreferences.getString(key, null), clazz) ?: defValue
     }
 
-    override fun <T> putList(key: String, value: List<T>) {
-        sharedPreferences.edit().putString(key, Gson().toJson(value)).commit()
+    override fun <T> putList(key: String, value: List<T>, clazz: Class<T>) {
+        val type = object : TypeToken<List<T>>() {}.type
+        sharedPreferences.edit().putString(key, Gson().toJson(value, type)).commit()
     }
 
-    override fun <T> getList(key: String, defValue: List<T>): List<T> {
+    override fun <T> getList(key: String, defValue: List<T>, clazz: Class<T>): List<T> {
         val type = object : TypeToken<List<T>>() {}.type
         return Gson().fromJson(sharedPreferences.getString(key, null), type) ?: defValue
     }

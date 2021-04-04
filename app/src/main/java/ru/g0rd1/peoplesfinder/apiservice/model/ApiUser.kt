@@ -22,7 +22,7 @@ data class ApiUser(
     val isClosed: Boolean,
 
     @SerializedName("bdate")
-    val birthday: String?,
+    val birthdayRaw: String?,
 
     @SerializedName("country")
     val country: ApiCountry?,
@@ -42,7 +42,7 @@ data class ApiUser(
     @SerializedName("photo_100")
     val photo100: String?,
 
-    @SerializedName("photo_max")
+    @SerializedName("photo_max_orig")
     val photoMax: String?
 
 )

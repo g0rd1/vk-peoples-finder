@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.databinding.FragmentSynchronizationBinding
-import javax.inject.Inject
+import timber.log.Timber
 
-class SynchronizationFragment : DaggerFragment() {
+@AndroidEntryPoint
+class SynchronizationFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModel: SynchronizationViewModel
+    private val viewModel: SynchronizationViewModel by viewModels()
 
     lateinit var binding: FragmentSynchronizationBinding
 
@@ -26,6 +28,7 @@ class SynchronizationFragment : DaggerFragment() {
     }
 
     override fun onStart() {
+        Timber.d("onStart()")
         super.onStart()
         viewModel.onStart()
     }

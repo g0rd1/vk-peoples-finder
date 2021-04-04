@@ -7,8 +7,10 @@ interface AppNavigator {
     fun synchronization()
     fun groups()
     fun settings()
-    fun results()
+    fun userDetail()
+    fun lists()
     fun back()
+    fun showFragment(fragment: Fragment)
     fun addOnFragmentChangeListener(listener: (Fragment) -> Unit)
     fun removeOnFragmentChangeListener(listener: (Fragment) -> Unit)
 }

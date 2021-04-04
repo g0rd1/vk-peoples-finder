@@ -2,6 +2,7 @@ package ru.g0rd1.peoplesfinder.ui.synchronization
 
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Completable
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
@@ -13,6 +14,7 @@ import ru.g0rd1.peoplesfinder.util.exhaustive
 import ru.g0rd1.peoplesfinder.util.observeOnUI
 import javax.inject.Inject
 
+@HiltViewModel
 class SynchronizationViewModel @Inject constructor(
     private val localGroupsRepo: LocalGroupsRepo,
     private val vkGroupsRepo: VkGroupsRepo,

@@ -12,7 +12,7 @@ import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.model.Optional
 import ru.g0rd1.peoplesfinder.util.subscribeOnIo
-import java.util.*
+import java.time.LocalDate
 import javax.inject.Inject
 
 class DBLocalGroupsRepo @Inject constructor(
@@ -27,7 +27,7 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun updateLoadedMembersCount(id: Int, loadedMembersCount: Int): Completable =
         groupDataDao.updateLoadedMembersCount(id, loadedMembersCount).subscribeOnIo()
 
-    override fun updateAllMembersLoadedDate(id: Int, allMembersLoadedDate: Date?): Completable =
+    override fun updateAllMembersLoadedDate(id: Int, allMembersLoadedDate: LocalDate?): Completable =
         groupDataDao.updateAllMembersLoadedDate(id, allMembersLoadedDate).subscribeOnIo()
 
     override fun updateSequentialNumber(id: Int, sequentialNumber: Int): Completable =

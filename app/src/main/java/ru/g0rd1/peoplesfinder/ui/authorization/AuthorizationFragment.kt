@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.databinding.FragmentAuthorizationBinding
 import timber.log.Timber
-import javax.inject.Inject
 
 
-class AuthorizationFragment : DaggerFragment() {
+@AndroidEntryPoint
+class AuthorizationFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModel: AuthorizationViewModel
+    private val viewModel: AuthorizationViewModel by viewModels()
 
     lateinit var binding: FragmentAuthorizationBinding
 
@@ -21,12 +22,12 @@ class AuthorizationFragment : DaggerFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Timber.d("TEST: onCreateView(")
         binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onStart() {
+        Timber.d("onStart()")
         super.onStart()
         viewModel.onStart()
     }

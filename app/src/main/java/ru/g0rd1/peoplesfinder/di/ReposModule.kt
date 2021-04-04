@@ -1,7 +1,12 @@
 package ru.g0rd1.peoplesfinder.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import ru.g0rd1.peoplesfinder.repo.access.SharedPrefVKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
@@ -18,9 +23,12 @@ import ru.g0rd1.peoplesfinder.repo.vk.city.CityRepo
 import ru.g0rd1.peoplesfinder.repo.vk.city.HttpCityRepo
 import ru.g0rd1.peoplesfinder.repo.vk.country.CountryRepo
 import ru.g0rd1.peoplesfinder.repo.vk.country.HttpCountryRepo
+import ru.g0rd1.peoplesfinder.repo.vk.photo.HttpPhotoRepo
+import ru.g0rd1.peoplesfinder.repo.vk.photo.PhotoRepo
 import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 abstract class ReposModule {
 
     @Binds
@@ -39,13 +47,13 @@ abstract class ReposModule {
     @Singleton
     abstract fun localUsersRepo(localUsersRepo: DBLocalUsersRepo): LocalUsersRepo
 
-    @Binds
-    @Singleton
-    abstract fun accessRepo(accessRepo: SharedPrefVKAccessRepo): VKAccessRepo
+    // @Binds
+    // @Singleton
+    // abstract fun accessRepo(accessRepo: SharedPrefVKAccessRepo): VKAccessRepo
 
-    @Binds
-    @Singleton
-    abstract fun filtersRepo(filtersRepo: SharedPrefFiltersRepo): FiltersRepo
+    // @Binds
+    // @Singleton
+    // abstract fun filtersRepo(filtersRepo: SharedPrefFiltersRepo): FiltersRepo
 
     @Binds
     @Singleton
@@ -54,5 +62,21 @@ abstract class ReposModule {
     @Binds
     @Singleton
     abstract fun countryRepo(countryRepo: HttpCountryRepo): CountryRepo
+
+    @Binds
+    @Singleton
+    abstract fun photoRepo(photoRepo: HttpPhotoRepo): PhotoRepo
+
+    companion object {
+
+        @Provides
+        @Singleton
+        fun filtersRepo(@ApplicationContext context: Context): FiltersRepo = SharedPrefFiltersRepo(context)
+
+        @Provides
+        @Singleton
+        fun accessRepo(@ApplicationContext context: Context): VKAccessRepo = SharedPrefVKAccessRepo(context)
+
+    }
 
 }

@@ -20,7 +20,7 @@ class SingleChooseItemDiffCallbackFactory <T> : AppDiffCallbackFactory<SingleCho
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return oldItems[oldItemPosition] == newItems[newItemPosition]
+                return (oldItems[oldItemPosition] == newItems[newItemPosition])
             }
         }
 

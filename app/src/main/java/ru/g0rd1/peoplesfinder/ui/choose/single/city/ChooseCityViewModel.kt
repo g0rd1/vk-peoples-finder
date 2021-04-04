@@ -1,6 +1,9 @@
 package ru.g0rd1.peoplesfinder.ui.choose.single.city
 
+import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
+import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.model.City
 import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.VkResult
@@ -14,10 +17,16 @@ import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import timber.log.Timber
 import javax.inject.Inject
 
+@HiltViewModel
 class ChooseCityViewModel @Inject constructor(
     private val filtersRepo: FiltersRepo,
-    private val cityRepo: CityRepo
+    private val cityRepo: CityRepo,
+    resourceManager: ResourceManager,
 ) : SingleChooseViewModel<City>() {
+
+    override val title: String = resourceManager.getString(R.string.choose_city_dialog_title)
+    override val searchTextHint: String =
+        resourceManager.getString(R.string.choose_city_dialog_search_text_hint)
 
     val closeEvent = SingleLiveEvent<Unit>()
 
@@ -35,7 +44,7 @@ class ChooseCityViewModel @Inject constructor(
             .flatMapSingle {
                 val countryId = when (val country = filtersRepo.getFilterParameters().country) {
                     FilterParameters.Country.Any -> null
-                    is FilterParameters.Country.Specific -> country.data.id
+                    is FilterParameters.Country.Specific -> country.country.id
                 }
                 cityRepo.getCities(countryId, it)
             }
@@ -74,13 +83,16 @@ class ChooseCityViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(position: Int) {
-        items.get()?.get(position)?.let { filtersRepo.setCity(FilterParameters.City.Specific(it.data as City)) }
+    override fun onItemClick(item: SingleChooseItemViewModel<City>) {
+        filtersRepo.setCity(FilterParameters.City.Specific(item.data))
         closeEvent.call()
     }
 
     override fun cancelChoice() {
         filtersRepo.setCity(FilterParameters.City.Any)
+        closeEvent.call()
+    }
+    override fun close() {
         closeEvent.call()
     }
 

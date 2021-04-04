@@ -6,5 +6,7 @@ data class ApiCity(
     @SerializedName("id")
     val id: Int,
     @SerializedName("title")
-    val title: String
+    val title: String,
+    @SerializedName("important")
+    val important: Int?
 )

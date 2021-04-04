@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerDialogFragment
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
+import ru.g0rd1.peoplesfinder.base.FullScreenDialogFragment
 import ru.g0rd1.peoplesfinder.databinding.DialogSingleChooseBinding
-import ru.g0rd1.peoplesfinder.model.City
 import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemAdapter
-import javax.inject.Inject
 
-class ChooseCityFragment : DaggerDialogFragment() {
+@AndroidEntryPoint
+class ChooseCityFragment : FullScreenDialogFragment() {
 
-    @Inject
-    lateinit var viewModel: ChooseCityViewModel
+    private val viewModel: ChooseCityViewModel by viewModels()
 
     lateinit var binding: DialogSingleChooseBinding
 
@@ -23,7 +23,7 @@ class ChooseCityFragment : DaggerDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DialogSingleChooseBinding.inflate(inflater, container, false)
-        binding.searchResults.adapter = SingleChooseItemAdapter<City>()
+        binding.searchResults.adapter = SingleChooseItemAdapter(viewModel)
         binding.vm = viewModel
         return binding.root
     }

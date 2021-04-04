@@ -16,13 +16,13 @@ interface SharedPrefRepo {
 
     fun getBoolean(key: String, defValue: Boolean = false): Boolean
 
-    fun <T> putObject(key: String, value: T)
+    fun <T> putObject(key: String, value: T, clazz: Class<T>)
 
-    fun <T> getObject(key: String, defValue: T): T
+    fun <T> getObject(key: String, defValue: T, clazz: Class<T>): T
 
-    fun <T> putList(key: String, value: List<T>)
+    fun <T> putList(key: String, value: List<T>, clazz: Class<T>)
 
-    fun <T> getList(key: String, defValue: List<T> = listOf()): List<T>
+    fun <T> getList(key: String, defValue: List<T> = listOf(), clazz: Class<T>): List<T>
 
     fun <T : Enum<T>> putEnum(key: String, value: T)
 

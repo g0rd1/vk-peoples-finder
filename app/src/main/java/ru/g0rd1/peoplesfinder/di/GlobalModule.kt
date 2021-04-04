@@ -1,8 +1,12 @@
 package ru.g0rd1.peoplesfinder.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import ru.g0rd1.peoplesfinder.apiservice.ApiClient
 import ru.g0rd1.peoplesfinder.apiservice.ApiClientFactory
 import ru.g0rd1.peoplesfinder.apiservice.PriorityQueueApiClient
@@ -15,17 +19,22 @@ import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 abstract class GlobalModule {
 
     @Binds
     @Singleton
     abstract fun navigator(navigator: SimpleAppNavigator): AppNavigator
 
-    @Binds
-    @Singleton
-    abstract fun resManager(resManager: AppResourceManager): ResourceManager
+    // @Binds
+    // @Singleton
+    // abstract fun resManager(resManager: AppResourceManager): ResourceManager
 
     companion object {
+
+        @Provides
+        @Singleton
+        fun resManager(@ApplicationContext context: Context): ResourceManager = AppResourceManager(context)
 
         @Provides
         @Singleton

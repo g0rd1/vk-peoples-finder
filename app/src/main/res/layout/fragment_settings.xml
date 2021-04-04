@@ -29,8 +29,8 @@
 
         <LinearLayout
             android:id="@+id/ageValueContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:orientation="horizontal"
@@ -42,25 +42,30 @@
             <!--suppress AndroidUnknownAttribute -->
             <Spinner
                 android:id="@+id/ageFrom"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fragment_settings_view_height"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
                 android:selectedItemPosition="@={vm.selectedAgeFromPosition}"
-                app:items="@{vm.ageFromItems}" />
+                app:items="@{vm.ageFromTextItems}" />
 
-            <TextView
+            <View
                 android:id="@+id/dash"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fragment_settings_view_height"
-                android:gravity="center"
-                android:text="@string/dash" />
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:background="?android:attr/listDivider"
+                android:backgroundTint="@color/black" />
 
             <!--suppress AndroidUnknownAttribute -->
             <Spinner
                 android:id="@+id/ageTo"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fragment_settings_view_height"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="8"
                 android:selectedItemPosition="@={vm.selectedAgeToPosition}"
-                app:items="@{vm.ageToItems}" />
+                app:items="@{vm.ageToTextItems}" />
 
         </LinearLayout>
 
@@ -86,12 +91,12 @@
         <!--suppress AndroidUnknownAttribute -->
         <Spinner
             android:id="@+id/sexValue"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:selectedItemPosition="@={vm.selectedSexPosition}"
-            app:items="@{vm.sexItems}"
+            app:items="@{vm.sexTextItems}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -119,12 +124,12 @@
         <!--suppress AndroidUnknownAttribute -->
         <Spinner
             android:id="@+id/relationValue"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:selectedItemPosition="@={vm.selectedRelationPosition}"
-            app:items="@{vm.relationItems}"
+            app:items="@{vm.relationTextItems}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -153,10 +158,11 @@
         <TextView
             android:id="@+id/countryValue"
             style="@style/Widget.AppCompat.Spinner.DropDown"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:onClick="@{() -> vm.chooseCountry()}"
             android:text="@{vm.country}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -189,10 +195,11 @@
         <TextView
             android:id="@+id/cityValue"
             style="@style/Widget.AppCompat.Spinner.DropDown"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:onClick="@{() -> vm.chooseCity()}"
             android:text="@{vm.city}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -243,6 +250,39 @@
             app:layout_constraintTop_toBottomOf="@id/hasPhotoTitle" />
 
         <TextView
+            android:id="@+id/notClosedTitle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:labelFor="@id/notClosedCheckBox"
+            android:text="@string/fragment_settings_not_closed_title"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/hasPhotoTitle" />
+
+        <CheckBox
+            android:id="@+id/notClosedCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_settings_view_height"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:checked="@{vm.notClosed}"
+            android:onClick="@{() -> vm.notClosedClicked()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/notClosedTitle" />
+
+        <View
+            android:id="@+id/notClosedDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintTop_toBottomOf="@id/notClosedTitle" />
+
+        <TextView
             android:id="@+id/requiredGroupsTitle"
             android:layout_width="0dp"
             android:layout_height="@dimen/fragment_settings_view_height"
@@ -252,7 +292,7 @@
             android:text="@string/fragment_settings_required_groups_title"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/hasPhotoTitle" />
+            app:layout_constraintTop_toBottomOf="@id/notClosedTitle" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/requiredGroupsButton"
@@ -260,6 +300,7 @@
             android:layout_height="@dimen/fragment_settings_view_height"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:onClick="@{() -> vm.chooseRequiredGroups()}"
             android:text="@{vm.requiredGroupIdsCount > 0 ? @plurals/groups_choosed(vm.requiredGroupIdsCount, vm.requiredGroupIdsCount) : @string/fragment_settings_requiredGroupsButton_zero_groups_choosed}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -272,7 +313,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.45" />
+            app:layout_constraintGuide_percent="0.35" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

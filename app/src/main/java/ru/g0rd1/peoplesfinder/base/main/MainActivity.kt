@@ -3,15 +3,14 @@ package ru.g0rd1.peoplesfinder.base.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.ListFragment
 import com.vk.api.sdk.VK
 import com.vk.api.sdk.auth.VKAccessToken
 import com.vk.api.sdk.auth.VKAuthCallback
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.HasAndroidInjector
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.MainActivityProvider
 import ru.g0rd1.peoplesfinder.base.auhorization.VkAuthorizationContract
@@ -19,17 +18,15 @@ import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.databinding.ActivityMainBinding
 import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment
 import ru.g0rd1.peoplesfinder.ui.groups.GroupsFragment
-import ru.g0rd1.peoplesfinder.ui.results.ResultsFragment
 import ru.g0rd1.peoplesfinder.ui.settings.SettingsFragment
 import ru.g0rd1.peoplesfinder.ui.synchronization.SynchronizationFragment
+import ru.g0rd1.peoplesfinder.ui.userDetail.UserDetailDialog
 import javax.inject.Inject
 
-class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector {
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
-
-    @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var appNavigator: AppNavigator
@@ -56,9 +53,13 @@ class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector {
                 binding?.navView?.visibility = View.VISIBLE
                 binding?.navView?.selectedItemId = R.id.settings_fragment
             }
-            is ResultsFragment -> {
+            is UserDetailDialog -> {
                 binding?.navView?.visibility = View.VISIBLE
-                binding?.navView?.selectedItemId = R.id.results_fragment
+                binding?.navView?.selectedItemId = R.id.user_detail_fragment
+            }
+            is ListFragment -> {
+                binding?.navView?.visibility = View.VISIBLE
+                binding?.navView?.selectedItemId = R.id.lists_fragment
             }
         }
     }
@@ -102,8 +103,12 @@ class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector {
                     appNavigator.settings()
                     true
                 }
-                R.id.results_fragment -> {
-                    appNavigator.results()
+                R.id.user_detail_fragment -> {
+                    appNavigator.userDetail()
+                    true
+                }
+                R.id.lists_fragment -> {
+                    appNavigator.lists()
                     true
                 }
                 else -> false
@@ -124,10 +129,6 @@ class MainActivity : DaggerAppCompatActivity(), HasAndroidInjector {
 
     override fun onBackPressed() {
         appNavigator.back()
-    }
-
-    override fun androidInjector(): AndroidInjector<Any> {
-        return dispatchingAndroidInjector
     }
 
 }

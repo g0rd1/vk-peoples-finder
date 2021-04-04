@@ -19,4 +19,5 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("ru.g0rd1.peoplesfinder", appContext.packageName)
     }
+
 }

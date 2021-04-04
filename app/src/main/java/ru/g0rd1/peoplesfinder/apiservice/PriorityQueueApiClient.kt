@@ -1,10 +1,7 @@
 package ru.g0rd1.peoplesfinder.apiservice
 
 import io.reactivex.Single
-import ru.g0rd1.peoplesfinder.apiservice.model.ApiCity
-import ru.g0rd1.peoplesfinder.apiservice.model.ApiCountry
-import ru.g0rd1.peoplesfinder.apiservice.model.ApiGroup
-import ru.g0rd1.peoplesfinder.apiservice.model.ApiUser
+import ru.g0rd1.peoplesfinder.apiservice.model.*
 import ru.g0rd1.peoplesfinder.apiservice.response.ApiVkResponse
 import ru.g0rd1.peoplesfinder.common.PriorityQueueManager
 import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
@@ -12,7 +9,7 @@ import ru.g0rd1.peoplesfinder.repo.access.VKAccessRepo
 class PriorityQueueApiClient(
     apiClient: ApiClient,
     private val vkAccessRepo: VKAccessRepo,
-    private val priorityQueueManager: PriorityQueueManager
+    private val priorityQueueManager: PriorityQueueManager,
 ) : ApiClientDecorator(apiClient) {
 
     override fun getGroups(
@@ -22,7 +19,7 @@ class PriorityQueueApiClient(
         offset: Int,
         count: Int,
         accessToken: String,
-        version: String
+        version: String,
     ): Single<ApiVkResponse<ApiGroup>> {
         return priorityQueueManager.getQueuedSingle(
             apiClient.getGroups(
@@ -39,12 +36,23 @@ class PriorityQueueApiClient(
     }
 
     override fun getGroupMembers(
-        code: String,
+        groupId: String,
+        offset: Int,
+        count: Int,
+        sort: String?,
+        fields: String,
         accessToken: String,
-        version: String
+        version: String,
     ): Single<ApiVkResponse<ApiUser>> {
         return priorityQueueManager.getQueuedSingle(
-            apiClient.getGroupMembers(code, accessToken, version),
+            apiClient.getGroupMembers(groupId, offset, count, sort, fields, accessToken, version),
+            LOW_PRIORITY
+        )
+    }
+
+    override fun execute(code: String, accessToken: String, version: String): Single<ApiVkResponse<ApiUser>> {
+        return priorityQueueManager.getQueuedSingle(
+            apiClient.execute(code, accessToken, version),
             LOW_PRIORITY
         )
     }
@@ -53,7 +61,7 @@ class PriorityQueueApiClient(
         needAll: Int,
         count: Int,
         accessToken: String,
-        version: String
+        version: String,
     ): Single<ApiVkResponse<ApiCountry>> {
         return priorityQueueManager.getQueuedSingle(
             apiClient.getCountries(needAll, count, accessToken, version),
@@ -67,10 +75,26 @@ class PriorityQueueApiClient(
         countryId: Int?,
         query: String?,
         accessToken: String,
-        version: String
+        version: String,
     ): Single<ApiVkResponse<ApiCity>> {
         return priorityQueueManager.getQueuedSingle(
             apiClient.getCities(needAll, count, countryId, query, accessToken, version),
+            HIGH_PRIORITY
+        )
+    }
+
+    override fun getProfilePhotos(
+        ownerId: Int,
+        extended: Int,
+        offset: Int,
+        count: Int,
+        photoSizes: Int,
+        rev: Int,
+        accessToken: String,
+        version: String,
+    ): Single<ApiVkResponse<ApiPhoto>> {
+        return priorityQueueManager.getQueuedSingle(
+            apiClient.getProfilePhotos(ownerId, extended, offset, count, photoSizes, rev, accessToken, version),
             HIGH_PRIORITY
         )
     }

@@ -55,14 +55,17 @@
 
                 <ImageView
                     android:id="@+id/avatar"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:scaleType="centerInside"
+                    android:onClick="@{() -> vm.showPhotos()}"
+                    android:scaleType="centerCrop"
+                    app:imageUrl="@{vm.imageUrl}"
                     app:layout_constraintDimensionRatio="1:1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:srcCompat="@tools:sample/avatars[0]" />
+                    tools:srcCompat="@tools:sample/avatars[0]"
+                    tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/infoContainer"
@@ -227,6 +230,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="32dp"
+                    android:text="@{@plurals/groups_same(vm.sameGroups.size(), vm.sameGroups.size())}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/toUserPageButton"
                     app:visible="@{!vm.sameGroups.empty}"
@@ -271,7 +275,8 @@
                     app:layout_constraintEnd_toStartOf="@id/blocked"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintWidth_percent="0.2"
+                    tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/blocked"
@@ -285,7 +290,8 @@
                     app:layout_constraintEnd_toStartOf="@id/favorite"
                     app:layout_constraintStart_toEndOf="@id/viewed"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintWidth_percent="0.2"
+                    tools:ignore="ContentDescription" />
 
                 <ImageView
                     android:id="@+id/favorite"
@@ -299,7 +305,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/blocked"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2" />
+                    app:layout_constraintWidth_percent="0.2"
+                    tools:ignore="ContentDescription" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

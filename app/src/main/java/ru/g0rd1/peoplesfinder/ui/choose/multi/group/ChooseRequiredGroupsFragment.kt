@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerDialogFragment
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
+import ru.g0rd1.peoplesfinder.base.FullScreenDialogFragment
 import ru.g0rd1.peoplesfinder.databinding.DialogMultichooseBinding
-import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseItemAdapter
-import javax.inject.Inject
 
-class ChooseRequiredGroupsFragment : DaggerDialogFragment() {
+@AndroidEntryPoint
+class ChooseRequiredGroupsFragment : FullScreenDialogFragment() {
 
-    @Inject
-    lateinit var viewModel: ChooseRequiredGroupsViewModel
+    private val viewModel: ChooseRequiredGroupsViewModel by viewModels()
 
     lateinit var binding: DialogMultichooseBinding
 
@@ -23,7 +23,7 @@ class ChooseRequiredGroupsFragment : DaggerDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = DialogMultichooseBinding.inflate(inflater, container, false)
-        binding.searchResults.adapter = MultichooseItemAdapter<Group>()
+        binding.searchResults.adapter = MultichooseItemAdapter(viewModel)
         binding.vm = viewModel
         return binding.root
     }

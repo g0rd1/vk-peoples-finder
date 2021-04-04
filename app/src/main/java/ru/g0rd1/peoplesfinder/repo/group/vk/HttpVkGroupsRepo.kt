@@ -1,7 +1,6 @@
 package ru.g0rd1.peoplesfinder.repo.group.vk
 
 import io.reactivex.Single
-import ru.g0rd1.peoplesfinder.apiservice.ApiClient
 import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.mapper.UserMapper
 import ru.g0rd1.peoplesfinder.mapper.VkErrorMapper
@@ -20,7 +19,7 @@ class HttpVkGroupsRepo @Inject constructor(
     private val userMapper: UserMapper,
     private val groupMapper: GroupMapper,
     private val vkErrorMapper: VkErrorMapper,
-    private val vkResultMapper: VkResultMapper
+    private val vkResultMapper: VkResultMapper,
 ) : VkGroupsRepo {
 
     private var groupsCache: MutableMap<Int, List<Group>> = mutableMapOf()
@@ -32,32 +31,28 @@ class HttpVkGroupsRepo @Inject constructor(
             userId = userId,
             count = DEFAULT_GROUP_COUNT
         ).map {
-            val vkResult = vkResultMapper.transform(it) { apiGroups ->
-                apiGroups.mapIndexed { index, apiGroup ->
-                    groupMapper.transform(apiGroup, index)
+            try {
+                val vkResult = vkResultMapper.transform(it) { apiGroups ->
+                    apiGroups.mapIndexed { index, apiGroup ->
+                        groupMapper.transform(apiGroup, index)
+                    }
                 }
+                if (vkResult is VkResult.Success) {
+                    groupsCache[userId] = vkResult.data
+                }
+                vkResult
+            } catch (t: Throwable) {
+                VkResult.Error.Generic(t)
             }
-            if (vkResult is VkResult.Success) {
-                groupsCache[userId] = vkResult.data
-            }
-            vkResult
         }.subscribeOnIo()
     }
 
     override fun getGroupMembers(
         groupId: String,
         count: Int,
-        offset: Int
+        offset: Int,
     ): Single<VkResult<List<User>>> {
-        if (count % DEFAULT_STEPS_COUNT != 0) throw IllegalArgumentException("the number should be divisible by $DEFAULT_STEPS_COUNT")
-        val step = count / DEFAULT_STEPS_COUNT
-        val code = ApiClient.getGroupMembersCode(
-            groupId = groupId,
-            offset = offset,
-            step = step,
-            stepsCount = DEFAULT_STEPS_COUNT
-        )
-        return vkRepo.getGroupMembers(code).map { apiVkResult ->
+        return vkRepo.getGroupMembers(groupId, offset, count).map { apiVkResult ->
             vkResultMapper.transform(apiVkResult) { apiUsers ->
                 apiUsers.map { userMapper.transform(it) }
             }

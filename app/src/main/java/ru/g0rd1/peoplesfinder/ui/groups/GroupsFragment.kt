@@ -4,14 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import dagger.android.support.DaggerFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.databinding.FragmentGroupsBinding
-import javax.inject.Inject
+import timber.log.Timber
 
-class GroupsFragment : DaggerFragment() {
+@AndroidEntryPoint
+class GroupsFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModel: GroupsViewModel
+    private val viewModel: GroupsViewModel by viewModels()
 
     lateinit var binding: FragmentGroupsBinding
 
@@ -27,6 +29,7 @@ class GroupsFragment : DaggerFragment() {
     }
 
     override fun onStart() {
+        Timber.d("onStart()")
         super.onStart()
         viewModel.onStart()
     }
