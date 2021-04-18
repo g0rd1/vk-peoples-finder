@@ -10,13 +10,13 @@ import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.ItemClickListener
 import java.util.concurrent.TimeUnit
 
-abstract class SingleChooseViewModel<T> : BaseViewModel(), ItemClickListener<SingleChooseItemViewModel<T>> {
+abstract class SingleChooseViewModel<T> : BaseViewModel(), ItemClickListener<SingleChooseItemViewData<T>> {
 
     val searchText = ObservableField<String>()
 
     val loaderVisible = ObservableBoolean()
 
-    val items = ObservableField<List<SingleChooseItemViewModel<*>>>(listOf())
+    val items = ObservableField<List<SingleChooseItemViewData<*>>>(listOf())
 
     val errorText = ObservableField("")
 

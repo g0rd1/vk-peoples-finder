@@ -5,13 +5,13 @@ import ru.g0rd1.peoplesfinder.base.BindingRecyclerViewAdapter
 import ru.g0rd1.peoplesfinder.base.ItemClickListener
 import ru.g0rd1.peoplesfinder.databinding.ItemMultichooseBinding
 
-class MultichooseItemAdapter<T>(itemClickListener: ItemClickListener<MultichooseItemViewModel<T>>) :
-    BindingRecyclerViewAdapter<ItemMultichooseBinding, MultichooseItemViewModel<T>>(
+class MultichooseItemAdapter<T>(itemClickListener: ItemClickListener<MultichooseItemViewData<T>>) :
+    BindingRecyclerViewAdapter<ItemMultichooseBinding, MultichooseItemViewData<T>>(
         R.layout.item_multichoose,
         MultichooseItemDiffCallbackFactory<T>(),
         itemClickListener
     ) {
 
-    override fun getSetViewModelToBindingFunction(holderBinding: ItemMultichooseBinding): (MultichooseItemViewModel<T>) -> Unit =
+    override fun getSetViewModelToBindingFunction(holderBinding: ItemMultichooseBinding): (MultichooseItemViewData<T>) -> Unit =
         holderBinding::setItem
 }

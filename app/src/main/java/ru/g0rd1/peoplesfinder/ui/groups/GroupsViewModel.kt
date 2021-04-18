@@ -43,7 +43,7 @@ class GroupsViewModel @Inject constructor(
     val membersCount = ObservableInt(0)
     val loadedMembersCount = ObservableInt(0)
 
-    val groupViewModels: ObservableField<List<GroupViewModel>> = ObservableField()
+    val groupViewModels: ObservableField<List<GroupViewData>> = ObservableField()
 
     override fun onStart() {
         observe()
@@ -187,7 +187,7 @@ class GroupsViewModel @Inject constructor(
                     showContent.set(true)
                     groupViewModels.set(
                         groups.sortedBy { it.sequentialNumber }.map { group ->
-                            GroupViewModel(
+                            GroupViewData(
                                 id = group.id,
                                 name = group.name,
                                 photo = group.photo,

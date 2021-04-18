@@ -3,11 +3,11 @@ package ru.g0rd1.peoplesfinder.ui.groups
 import androidx.recyclerview.widget.DiffUtil
 import ru.g0rd1.peoplesfinder.common.AppDiffCallbackFactory
 
-class GroupsDiffCallbackFactory : AppDiffCallbackFactory<GroupViewModel> {
+class GroupsDiffCallbackFactory : AppDiffCallbackFactory<GroupViewData> {
 
     override fun create(
-        oldItems: List<GroupViewModel>,
-        newItems: List<GroupViewModel>
+        oldItems: List<GroupViewData>,
+        newItems: List<GroupViewData>
     ): DiffUtil.Callback {
         return object : DiffUtil.Callback() {
             override fun getOldListSize(): Int = oldItems.size

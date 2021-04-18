@@ -9,7 +9,7 @@ import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.repo.vk.city.CityRepo
-import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewModel
+import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewData
 import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseViewModel
 import ru.g0rd1.peoplesfinder.util.exhaustive
 import ru.g0rd1.peoplesfinder.util.observeOnUI
@@ -69,7 +69,7 @@ class ChooseCityViewModel @Inject constructor(
                             clearError()
                             items.set(
                                 it.data.map { city ->
-                                    SingleChooseItemViewModel(
+                                    SingleChooseItemViewData(
                                         data = city,
                                         name = city.title,
                                         id = city.id
@@ -83,7 +83,7 @@ class ChooseCityViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(item: SingleChooseItemViewModel<City>) {
+    override fun onItemClick(item: SingleChooseItemViewData<City>) {
         filtersRepo.setCity(FilterParameters.City.Specific(item.data))
         closeEvent.call()
     }

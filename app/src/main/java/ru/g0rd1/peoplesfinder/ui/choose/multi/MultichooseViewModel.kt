@@ -10,7 +10,7 @@ import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.ItemClickListener
 import java.util.concurrent.TimeUnit
 
-abstract class MultichooseViewModel<T> : BaseViewModel(), ItemClickListener<MultichooseItemViewModel<T>> {
+abstract class MultichooseViewModel<T> : BaseViewModel(), ItemClickListener<MultichooseItemViewData<T>> {
 
     val searchText = ObservableField<String>()
 
@@ -18,7 +18,7 @@ abstract class MultichooseViewModel<T> : BaseViewModel(), ItemClickListener<Mult
 
     val dropChoiceVisible = ObservableBoolean()
 
-    val items = ObservableField<List<MultichooseItemViewModel<*>>>(listOf())
+    val items = ObservableField<List<MultichooseItemViewData<*>>>(listOf())
 
     val errorText = ObservableField("")
 

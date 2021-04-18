@@ -7,7 +7,7 @@
 
         <variable
             name="vm"
-            type="ru.g0rd1.peoplesfinder.ui.groups.GroupViewModel" />
+            type="ru.g0rd1.peoplesfinder.ui.groups.GroupViewData" />
 
     </data>
 

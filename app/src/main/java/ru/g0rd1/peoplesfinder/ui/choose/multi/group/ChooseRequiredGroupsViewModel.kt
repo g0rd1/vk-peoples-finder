@@ -7,7 +7,7 @@ import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
-import ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseItemViewModel
+import ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseItemViewData
 import ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseViewModel
 import ru.g0rd1.peoplesfinder.util.observeOnUI
 import ru.g0rd1.peoplesfinder.util.subscribeOnIo
@@ -49,7 +49,7 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
                     clearError()
                     items.set(
                         groups.map { group ->
-                            MultichooseItemViewModel(
+                            MultichooseItemViewData(
                                 data = group,
                                 name = group.name,
                                 id = group.id,
@@ -63,7 +63,7 @@ class ChooseRequiredGroupsViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(item: MultichooseItemViewModel<Group>) {
+    override fun onItemClick(item: MultichooseItemViewData<Group>) {
         items.set(
             items.get()?.map {
                 if (it.id == item.id) it.copy(choosed = !item.choosed) else it

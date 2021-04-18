@@ -3,11 +3,11 @@ package ru.g0rd1.peoplesfinder.ui.choose.single
 import androidx.recyclerview.widget.DiffUtil
 import ru.g0rd1.peoplesfinder.common.AppDiffCallbackFactory
 
-class SingleChooseItemDiffCallbackFactory <T> : AppDiffCallbackFactory<SingleChooseItemViewModel<T>> {
+class SingleChooseItemDiffCallbackFactory <T> : AppDiffCallbackFactory<SingleChooseItemViewData<T>> {
 
     override fun create(
-        oldItems: List<SingleChooseItemViewModel<T>>,
-        newItems: List<SingleChooseItemViewModel<T>>
+        oldItems: List<SingleChooseItemViewData<T>>,
+        newItems: List<SingleChooseItemViewData<T>>
     ): DiffUtil.Callback {
 
         return object : DiffUtil.Callback() {

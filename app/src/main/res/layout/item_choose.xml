@@ -15,7 +15,7 @@
 
         <variable
             name="item"
-            type="ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewModel" />
+            type="ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewData" />
 
     </data>
 

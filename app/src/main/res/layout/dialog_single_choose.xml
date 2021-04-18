@@ -9,7 +9,7 @@
             name="vm"
             type="ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseViewModel" />
 
-        <import type="ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewModel" />
+        <import type="ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewData" />
 
     </data>
 

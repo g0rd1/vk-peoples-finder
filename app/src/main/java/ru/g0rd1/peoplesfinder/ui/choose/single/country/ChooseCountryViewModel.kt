@@ -9,7 +9,7 @@ import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.repo.vk.country.CountryRepo
-import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewModel
+import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewData
 import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseViewModel
 import ru.g0rd1.peoplesfinder.util.exhaustive
 import ru.g0rd1.peoplesfinder.util.observeOnUI
@@ -63,7 +63,7 @@ class ChooseCountryViewModel @Inject constructor(
                             clearError()
                             items.set(
                                 it.data.map { country ->
-                                    SingleChooseItemViewModel(
+                                    SingleChooseItemViewData(
                                         data = country,
                                         name = country.title,
                                         id = country.id
@@ -77,7 +77,7 @@ class ChooseCountryViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(item: SingleChooseItemViewModel<Country>) {
+    override fun onItemClick(item: SingleChooseItemViewData<Country>) {
         filtersRepo.setCountry(FilterParameters.Country.Specific(item.data))
         closeEvent.call()
     }

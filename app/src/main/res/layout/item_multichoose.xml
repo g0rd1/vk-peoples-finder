@@ -15,7 +15,7 @@
 
         <variable
             name="item"
-            type="ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseItemViewModel" />
+            type="ru.g0rd1.peoplesfinder.ui.choose.multi.MultichooseItemViewData" />
 
     </data>
 

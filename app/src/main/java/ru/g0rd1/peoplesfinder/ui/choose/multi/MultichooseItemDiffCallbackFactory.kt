@@ -3,11 +3,11 @@ package ru.g0rd1.peoplesfinder.ui.choose.multi
 import androidx.recyclerview.widget.DiffUtil
 import ru.g0rd1.peoplesfinder.common.AppDiffCallbackFactory
 
-class MultichooseItemDiffCallbackFactory <T> : AppDiffCallbackFactory<MultichooseItemViewModel<T>> {
+class MultichooseItemDiffCallbackFactory <T> : AppDiffCallbackFactory<MultichooseItemViewData<T>> {
 
     override fun create(
-        oldItems: List<MultichooseItemViewModel<T>>,
-        newItems: List<MultichooseItemViewModel<T>>
+        oldItems: List<MultichooseItemViewData<T>>,
+        newItems: List<MultichooseItemViewData<T>>
     ): DiffUtil.Callback {
 
         return object : DiffUtil.Callback() {
