@@ -26,10 +26,6 @@ abstract class GlobalModule {
     @Singleton
     abstract fun navigator(navigator: SimpleAppNavigator): AppNavigator
 
-    // @Binds
-    // @Singleton
-    // abstract fun resManager(resManager: AppResourceManager): ResourceManager
-
     companion object {
 
         @Provides

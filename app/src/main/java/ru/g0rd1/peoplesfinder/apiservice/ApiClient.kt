@@ -70,7 +70,7 @@ interface ApiClient {
     ): Single<ApiVkResponse<ApiUser>>
 
     companion object {
-        private const val API_VERSION = "5.89"
+        const val API_VERSION = "5.89"
         private const val ACCESS_TOKEN_QUERY = "access_token"
         private const val VERSION_QUERY = "v"
         private const val USER_DEFAULT_FIELDS =

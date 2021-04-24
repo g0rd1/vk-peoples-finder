@@ -26,8 +26,12 @@ class SettingsFragment : Fragment() {
     ): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
         binding.vm = viewModel
-        observe()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        observe()
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onStart() {

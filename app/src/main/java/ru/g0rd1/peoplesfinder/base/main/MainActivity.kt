@@ -1,19 +1,14 @@
 package ru.g0rd1.peoplesfinder.base.main
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.ListFragment
-import com.vk.api.sdk.VK
-import com.vk.api.sdk.auth.VKAccessToken
-import com.vk.api.sdk.auth.VKAuthCallback
 import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.MainActivityProvider
-import ru.g0rd1.peoplesfinder.base.auhorization.VkAuthorizationContract
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.databinding.ActivityMainBinding
 import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment
@@ -33,9 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var mainActivityProvider: MainActivityProvider
-
-    @Inject
-    lateinit var vkAuthorizationManager: VkAuthorizationContract.Manager
 
     private val onFragmentChangeListener: (Fragment) -> Unit = { fragment ->
         when (fragment) {
@@ -64,27 +56,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val callback = object : VKAuthCallback {
-            override fun onLogin(token: VKAccessToken) {
-                vkAuthorizationManager.onLogin(token)
-            }
-
-            override fun onLoginFailed(errorCode: Int) {
-                vkAuthorizationManager.onLoginFailed(errorCode)
-            }
-        }
-        if (data == null || !VK.onActivityResult(requestCode, resultCode, data, callback)) {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mainActivityProvider.setMainActivity(this)
-
-        vkAuthorizationManager.initiateHelper(this)
 
         binding = DataBindingUtil.setContentView(
             this,

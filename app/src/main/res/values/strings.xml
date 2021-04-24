@@ -129,4 +129,8 @@
     <string name="dialog_multichoose_confirm_choice">Выбрать</string>
     <string name="dialog_multichoose_no_results_message">Нет результатов по данному запросу</string>
 
+    <string name="fragment_authorization_error_text">Ошибка при загрузки страницы авторизации</string>
+    <string name="fragment_authorization_start_page_greeting">Приветствую!\nДля работы приложения необходимо разрешение на получение списка ваших групп</string>
+    <string name="fragment_authorization_start_page_continue">Продолжить</string>
+
 </resources>

@@ -16,6 +16,8 @@ class SharedPrefVKAccessRepo @Inject constructor(
         return getStringOrNull(USER_TOKEN_KEY) ?: throw IllegalStateException("No token in shared preferences")
     }
 
+    override fun isHasToken(): Boolean = getStringOrNull(USER_TOKEN_KEY) != null
+
     override fun setUserId(id: Int) {
         putInt(USER_ID_KEY, id)
     }

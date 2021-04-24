@@ -16,14 +16,35 @@ class AuthorizationFragment : Fragment() {
 
     private val viewModel: AuthorizationViewModel by viewModels()
 
-    lateinit var binding: FragmentAuthorizationBinding
+    private var binding: FragmentAuthorizationBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
+        val binding = FragmentAuthorizationBinding.inflate(inflater, container, false)
+        this.binding = binding
+        binding.vm = viewModel
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        observe()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onDestroy() {
+        binding = null
+        super.onDestroy()
+    }
+
+    private fun observe() {
+        viewModel.reload.observe(
+            viewLifecycleOwner,
+            {
+                binding?.webView?.reload()
+            }
+        )
     }
 
     override fun onStart() {

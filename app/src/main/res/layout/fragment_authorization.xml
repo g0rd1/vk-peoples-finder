@@ -1,8 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <WebView
+    <data>
+
+        <variable
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationViewModel" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <WebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:loadUrl="@{vm.url}"
+            app:webViewClient="@{vm.webViewClient}" />
+
+        <include
+            layout="@layout/fragment_authorization_start_page"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:visible="@{vm.startPageVisible}"
+            app:vm="@{vm}" />
+
+        <include
+            layout="@layout/error_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:errorText="@{vm.errorText}"
+            app:retryFunction="@{vm.retryFunction}"
+            app:visible="@{vm.errorVisible}"
+            tools:visibility="gone" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

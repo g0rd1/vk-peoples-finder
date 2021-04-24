@@ -47,14 +47,6 @@ abstract class ReposModule {
     @Singleton
     abstract fun localUsersRepo(localUsersRepo: DBLocalUsersRepo): LocalUsersRepo
 
-    // @Binds
-    // @Singleton
-    // abstract fun accessRepo(accessRepo: SharedPrefVKAccessRepo): VKAccessRepo
-
-    // @Binds
-    // @Singleton
-    // abstract fun filtersRepo(filtersRepo: SharedPrefFiltersRepo): FiltersRepo
-
     @Binds
     @Singleton
     abstract fun cityRepo(cityRepo: HttpCityRepo): CityRepo

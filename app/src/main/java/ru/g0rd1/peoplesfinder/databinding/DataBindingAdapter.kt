@@ -5,6 +5,8 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Spinner
@@ -74,7 +76,7 @@ object DataBindingAdapter {
     // }
 
     @JvmStatic
-    @BindingAdapter("visible")
+    @BindingAdapter("app:visible")
     fun setVisible(view: View, visible: Boolean) {
         view.visibility = if (visible) View.VISIBLE else View.GONE
     }
@@ -118,13 +120,18 @@ object DataBindingAdapter {
         )
     }
 
-    // @JvmStatic
-    // @BindingAdapter("items")
-    // fun AutoCompleteTextView.setItems(items: List<Any>?) {
-    //     if (items != null) {
-    //         val arrayAdapter = ArrayAdapter(context, R.layout.simple_spinner_item, items)
-    //         setAdapter(arrayAdapter)
-    //     }
-    // }
+    @JvmStatic
+    @BindingAdapter("webViewClient")
+    fun WebView.setWebViewClient(client: WebViewClient?) {
+        client ?: return
+        this.webViewClient = client
+    }
+
+    @JvmStatic
+    @BindingAdapter("loadUrl")
+    fun WebView.loadUrl(url: String?) {
+        url ?: return
+        this.loadUrl(url)
+    }
 
 }
