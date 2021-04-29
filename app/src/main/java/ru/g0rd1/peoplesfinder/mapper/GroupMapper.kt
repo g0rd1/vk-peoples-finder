@@ -1,14 +1,14 @@
 package ru.g0rd1.peoplesfinder.mapper
 
 import ru.g0rd1.peoplesfinder.apiservice.model.ApiGroup
-import ru.g0rd1.peoplesfinder.db.entity.GroupDataEntity
+import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.model.Group
 import javax.inject.Inject
 
 class GroupMapper @Inject constructor() {
 
-    fun transformToEntityAndGroupDataEntity(group: Group): Pair<GroupEntity, GroupDataEntity> {
+    fun transformToEntityAndGroupDataEntity(group: Group): Pair<GroupEntity, GroupInfoEntity> {
         return Pair(
             GroupEntity(
                 id = group.id,
@@ -18,7 +18,7 @@ class GroupMapper @Inject constructor() {
                 type = group.type,
                 membersCount = group.membersCount,
             ),
-            GroupDataEntity(
+            GroupInfoEntity(
                 groupId = group.id,
                 loadedMembersCount = group.loadedMembersCount,
                 allMembersLoadedDate = group.allMembersLoadedDate,
@@ -28,7 +28,7 @@ class GroupMapper @Inject constructor() {
         )
     }
 
-    fun transform(groupEntity: GroupEntity, groupDataEntity: GroupDataEntity): Group {
+    fun transform(groupEntity: GroupEntity, groupInfoEntity: GroupInfoEntity): Group {
         return Group(
             id = groupEntity.id,
             name = groupEntity.name,
@@ -36,10 +36,10 @@ class GroupMapper @Inject constructor() {
             photo = groupEntity.photo,
             type = groupEntity.type,
             membersCount = groupEntity.membersCount,
-            loadedMembersCount = groupDataEntity.loadedMembersCount,
-            allMembersLoadedDate = groupDataEntity.allMembersLoadedDate,
-            sequentialNumber = groupDataEntity.sequentialNumber,
-            hasAccessToMembers = groupDataEntity.hasAccessToMembers
+            loadedMembersCount = groupInfoEntity.loadedMembersCount,
+            allMembersLoadedDate = groupInfoEntity.allMembersLoadedDate,
+            sequentialNumber = groupInfoEntity.sequentialNumber,
+            hasAccessToMembers = groupInfoEntity.hasAccessToMembers
         )
     }
 

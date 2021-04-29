@@ -20,7 +20,7 @@ class UserTypeEntity(
     }
 
     companion object {
-        const val TABLE_NAME = "user_type"
+        const val TABLE_NAME = "user_types"
     }
 
 }

@@ -14,17 +14,19 @@ import ru.g0rd1.peoplesfinder.model.UserType
 @Database(
     entities = [
         GroupEntity::class,
-        GroupDataEntity::class,
+        GroupInfoEntity::class,
         UserEntity::class,
         UserGroupEntity::class,
         UserTypeEntity::class,
         UserUserTypeEntity::class,
+        GroupHistoryEntity::class
     ],
     version = 1
 )
 @TypeConverters(DateConverter::class, UserConverter::class, GroupConverter::class)
 abstract class Database : RoomDatabase() {
     abstract fun groupDao(): GroupDao
+    abstract fun groupHistoryDao(): GroupHistoryDao
     abstract fun userDao(): UserDao
     abstract fun groupDataDao(): GroupDataDao
     abstract fun userGroupDao(): UserGroupDao
@@ -35,33 +37,8 @@ abstract class Database : RoomDatabase() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
 
-                db.execSQL(
-                    """
-                    CREATE TRIGGER delete_user_relations
-                    BEFORE DELETE
-                    ON ${UserEntity.TABLE_NAME}
-                    FOR EACH ROW
-                    BEGIN
-                    DELETE FROM ${UserGroupEntity.TABLE_NAME} WHERE ${UserGroupEntity.TABLE_NAME}.${UserGroupEntity.Column.USER_ID} = old.${UserEntity.Column.ID};
-                    END;
-                    """.trimIndent()
-                )
-
-                db.execSQL(
-                    """
-                    CREATE TRIGGER delete_group_relations
-                    BEFORE DELETE
-                    ON `${GroupEntity.TABLE_NAME}`
-                    FOR EACH ROW
-                    BEGIN
-                    DELETE FROM ${UserGroupEntity.TABLE_NAME} WHERE ${UserGroupEntity.TABLE_NAME}.${UserGroupEntity.Column.USER_ID} = old.${GroupEntity.Column.ID};
-                    END;
-                    """.trimIndent()
-                )
-
-                db.execSQL("INSERT INTO `${UserTypeEntity.TABLE_NAME}` (name) VALUES('${UserType.VIEWED.name}')")
-                db.execSQL("INSERT INTO `${UserTypeEntity.TABLE_NAME}` (name) VALUES('${UserType.FAVORITE.name}')")
-                db.execSQL("INSERT INTO `${UserTypeEntity.TABLE_NAME}` (name) VALUES('${UserType.BLOCKED.name}')")
+                db.execSQL("INSERT INTO `${UserTypeEntity.TABLE_NAME}` (id, name) VALUES(${UserType.FAVORITE.id}, '${UserType.FAVORITE.name}')")
+                db.execSQL("INSERT INTO `${UserTypeEntity.TABLE_NAME}` (id, name) VALUES(${UserType.BLOCKED.id}, '${UserType.BLOCKED.name}')")
 
             }
         }

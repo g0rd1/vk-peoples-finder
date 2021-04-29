@@ -1,10 +1,6 @@
 package ru.g0rd1.peoplesfinder.db.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Transaction
-import androidx.room.Update
+import androidx.room.*
 import io.reactivex.Completable
 
 @Dao
@@ -24,9 +20,11 @@ abstract class BaseDao<E> {
         }
     }
 
+    @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun _insert(entities: List<E>): List<Long>
 
+    @Suppress("FunctionName")
     @Update(onConflict = OnConflictStrategy.IGNORE)
     abstract fun _update(entities: List<E>)
 

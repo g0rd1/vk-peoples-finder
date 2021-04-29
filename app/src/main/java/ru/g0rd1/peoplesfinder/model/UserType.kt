@@ -16,12 +16,10 @@ data class UserType(
 
     companion object {
         private val baseUserTypesToIconRes = mapOf(
-            UserType(1, "Просмотренные") to R.drawable.ic_visibility,
             UserType(2, "Избранные") to R.drawable.ic_star,
             UserType(3, "Заблокированные") to R.drawable.ic_block
         )
-        val VIEWED = baseUserTypesToIconRes.keys.first { it.id == 1 }
-        val FAVORITE = baseUserTypesToIconRes.keys.first { it.id == 2 }
-        val BLOCKED = baseUserTypesToIconRes.keys.first { it.id == 3 }
+        val FAVORITE = baseUserTypesToIconRes.keys.first { it.id == 1 }
+        val BLOCKED = baseUserTypesToIconRes.keys.first { it.id == 2 }
     }
 }

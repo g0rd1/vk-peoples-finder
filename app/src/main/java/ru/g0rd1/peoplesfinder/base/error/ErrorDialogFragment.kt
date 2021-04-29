@@ -35,10 +35,6 @@ class ErrorDialogFragment : DialogFragment(), Error.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.message?.text = arguments?.getString(MESSAGE)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         presenter.setView(this)
         presenter.setRetry(retry)
         binding?.retryButton?.setOnClickListener { presenter.onRetryButtonClick() }

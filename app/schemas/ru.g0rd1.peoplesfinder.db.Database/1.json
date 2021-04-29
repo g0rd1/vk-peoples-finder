@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2b6e1b134e3acf1293db13453ddc4043",
+    "identityHash": "81eb6a75ae8c82d6af25041667c213e0",
     "entities": [
       {
-        "tableName": "group",
+        "tableName": "groups",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `deactivated` TEXT, `photo_200` TEXT, `type` TEXT NOT NULL, `members_count` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -55,8 +55,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "group_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` INTEGER NOT NULL, `loaded_members_count` INTEGER NOT NULL, `all_members_loaded_date` INTEGER, `sequential_number` INTEGER NOT NULL, `has_access_to_members` INTEGER NOT NULL, PRIMARY KEY(`groupId`), FOREIGN KEY(`groupId`) REFERENCES `group`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "group_info",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` INTEGER NOT NULL, `loaded_members_count` INTEGER NOT NULL, `all_members_loaded_date` INTEGER, `sequential_number` INTEGER NOT NULL, `has_access_to_members` INTEGER NOT NULL, PRIMARY KEY(`groupId`), FOREIGN KEY(`groupId`) REFERENCES `groups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "groupId",
@@ -98,7 +98,7 @@
         "indices": [],
         "foreignKeys": [
           {
-            "table": "group",
+            "table": "groups",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -111,7 +111,7 @@
         ]
       },
       {
-        "tableName": "user",
+        "tableName": "users",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `first_name` TEXT NOT NULL, `last_name` TEXT NOT NULL, `deactivated` TEXT, `is_closed` INTEGER NOT NULL, `bdate_epoch_days` INTEGER, `sex` TEXT, `relation` TEXT, `has_photo` INTEGER, `photo_100` TEXT, `photo_max` TEXT, `country_id` INTEGER, `country_title` TEXT, `city_id` INTEGER, `city_title` TEXT, `city_important` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -222,7 +222,7 @@
       },
       {
         "tableName": "user_group",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER NOT NULL, `group_id` INTEGER NOT NULL, PRIMARY KEY(`user_id`, `group_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`user_id` INTEGER NOT NULL, `group_id` INTEGER NOT NULL, PRIMARY KEY(`user_id`, `group_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`group_id`) REFERENCES `groups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "userId",
@@ -245,10 +245,33 @@
           "autoGenerate": false
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "groups",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
-        "tableName": "user_type",
+        "tableName": "user_types",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -299,12 +322,59 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "group_histories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group_id` INTEGER NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "groupId",
+            "columnName": "group_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_group_histories_group_id",
+            "unique": true,
+            "columnNames": [
+              "group_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_group_histories_group_id` ON `${TABLE_NAME}` (`group_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "groups",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b6e1b134e3acf1293db13453ddc4043')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81eb6a75ae8c82d6af25041667c213e0')"
     ]
   }
 }

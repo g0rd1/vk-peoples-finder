@@ -74,7 +74,7 @@ data class UserEntity(
     }
 
     companion object {
-        const val TABLE_NAME = "user"
+        const val TABLE_NAME = "users"
     }
 
 }

@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import ru.g0rd1.peoplesfinder.db.entity.GroupDataEntity.Companion.TABLE_NAME
+import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity.Companion.TABLE_NAME
 import java.time.LocalDate
 
 
@@ -19,7 +19,7 @@ import java.time.LocalDate
         )
     ]
 )
-data class GroupDataEntity(
+data class GroupInfoEntity(
 
     @PrimaryKey
     val groupId: Int,
@@ -38,7 +38,7 @@ data class GroupDataEntity(
 ) {
 
     companion object {
-        const val TABLE_NAME = "group_data"
+        const val TABLE_NAME = "group_info"
     }
 
 }

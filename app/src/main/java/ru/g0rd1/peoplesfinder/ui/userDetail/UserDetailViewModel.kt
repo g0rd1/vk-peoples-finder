@@ -8,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import io.reactivex.Single
+import io.reactivex.subjects.BehaviorSubject
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
@@ -32,7 +33,9 @@ class UserDetailViewModel @AssistedInject constructor(
     private val appNavigator: AppNavigator,
 ) : BaseViewModel() {
 
-    val arrowVisible = ObservableBoolean(false)
+    // val arrowVisible = ObservableBoolean(false)
+    val showLeftArrow = ObservableBoolean(false)
+    val showRightArrow = ObservableBoolean(false)
 
     val infoVisible = ObservableBoolean(false)
     val loadingVisible = ObservableBoolean(false)
@@ -58,6 +61,9 @@ class UserDetailViewModel @AssistedInject constructor(
     private var userId: Int = -1
 
     val sameGroups = ObservableField<List<Group>>()
+
+    private val stateSubject =
+        BehaviorSubject.createDefault(UserDetailWithSwitchesState(Optional.empty(), Optional.empty(), Optional.empty()))
 
     override fun onStart() {
         when (type) {
@@ -109,8 +115,28 @@ class UserDetailViewModel @AssistedInject constructor(
             ).disposeLater()
     }
 
+    // private fun sadas() {
+    //     stateSubject
+    //         .observeOnUI()
+    //         .subscribe(
+    //             {
+    //                 if ()
+    //             },
+    //             Timber::e
+    //         )
+    //         .disposeLater()
+    // }
+
+    fun previousUser() {
+        TODO()
+    }
+
+    fun nextUser() {
+        TODO()
+    }
+
     private fun onWithSwitchesUserDetailDialogType() {
-        localUsersRepo.getUserWithMaxSameGroupsCountWithFilters(listOf(UserType.BLOCKED, UserType.VIEWED))
+        localUsersRepo.getUserWithMaxSameGroupsCountWithFilters(listOf(UserType.BLOCKED/*, UserType.VIEWED*/))
             .flatMap { userWithMaxGroupsCountResult ->
                 when (userWithMaxGroupsCountResult) {
                     UserWithSameGroupsCountResult.Empty -> {
@@ -171,7 +197,6 @@ class UserDetailViewModel @AssistedInject constructor(
         }
         userCountry.set(user.country?.title)
         userCity.set(user.city?.title)
-        isViewed.set(userTypes.any { it.id == UserType.VIEWED.id })
         isBlocked.set(userTypes.any { it.id == UserType.BLOCKED.id })
         isFavorite.set(userTypes.any { it.id == UserType.FAVORITE.id })
         this.sameGroups.set(sameGroups)
@@ -195,7 +220,7 @@ class UserDetailViewModel @AssistedInject constructor(
     companion object {
         fun provideFactory(
             assistedFactory: Factory,
-            type: UserDetailDialogType
+            type: UserDetailDialogType,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {

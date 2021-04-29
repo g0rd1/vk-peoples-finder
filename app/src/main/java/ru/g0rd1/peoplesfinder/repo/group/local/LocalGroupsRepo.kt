@@ -31,4 +31,10 @@ interface LocalGroupsRepo {
 
     fun getSameGroupsWithUser(userId: Int): Single<List<Group>>
 
+    fun clearGroupHistory(): Completable
+
+    fun getPreviousGroupInHistory(groupId: Int): Single<Optional<Group>>
+
+    fun getNextGroupInHistory(groupId: Int): Single<Optional<Group>>
+
 }

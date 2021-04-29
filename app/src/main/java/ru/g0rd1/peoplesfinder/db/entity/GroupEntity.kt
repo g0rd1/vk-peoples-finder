@@ -35,6 +35,6 @@ data class GroupEntity constructor(
     }
 
     companion object {
-        const val TABLE_NAME = "group"
+        const val TABLE_NAME = "groups"
     }
 }

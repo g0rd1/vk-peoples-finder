@@ -23,7 +23,8 @@
             android:layout_height="0dp"
             android:scaleType="center"
             android:src="@drawable/ic_arrow_left"
-            android:visibility="@{vm.arrowVisible ? View.VISIBLE : View.INVISIBLE}"
+            android:onClick="@{() -> vm.previousUser()}"
+            android:visibility="@{vm.showLeftArrow ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toTopOf="@id/groupIconContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -34,8 +35,9 @@
             android:layout_width="50dp"
             android:layout_height="0dp"
             android:scaleType="center"
+            android:onClick="@{() -> vm.nextUser()}"
             android:src="@drawable/ic_arrow_right"
-            android:visibility="@{vm.arrowVisible ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{vm.showRightArrow ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toTopOf="@id/groupIconContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -264,21 +266,6 @@
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:id="@+id/viewed"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:alpha="@{vm.isViewed ? 1.0F : 0.2F}"
-                    android:src="@drawable/ic_visibility"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/blocked"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.2"
-                    tools:ignore="ContentDescription" />
-
-                <ImageView
                     android:id="@+id/blocked"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -288,7 +275,7 @@
                     android:src="@drawable/ic_block"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/favorite"
-                    app:layout_constraintStart_toEndOf="@id/viewed"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintWidth_percent="0.2"
                     tools:ignore="ContentDescription" />
