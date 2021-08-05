@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "81eb6a75ae8c82d6af25041667c213e0",
+    "identityHash": "f6dfd32181cf447d18a8b73e1db68659",
     "entities": [
       {
         "tableName": "groups",
@@ -244,7 +244,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_user_group_group_id",
+            "unique": false,
+            "columnNames": [
+              "group_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_user_group_group_id` ON `${TABLE_NAME}` (`group_id`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "users",
@@ -369,12 +378,59 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "user_histories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` INTEGER NOT NULL, FOREIGN KEY(`user_id`) REFERENCES `users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_user_histories_user_id",
+            "unique": true,
+            "columnNames": [
+              "user_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_histories_user_id` ON `${TABLE_NAME}` (`user_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81eb6a75ae8c82d6af25041667c213e0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f6dfd32181cf447d18a8b73e1db68659')"
     ]
   }
 }

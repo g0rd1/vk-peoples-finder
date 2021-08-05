@@ -70,7 +70,7 @@ class SimpleAppNavigator @Inject constructor(
     }
 
     override fun userDetail() {
-        replaceFragment(UserDetailDialog.create(UserDetailDialogType.WithSwitches))
+        replaceFragment(UserDetailDialog.create(UserDetailDialogType.Multiple))
     }
 
     override fun lists() {

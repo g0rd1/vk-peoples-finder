@@ -19,7 +19,8 @@ import ru.g0rd1.peoplesfinder.model.UserType
         UserGroupEntity::class,
         UserTypeEntity::class,
         UserUserTypeEntity::class,
-        GroupHistoryEntity::class
+        GroupHistoryEntity::class,
+        UserHistoryEntity::class,
     ],
     version = 1
 )
@@ -31,6 +32,7 @@ abstract class Database : RoomDatabase() {
     abstract fun groupDataDao(): GroupDataDao
     abstract fun userGroupDao(): UserGroupDao
     abstract fun userTypeDao(): UserTypeDao
+    abstract fun userHistoryDao(): UserHistoryDao
 
     companion object {
         val onCreateCallback = object : RoomDatabase.Callback() {

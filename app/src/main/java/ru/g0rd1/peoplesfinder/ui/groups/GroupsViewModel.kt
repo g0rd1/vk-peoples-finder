@@ -182,8 +182,8 @@ class GroupsViewModel @Inject constructor(
             .observeOnUI()
             .subscribe(
                 { groups ->
-                    membersCount.set(groups.sumBy { it.membersCount })
-                    loadedMembersCount.set(groups.sumBy { it.loadedMembersCount })
+                    membersCount.set(groups.sumOf { it.membersCount })
+                    loadedMembersCount.set(groups.sumOf{ it.loadedMembersCount })
                     showContent.set(true)
                     groupViewModels.set(
                         groups.sortedBy { it.sequentialNumber }.map { group ->

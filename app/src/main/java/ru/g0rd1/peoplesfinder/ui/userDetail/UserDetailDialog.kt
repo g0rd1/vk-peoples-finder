@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.base.FullScreenDialogFragment
 import ru.g0rd1.peoplesfinder.databinding.DialogUserDetailBinding
@@ -17,14 +16,15 @@ class UserDetailDialog: FullScreenDialogFragment() {
     @Inject
     lateinit var viewModelFactory: UserDetailViewModel.Factory
 
-    val viewModel: UserDetailViewModel by viewModels {
-        UserDetailViewModel.provideFactory(
-            viewModelFactory,
-            requireArguments().getParcelable(USER_DETAIL_DIALOG_TYPE)!!
-        )
-    }
+    lateinit var viewModel: UserDetailViewModel
 
     lateinit var binding: DialogUserDetailBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val userDialogType = requireArguments().getParcelable<UserDetailDialogType>(USER_DETAIL_DIALOG_TYPE)!!
+        viewModel = viewModelFactory.create(userDialogType, this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

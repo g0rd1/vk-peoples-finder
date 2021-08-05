@@ -18,12 +18,16 @@ class ApiClientFactory @Inject constructor() {
         else
             HttpLoggingInterceptor.Level.BASIC
 
+
         // interceptor.level = HttpLoggingInterceptor.Level.BASIC
 
         val client: OkHttpClient = OkHttpClient.Builder()
             .addInterceptor(interceptor)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .callTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .pingInterval(15, TimeUnit.SECONDS)
             .build()
 
         val retrofit = Retrofit.Builder()

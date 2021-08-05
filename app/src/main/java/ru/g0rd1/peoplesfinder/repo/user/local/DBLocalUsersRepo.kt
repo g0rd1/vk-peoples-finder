@@ -17,7 +17,6 @@ import ru.g0rd1.peoplesfinder.model.Optional
 import ru.g0rd1.peoplesfinder.model.User
 import ru.g0rd1.peoplesfinder.model.UserType
 import ru.g0rd1.peoplesfinder.model.result.UserWithSameGroupsCountResult
-import ru.g0rd1.peoplesfinder.model.result.UsersWithSameGroupsCountResult
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import java.time.LocalDate
@@ -67,7 +66,7 @@ class DBLocalUsersRepo @Inject constructor(
     override fun getUsersWithSameGroupsCountWithFilters(
         count: Int,
         notInUserTypes: List<UserType>,
-    ): Single<UsersWithSameGroupsCountResult> {
+    ): Single<Map<User, Int>> {
         return userDao.getUsersWithSameGroupsCountByQuery(
             UserQueryBuilder.getUsersQuery(
                 filterParameters = filtersRepo.getFilterParameters(),
@@ -75,12 +74,9 @@ class DBLocalUsersRepo @Inject constructor(
                 notInUserTypes = notInUserTypes
             )
         ).map { userEntitiesWithSameGroupsCounts ->
-            UsersWithSameGroupsCountResult.Result(
-                userEntitiesWithSameGroupsCounts.associate { it.userEntity.toUser() to it.sameGroupsCount }
-            )
+            userEntitiesWithSameGroupsCounts.associate { it.userEntity.toUser() to it.sameGroupsCount }
         }
-            .cast(UsersWithSameGroupsCountResult::class.java)
-            .switchIfEmpty(Single.just(UsersWithSameGroupsCountResult.Empty))
+            .switchIfEmpty(Single.just(mapOf()))
             .subscribeOnIo()
     }
 

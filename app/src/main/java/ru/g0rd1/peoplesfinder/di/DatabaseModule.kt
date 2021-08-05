@@ -48,6 +48,10 @@ abstract class DatabaseModule {
         @Singleton
         fun userTypeDao(db: Database): UserTypeDao = db.userTypeDao()
 
+        @Provides
+        @Singleton
+        fun userHistoryDao(db: Database): UserHistoryDao = db.userHistoryDao()
+
     }
 
 }

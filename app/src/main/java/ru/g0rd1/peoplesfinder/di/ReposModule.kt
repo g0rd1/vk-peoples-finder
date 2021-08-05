@@ -15,6 +15,8 @@ import ru.g0rd1.peoplesfinder.repo.group.local.DBLocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.HttpVkGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.group.vk.VkGroupsRepo
+import ru.g0rd1.peoplesfinder.repo.user.history.DBUserHistoryRepo
+import ru.g0rd1.peoplesfinder.repo.user.history.UserHistoryRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.DBLocalUsersRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
 import ru.g0rd1.peoplesfinder.repo.vk.HttpVkRepo
@@ -46,6 +48,10 @@ abstract class ReposModule {
     @Binds
     @Singleton
     abstract fun localUsersRepo(localUsersRepo: DBLocalUsersRepo): LocalUsersRepo
+
+    @Binds
+    @Singleton
+    abstract fun userHistoryRepo(userHistoryRepo: DBUserHistoryRepo): UserHistoryRepo
 
     @Binds
     @Singleton

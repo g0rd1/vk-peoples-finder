@@ -5,5 +5,5 @@ import kotlinx.parcelize.Parcelize
 
 sealed class UserDetailDialogType: Parcelable {
     @Parcelize data class Single(val userId: Int) : UserDetailDialogType()
-    @Parcelize object WithSwitches : UserDetailDialogType()
+    @Parcelize object Multiple : UserDetailDialogType()
 }

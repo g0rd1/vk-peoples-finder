@@ -45,7 +45,9 @@ class HttpVkRepo @Inject constructor(
             countryId = countryId,
             query = query,
             needAll = if (needAll) 1 else 0
-        ).toVkResult(ApiCity::class.java).subscribeOnIo()
+        )
+            .doFinally { print("123") }
+            .toVkResult(ApiCity::class.java).subscribeOnIo()
     }
 
     override fun getProfilePhotos(ownerId: Int): Single<ApiVkResult<List<ApiPhoto>>> {

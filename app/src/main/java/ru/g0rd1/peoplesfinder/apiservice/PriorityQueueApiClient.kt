@@ -21,17 +21,26 @@ class PriorityQueueApiClient(
         accessToken: String,
         version: String,
     ): Single<ApiVkResponse<ApiGroup>> {
-        return priorityQueueManager.getQueuedSingle(
-            apiClient.getGroups(
-                userId,
-                extended,
-                fields,
-                offset,
-                count,
-                accessToken,
-                version
-            ),
-            HIGH_PRIORITY
+        // return priorityQueueManager.getQueuedSingle(
+        //     apiClient.getGroups(
+        //         userId,
+        //         extended,
+        //         fields,
+        //         offset,
+        //         count,
+        //         accessToken,
+        //         version
+        //     ),
+        //     HIGH_PRIORITY
+        // )
+        return apiClient.getGroups(
+            userId,
+            extended,
+            fields,
+            offset,
+            count,
+            accessToken,
+            version
         )
     }
 

@@ -28,7 +28,7 @@ data class UserGroupEntity(
     @ColumnInfo(name = Column.USER_ID)
     val userId: Int,
 
-    @ColumnInfo(name = Column.GROUP_ID)
+    @ColumnInfo(name = Column.GROUP_ID, index = true)
     val groupId: Int,
 ) {
 

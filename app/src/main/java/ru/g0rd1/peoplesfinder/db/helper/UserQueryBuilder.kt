@@ -4,6 +4,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
+import ru.g0rd1.peoplesfinder.db.entity.UserHistoryEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserUserTypeEntity
 import ru.g0rd1.peoplesfinder.db.query.UserEntityWithSameGroupsCount
 import ru.g0rd1.peoplesfinder.model.FilterParameters
@@ -61,17 +62,20 @@ object UserQueryBuilder {
         notInUserTypes: List<UserType>,
     ): List<String> {
         val whereConditions: MutableList<String> = mutableListOf()
-        getAgeFromWhereConditionOrNull(filterParameters.ageFrom)?.let { whereConditions.add(it) }
-        getAgeToWhereConditionOrNull(filterParameters.ageTo)?.let { whereConditions.add(it) }
-        getSexWhereConditionOrNull(filterParameters.sex)?.let { whereConditions.add(it) }
-        getRelationWhereConditionOrNull(filterParameters.relation)?.let { whereConditions.add(it) }
-        getCityWhereConditionOrNull(filterParameters.city)?.let { whereConditions.add(it) }
-        getCountryWhereConditionOrNull(filterParameters.country)?.let { whereConditions.add(it) }
-        getHasPhotoWhereConditionOrNull(filterParameters.hasPhoto)?.let { whereConditions.add(it) }
-        getNotClosedWhereConditionOrNull(filterParameters.notClosed)?.let { whereConditions.add(it) }
-        getUserWithRequiredGroupsWhereConditionOrNull(filterParameters.requiredGroupIds)?.let { whereConditions.add(it) }
-        getUserNotInUserTypesWhereConditionOrNull(notInUserTypes)?.let {
-            whereConditions.add(it)
+        whereConditions.apply {
+            getAgeFromWhereConditionOrNull(filterParameters.ageFrom)?.let { add(it) }
+            getAgeToWhereConditionOrNull(filterParameters.ageTo)?.let { add(it) }
+            getSexWhereConditionOrNull(filterParameters.sex)?.let { add(it) }
+            getRelationWhereConditionOrNull(filterParameters.relation)?.let { add(it) }
+            getCityWhereConditionOrNull(filterParameters.city)?.let { add(it) }
+            getCountryWhereConditionOrNull(filterParameters.country)?.let { add(it) }
+            getHasPhotoWhereConditionOrNull(filterParameters.hasPhoto)?.let { add(it) }
+            getNotClosedWhereConditionOrNull(filterParameters.notClosed)?.let { add(it) }
+            getUserWithRequiredGroupsWhereConditionOrNull(filterParameters.requiredGroupIds)?.let { add(it) }
+            getUserNotInUserTypesWhereConditionOrNull(notInUserTypes)?.let {
+                add(it)
+            }
+            add(getUsersNotInViewedWhereCondition())
         }
         return whereConditions
     }
@@ -160,6 +164,14 @@ object UserQueryBuilder {
             builder.append(userType.id)
         }
         builder.append("))")
+        return builder.toString()
+    }
+
+    private fun getUsersNotInViewedWhereCondition(): String {
+        val builder = StringBuilder()
+        builder.append("${UserEntity.Column.ID} NOT IN (")
+        builder.append("SELECT ${UserHistoryEntity.Column.USER_ID}")
+        builder.append(" FROM ${UserHistoryEntity.TABLE_NAME})")
         return builder.toString()
     }
 
