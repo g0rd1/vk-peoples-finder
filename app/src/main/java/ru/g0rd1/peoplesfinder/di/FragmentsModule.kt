@@ -17,24 +17,38 @@ abstract class FragmentsModule {
 
         @Provides
         @Singleton
-        fun userDetailViewModelFactory(userDetailSingleViewModelFactory: UserDetailSingleViewModel.Factory): UserDetailViewModel.Factory {
+        fun userDetailViewModelFactory(
+            userDetailSingleViewModelFactory: UserDetailSingleViewModel.Factory,
+            userDetailMultipleViewModelFactory: UserDetailMultipleViewModel.Factory,
+        ): UserDetailViewModel.Factory {
             return object : UserDetailViewModel.Factory {
                 override fun create(dialogType: UserDetailDialogType, fragment: UserDetailDialog): UserDetailViewModel {
                     return when (dialogType) {
-                        UserDetailDialogType.Multiple -> userDetailMultipleViewModel(fragment)
-                        is UserDetailDialogType.Single -> userDetailSingleViewModel(fragment,
+                        UserDetailDialogType.Multiple -> userDetailMultipleViewModel(
+                            fragment,
+                            userDetailMultipleViewModelFactory,
+                        )
+                        is UserDetailDialogType.Single -> userDetailSingleViewModel(
+                            fragment,
                             userDetailSingleViewModelFactory,
-                            dialogType)
+                            dialogType
+                        )
                     }
                 }
             }
         }
 
-        private fun userDetailMultipleViewModel(fragment: UserDetailDialog): UserDetailMultipleViewModel {
+        private fun userDetailMultipleViewModel(
+            fragment: UserDetailDialog,
+            userDetailMultipleViewModelFactory: UserDetailMultipleViewModel.Factory,
+        ): UserDetailMultipleViewModel {
             return fragment.createViewModelLazy(
                 UserDetailMultipleViewModel::class,
                 { fragment.viewModelStore },
-            ).value
+                getUserDetailMultipleViewModelFactory(userDetailMultipleViewModelFactory)
+            ).value.also {
+                println()
+            }
         }
 
         private fun userDetailSingleViewModel(
@@ -58,6 +72,14 @@ abstract class FragmentsModule {
                     userDetailSingleViewModelFactory,
                     dialogType.userId
                 )
+            }
+        }
+
+        private fun getUserDetailMultipleViewModelFactory(
+            userDetailMultipleViewModelFactory: UserDetailMultipleViewModel.Factory,
+        ): () -> ViewModelProvider.Factory {
+            return {
+                UserDetailMultipleViewModel.provideFactory(userDetailMultipleViewModelFactory)
             }
         }
 

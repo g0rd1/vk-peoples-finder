@@ -119,7 +119,7 @@ class HttpGroupMembersLoaderManager @Inject constructor(
     private fun load(): Single<GroupMembersLoader.LoadResult> {
         return localGroupsRepo.get().flatMap { groups ->
             val loadSingles: List<Single<GroupMembersLoader.LoadResult>> = groups
-                .sortedBy { it.sequentialNumber }
+                .sortedBy { it.membersCount }
                 .map { groupMembersLoaderFactory.create(it.id).load() }
             Completable.fromAction { loadStatusSubject.onNext(Status.Load) }.andThen(
                 Flowable

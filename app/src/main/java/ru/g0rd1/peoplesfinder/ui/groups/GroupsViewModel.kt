@@ -6,6 +6,7 @@ import androidx.databinding.ObservableInt
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.error.Error
@@ -102,7 +103,7 @@ class GroupsViewModel @Inject constructor(
             showCommandProcessingLoader.set(false)
             return
         }
-        Single.timer(500, TimeUnit.MILLISECONDS)
+        Single.timer(500, TimeUnit.MILLISECONDS, Schedulers.newThread())
             .observeOnUI()
             .subscribe(
                 { showCommandProcessingLoader.set(true) },
@@ -186,7 +187,7 @@ class GroupsViewModel @Inject constructor(
                     loadedMembersCount.set(groups.sumOf{ it.loadedMembersCount })
                     showContent.set(true)
                     groupViewModels.set(
-                        groups.sortedBy { it.sequentialNumber }.map { group ->
+                        groups.sortedBy { it.membersCount }.map { group ->
                             GroupViewData(
                                 id = group.id,
                                 name = group.name,

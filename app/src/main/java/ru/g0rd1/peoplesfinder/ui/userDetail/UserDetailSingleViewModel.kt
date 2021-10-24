@@ -13,7 +13,6 @@ import ru.g0rd1.peoplesfinder.model.Optional
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
 import ru.g0rd1.peoplesfinder.util.observeOnUI
-import timber.log.Timber
 
 class UserDetailSingleViewModel @AssistedInject constructor(
     @Assisted private val userId: Int,
@@ -27,6 +26,9 @@ class UserDetailSingleViewModel @AssistedInject constructor(
     resourceManager = resourceManager,
     appNavigator = appNavigator,
 ) {
+    override fun previousUser() = Unit
+
+    override fun nextUser() = Unit
 
     override fun onStart() {
         getUser()

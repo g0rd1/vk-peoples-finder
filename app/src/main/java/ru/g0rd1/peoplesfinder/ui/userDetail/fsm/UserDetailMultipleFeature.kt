@@ -19,9 +19,7 @@ object UserDetailMultiple {
         val userResults: List<UserResult>,
         val currentUser: User?,
         val loading: Boolean,
-    ) {
-
-    }
+    )
 
     sealed class Wish {
         object ToPreviousUser : Wish()
@@ -39,8 +37,8 @@ object UserDetailMultiple {
 }
 
 class UserDetailMultipleFeature @Inject constructor(
-    private val actor: UserDetailMultipleActor,
-    private val reducer: UserDetailMultipleReducer,
+    actor: UserDetailMultipleActor,
+    reducer: UserDetailMultipleReducer,
 ) : ActorReducerFeature<UserDetailMultiple.Wish, UserDetailMultiple.Effect, UserDetailMultiple.State, Nothing>(
     initialState = UserDetailMultiple.State(
         userResults = listOf(),
@@ -68,24 +66,32 @@ class UserDetailMultipleFeature @Inject constructor(
 class UserDetailMultipleActor @Inject constructor(
     private val userRepo: LocalUsersRepo,
     private val userHistoryRepo: UserHistoryRepo,
-) :
-    Actor<UserDetailMultiple.State, UserDetailMultiple.Wish, UserDetailMultiple.Effect> {
+) : Actor<UserDetailMultiple.State, UserDetailMultiple.Wish, UserDetailMultiple.Effect> {
 
     override fun invoke(
         state: UserDetailMultiple.State,
         action: UserDetailMultiple.Wish,
     ): Observable<out UserDetailMultiple.Effect> {
+
         return when (action) {
-            UserDetailMultiple.Wish.LoadUsers -> getLoadUserEffectObservable(state.currentUser?.id)
+            UserDetailMultiple.Wish.LoadUsers -> {
+                if (state.currentUser == null) {
+                    getLoadUserEffectObservable(state.currentUser?.id)
+                } else {
+                    Observable.empty()
+                }
+            }
             UserDetailMultiple.Wish.ToNextUsers -> {
                 val needLoadCondition =
                     state.userResults.takeLast(LOAD_GAP).map { it.user.id }.contains(state.currentUser?.id)
-                return if (needLoadCondition) {
-                    if (state.loading) {
-                        Observable.empty()
-                    } else {
-                        getLoadUserEffectObservable(state.currentUser?.id)
-                    }.concatWith(Observable.just(UserDetailMultiple.Effect.ToNextUser))
+                if (needLoadCondition) {
+                    Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToNextUser).concatWith(
+                        if (state.loading) {
+                            Observable.empty()
+                        } else {
+                            getLoadUserEffectObservable(state.currentUser?.id)
+                        }
+                    )
                 } else {
                     Observable.just(UserDetailMultiple.Effect.ToNextUser)
                 }
@@ -93,18 +99,19 @@ class UserDetailMultipleActor @Inject constructor(
             UserDetailMultiple.Wish.ToPreviousUser -> {
                 val needLoadCondition =
                     state.userResults.take(LOAD_GAP).map { it.user.id }.contains(state.currentUser?.id)
-                return if (needLoadCondition) {
-                    if (state.loading) {
-                        Observable.empty()
-                    } else {
-                        getLoadUserEffectObservable(state.currentUser?.id)
-                    }.concatWith(Observable.just(UserDetailMultiple.Effect.ToPreviousUser))
+                if (needLoadCondition) {
+                    Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToPreviousUser).concatWith(
+                        if (state.loading) {
+                            Observable.empty()
+                        } else {
+                            getLoadUserEffectObservable(state.currentUser?.id)
+                        }
+                    )
                 } else {
                     Observable.just(UserDetailMultiple.Effect.ToPreviousUser)
                 }
             }
         }.observeOnUI()
-
     }
 
     private fun getLoadUserEffectObservable(userId: Int?): Observable<UserDetailMultiple.Effect> {
@@ -117,40 +124,57 @@ class UserDetailMultipleActor @Inject constructor(
 
     private fun getLoadUsersSingle(lastUserId: Int?): Single<List<UserResult>> {
         val currentIdSingle = if (lastUserId != null) {
-            Single.fromCallable { lastUserId }
+            userHistoryRepo.getHistoryId(lastUserId)
         } else {
-            userHistoryRepo.getLastId().toSingle(0)
-        }
+            userHistoryRepo.getLastId()
+        }.toSingle(0)
         return currentIdSingle.flatMap { currentUserHistoryId ->
-            userHistoryRepo.getUserAndPreviousUsers(currentUserHistoryId, LOAD_SIZE / 2)
-                .map<List<UserResult>> {
-                    it.map { (historyId, user) ->
-                        UserResult.FromHistory(user, historyId)
-                    }
-                }
+            getCurrentUserAndPreviousInHistoryUsers(currentUserHistoryId)
                 .flatMap { currentAndPreviousHistoryUsers ->
-                    userHistoryRepo.getNextUsers(currentUserHistoryId,
-                        (LOAD_SIZE - currentAndPreviousHistoryUsers.size))
-                        .map<List<UserResult>> {
-                            it.map { (historyId, user) ->
-                                UserResult.FromHistory(user, historyId)
-                            }
-                        }
+                    getNextInHistoryUsers(currentUserHistoryId, currentAndPreviousHistoryUsers)
                         .flatMap { nextHistoryUsers ->
-                            val historyUsersCount = currentAndPreviousHistoryUsers.size + nextHistoryUsers.size
-                            userRepo.getUsersWithSameGroupsCountWithFilters(
-                                LOAD_SIZE - historyUsersCount,
-                                listOf(UserType.BLOCKED)
-                            )
-                                .map { usersFromSearchResult ->
-                                    val usersFromSearch = usersFromSearchResult.map {
-                                        UserResult.FromSearch(it.key)
-                                    }
-                                    currentAndPreviousHistoryUsers.plus(nextHistoryUsers).plus(usersFromSearch)
-                                }
+                            getHistoryAndFromSearchUsers(currentAndPreviousHistoryUsers, nextHistoryUsers)
                         }
                 }
         }
+    }
+
+    private fun getCurrentUserAndPreviousInHistoryUsers(currentUserHistoryId: Int) =
+        userHistoryRepo.getUserAndPreviousUsers(currentUserHistoryId, LOAD_SIZE / 2)
+            .map<List<UserResult>> {
+                it.map { (historyId, user) ->
+                    UserResult.FromHistory(user, historyId)
+                }
+            }
+
+    private fun getNextInHistoryUsers(
+        currentUserHistoryId: Int,
+        currentAndPreviousHistoryUsers: List<UserResult>,
+    ) = userHistoryRepo.getNextUsers(
+        historyId = currentUserHistoryId,
+        count = LOAD_SIZE - currentAndPreviousHistoryUsers.size
+    )
+        .map<List<UserResult>> {
+            it.map { (historyId, user) ->
+                UserResult.FromHistory(user, historyId)
+            }
+        }
+
+    private fun getHistoryAndFromSearchUsers(
+        currentAndPreviousHistoryUsers: List<UserResult>,
+        nextHistoryUsers: List<UserResult>,
+    ): Single<List<UserResult>> {
+        val historyUsersCount = currentAndPreviousHistoryUsers.size + nextHistoryUsers.size
+        return userRepo.getUsersWithSameGroupsCountWithFilters(
+            count = LOAD_SIZE - historyUsersCount,
+            notInUserTypes = listOf(UserType.BLOCKED)
+        )
+            .map { usersFromSearchResult ->
+                val usersFromSearch = usersFromSearchResult.map {
+                    UserResult.FromSearch(it.key)
+                }
+                currentAndPreviousHistoryUsers.plus(nextHistoryUsers).plus(usersFromSearch)
+            }
     }
 
     companion object {
@@ -162,7 +186,7 @@ class UserDetailMultipleActor @Inject constructor(
 
 class UserDetailMultipleReducer @Inject constructor() : Reducer<UserDetailMultiple.State, UserDetailMultiple.Effect> {
     override fun invoke(state: UserDetailMultiple.State, effect: UserDetailMultiple.Effect): UserDetailMultiple.State {
-        return when(effect) {
+        return when (effect) {
             UserDetailMultiple.Effect.LoadingStarted -> state.copy(loading = true)
             UserDetailMultiple.Effect.ToNextUser -> {
                 val currentUser = state.currentUser
@@ -196,15 +220,8 @@ class UserDetailMultipleReducer @Inject constructor() : Reducer<UserDetailMultip
             }
             is UserDetailMultiple.Effect.UsersLoaded -> {
                 val newUsers = effect.users.sorted()
-                val currentUser = if (newUsers.isEmpty()) {
-                    null
-                } else {
-                    if (state.currentUser == null) {
-                        newUsers[newUsers.size / 2].user
-                    } else {
-                        newUsers.firstOrNull { it.user.id == state.currentUser.id }?.user
-                    }
-                }
+                val newHistoryUsers = newUsers.filterIsInstance<UserResult.FromHistory>()
+                val currentUser = state.currentUser ?: (newHistoryUsers.lastOrNull() ?: newUsers.firstOrNull())?.user
                 state.copy(
                     loading = false,
                     userResults = newUsers,

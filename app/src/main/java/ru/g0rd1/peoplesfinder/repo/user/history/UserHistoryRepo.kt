@@ -7,6 +7,7 @@ import ru.g0rd1.peoplesfinder.model.User
 
 interface UserHistoryRepo {
 
+    fun getHistoryId(userId: Int): Maybe<Int>
     fun getLastId(): Maybe<Int>
     fun insert(userId: Int): Completable
     fun deleteAll(): Completable

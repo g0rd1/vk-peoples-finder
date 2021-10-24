@@ -54,9 +54,9 @@ abstract class UserDetailViewModel constructor(
         showPhotosEvent.value = userId
     }
 
-    fun previousUser() {}
+    abstract fun previousUser()
 
-    fun nextUser() {}
+    abstract fun nextUser()
 
     protected fun getSameGroupsAndTypes(userId: Int): Single<Pair<List<Group>, List<UserType>>> {
         return localGroupsRepo.getSameGroupsWithUser(userId)

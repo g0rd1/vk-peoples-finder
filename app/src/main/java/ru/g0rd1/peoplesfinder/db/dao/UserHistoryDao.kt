@@ -12,7 +12,7 @@ import ru.g0rd1.peoplesfinder.db.query.UserEntityWithHistoryId
 import ru.g0rd1.peoplesfinder.model.UserType
 
 @Dao
-abstract class UserHistoryDao {
+abstract class UserHistoryDao : BaseDao<UserHistoryEntity>() {
 
     @Query("SELECT * FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.USER_ID} = :userId")
     abstract fun getUserHistoryEntity(userId: Int): Maybe<UserHistoryEntity>
@@ -25,6 +25,9 @@ abstract class UserHistoryDao {
 
     @Query("SELECT ${UserHistoryEntity.Column.ID} FROM ${UserHistoryEntity.TABLE_NAME} ORDER BY ${UserHistoryEntity.Column.ID} DESC LIMIT 1")
     abstract fun getLastId(): Maybe<Int>
+
+    @Query("SELECT ${UserHistoryEntity.Column.ID} FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.USER_ID} = :userId")
+    abstract fun getHistoryId(userId: Int): Maybe<Int>
 
     // @Transaction
     // open fun getPreviousUsers(userId: Int, count: Int): List<UserEntity> {
@@ -41,11 +44,12 @@ abstract class UserHistoryDao {
     @Query(
         """
             SELECT * FROM
-            (SELECT * FROM ${UserEntity.TABLE_NAME} JOIN ${UserUserTypeEntity.TABLE_NAME} ON ${UserEntity.TABLE_NAME}.${UserEntity.Column.ID} = ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_ID} WHERE ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} != ${UserType.BLOCKED_ID}) as t
+            (SELECT * FROM ${UserEntity.TABLE_NAME} LEFT JOIN ${UserUserTypeEntity.TABLE_NAME} ON ${UserEntity.TABLE_NAME}.${UserEntity.Column.ID} = ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_ID} WHERE ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} IS NULL OR ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} != ${UserType.BLOCKED_ID}) as t
             JOIN
-            (SELECT ${UserHistoryEntity.Column.USER_ID}, ${UserHistoryEntity.Column.ID} as ${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.ID} <= :historyId ORDER BY ${UserHistoryEntity.Column.ID} DESC LIMIT :count) as k
+            (SELECT ${UserHistoryEntity.Column.USER_ID}, ${UserHistoryEntity.Column.ID} as ${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.ID} <= :historyId) as k
             ON
             t.${UserEntity.Column.ID} = k.${UserHistoryEntity.Column.USER_ID}
+            ORDER BY k.${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} DESC LIMIT :count
         """
     )
     abstract fun getUserAndPreviousUsers(historyId: Int, count: Int): Single<List<UserEntityWithHistoryId>>
@@ -53,11 +57,12 @@ abstract class UserHistoryDao {
     @Query(
         """
             SELECT * FROM
-            (SELECT * FROM ${UserEntity.TABLE_NAME} JOIN ${UserUserTypeEntity.TABLE_NAME} ON ${UserEntity.TABLE_NAME}.${UserEntity.Column.ID} = ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_ID} WHERE ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} != ${UserType.BLOCKED_ID}) as t
+            (SELECT * FROM ${UserEntity.TABLE_NAME} LEFT JOIN ${UserUserTypeEntity.TABLE_NAME} ON ${UserEntity.TABLE_NAME}.${UserEntity.Column.ID} = ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_ID} WHERE ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} IS NULL OR ${UserUserTypeEntity.TABLE_NAME}.${UserUserTypeEntity.Column.USER_TYPE_ID} != ${UserType.BLOCKED_ID}) as t
             JOIN
-            (SELECT ${UserHistoryEntity.Column.USER_ID}, ${UserHistoryEntity.Column.ID} as ${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.ID} > :historyId ORDER BY ${UserHistoryEntity.Column.ID} ASC LIMIT :count) as k
+            (SELECT ${UserHistoryEntity.Column.USER_ID}, ${UserHistoryEntity.Column.ID} as ${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} FROM ${UserHistoryEntity.TABLE_NAME} WHERE ${UserHistoryEntity.Column.ID} > :historyId) as k
             ON
             t.${UserEntity.Column.ID} = k.${UserHistoryEntity.Column.USER_ID}
+            ORDER BY k.${UserEntityWithHistoryId.HISTORY_ID_COLUMN_NAME} ASC LIMIT :count
         """
     )
     abstract fun getNextUsers(historyId: Int, count: Int): Single<List<UserEntityWithHistoryId>>
