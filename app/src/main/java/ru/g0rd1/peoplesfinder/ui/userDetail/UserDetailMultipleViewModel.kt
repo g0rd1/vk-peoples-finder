@@ -55,35 +55,57 @@ class UserDetailMultipleViewModel @AssistedInject constructor(
     }
 
     private fun observeState() {
+        // TODO Учесть что у стейта Result может поменяться только индикация загрузки и в этом случае не нужно делать повторный запрос в базу
+
         userDetailMultipleSubject
             .flatMapSingle { state ->
-                if (state.currentUser != null) {
-                    userHistoryRepo.insert(state.currentUser.id).andThen(
-                        getSameGroupsAndTypes(state.currentUser.id).map { (sameGroups, userTypes) ->
-                            Optional.create(Triple(state, sameGroups, userTypes))
-                        }
-                    )
-                } else {
-                    Single.just(Optional.empty())
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> Single.just(Pair(state, Optional.empty()))
+                    is UserDetailMultiple.State.Result -> {
+                        userHistoryRepo.insert(state.currentUser.id).andThen(
+                            getSameGroupsAndTypes(state.currentUser.id).map { (sameGroups, userTypes) ->
+                                Pair(state, Optional.create(Triple(state.currentUser, sameGroups, userTypes)))
+                            }
+                        )
+                    }
                 }
             }
             .observeOnUI()
             .subscribe(
-                {
-                    when (it) {
-                        is Optional.Empty -> Unit // TODO no user show loading
-                        is Optional.Value -> {
-                            val (state, sameGroups, userTypes) = it.value
-                            if (state.currentUser == null) return@subscribe
-                            setUserInfo(state.currentUser, sameGroups, userTypes)
+                { (state, triple) ->
+                    when (state) {
+                        UserDetailMultiple.State.Initial -> {
+                            loadingVisible.set(false)
+                            infoVisible.set(false)
+                        }
+                        is UserDetailMultiple.State.NoResult -> {
+                            // TODO Если загрузка завершена, а пользователи не найдены - то показать соответсующее сообщение
                             loadingVisible.set(state.loading)
-                            infoVisible.set(!state.loading)
-                            showLeftArrow.set(state.userResults.first().user.id != state.currentUser.id)
-                            showRightArrow.set(state.userResults.last().user.id != state.currentUser.id)
+                            infoVisible.set(false)
+                        }
+                        is UserDetailMultiple.State.Result -> {
+                            this.loadingVisible.set(state.loading)
+                            this.infoVisible.set(!state.loading)
+                            when (triple) {
+                                is Optional.Empty -> Unit
+                                is Optional.Value -> {
+                                    val (currentUser, sameGroups, userTypes) = triple.value
+                                    setUserInfo(currentUser, sameGroups, userTypes)
+                                    state.hasNextUser
+                                    showLeftArrow.set(state.hasPreviousUser)
+                                    showRightArrow.set(state.hasNextUser)
+                                    // showLeftArrow.set(userResults.first().user.id != currentUser.id)
+                                    // showRightArrow.set(userResults.last().user.id != currentUser.id)
+                                }
+                            }
+
                         }
                     }
                 },
                 {
+                    loadingVisible.set(false)
                     showError("Неизвестная ошибка") { observeState() }
                 }
             )

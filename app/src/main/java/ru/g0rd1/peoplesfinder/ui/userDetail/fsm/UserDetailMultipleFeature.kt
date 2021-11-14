@@ -15,11 +15,37 @@ import javax.inject.Inject
 
 object UserDetailMultiple {
 
-    data class State(
-        val userResults: List<UserResult>,
-        val currentUser: User?,
-        val loading: Boolean,
-    )
+    sealed class State {
+        object Initial : State()
+        data class Result(
+            // TODO Сделать загрузку всей необходимой инфы для юзера в стейт машине
+            val userResults: List<UserResult>,
+            val currentUser: User,
+            val loading: Boolean,
+        ) : State() {
+            val hasNextUser
+                get() = userResults.last().user.id != currentUser.id
+
+            val hasPreviousUser
+                get() = userResults.first().user.id != currentUser.id
+        }
+
+        data class NoResult(
+            val loading: Boolean,
+        ) : State()
+    }
+
+//    data class State(
+//        val userResults: List<UserResult>,
+//        val currentUser: User?,
+//        val loading: Boolean,
+//    ) {
+//        val hasNextUser
+//            get() = currentUser != null && userResults.lastOrNull()?.user?.id != currentUser.id
+//
+//        val hasPreviousUser
+//            get() = userResults.first().user.id != currentUser?.id
+//    }
 
     sealed class Wish {
         object ToPreviousUser : Wish()
@@ -40,11 +66,7 @@ class UserDetailMultipleFeature @Inject constructor(
     actor: UserDetailMultipleActor,
     reducer: UserDetailMultipleReducer,
 ) : ActorReducerFeature<UserDetailMultiple.Wish, UserDetailMultiple.Effect, UserDetailMultiple.State, Nothing>(
-    initialState = UserDetailMultiple.State(
-        userResults = listOf(),
-        currentUser = null,
-        loading = true
-    ),
+    initialState = UserDetailMultiple.State.NoResult(true),
     actor = actor,
     reducer = reducer,
 ) {
@@ -75,40 +97,56 @@ class UserDetailMultipleActor @Inject constructor(
 
         return when (action) {
             UserDetailMultiple.Wish.LoadUsers -> {
-                if (state.currentUser == null) {
-                    getLoadUserEffectObservable(state.currentUser?.id)
-                } else {
-                    Observable.empty()
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> getLoadUserEffectObservable(null)
+                    is UserDetailMultiple.State.Result -> Observable.empty()
                 }
             }
             UserDetailMultiple.Wish.ToNextUsers -> {
-                val needLoadCondition =
-                    state.userResults.takeLast(LOAD_GAP).map { it.user.id }.contains(state.currentUser?.id)
-                if (needLoadCondition) {
-                    Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToNextUser).concatWith(
-                        if (state.loading) {
-                            Observable.empty()
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> Observable.error(IllegalStateException())
+                    is UserDetailMultiple.State.Result -> {
+                        val needLoadCondition =
+                            state.userResults.takeLast(LOAD_GAP).map { it.user.id }.contains(state.currentUser.id)
+                        if (needLoadCondition) {
+                            Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToNextUser).concatWith(
+                                if (state.loading) {
+                                    Observable.empty()
+                                } else {
+                                    getLoadUserEffectObservable(state.currentUser.id)
+                                }
+                            )
                         } else {
-                            getLoadUserEffectObservable(state.currentUser?.id)
+                            Observable.just(UserDetailMultiple.Effect.ToNextUser)
                         }
-                    )
-                } else {
-                    Observable.just(UserDetailMultiple.Effect.ToNextUser)
+                    }
                 }
+
             }
             UserDetailMultiple.Wish.ToPreviousUser -> {
-                val needLoadCondition =
-                    state.userResults.take(LOAD_GAP).map { it.user.id }.contains(state.currentUser?.id)
-                if (needLoadCondition) {
-                    Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToPreviousUser).concatWith(
-                        if (state.loading) {
-                            Observable.empty()
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> Observable.error(IllegalStateException())
+                    is UserDetailMultiple.State.Result -> {
+                        val needLoadCondition =
+                            state.userResults.take(LOAD_GAP).map { it.user.id }.contains(state.currentUser.id)
+                        if (needLoadCondition) {
+                            Observable.just<UserDetailMultiple.Effect>(UserDetailMultiple.Effect.ToPreviousUser).concatWith(
+                                if (state.loading) {
+                                    Observable.empty()
+                                } else {
+                                    getLoadUserEffectObservable(state.currentUser.id)
+                                }
+                            )
                         } else {
-                            getLoadUserEffectObservable(state.currentUser?.id)
+                            Observable.just(UserDetailMultiple.Effect.ToPreviousUser)
                         }
-                    )
-                } else {
-                    Observable.just(UserDetailMultiple.Effect.ToPreviousUser)
+                    }
                 }
             }
         }.observeOnUI()
@@ -187,46 +225,76 @@ class UserDetailMultipleActor @Inject constructor(
 class UserDetailMultipleReducer @Inject constructor() : Reducer<UserDetailMultiple.State, UserDetailMultiple.Effect> {
     override fun invoke(state: UserDetailMultiple.State, effect: UserDetailMultiple.Effect): UserDetailMultiple.State {
         return when (effect) {
-            UserDetailMultiple.Effect.LoadingStarted -> state.copy(loading = true)
-            UserDetailMultiple.Effect.ToNextUser -> {
-                val currentUser = state.currentUser
-                val users = state.userResults.map { it.user }
-                val newCurrentUser = if (currentUser != null && users.map { it.id }.contains(currentUser.id)) {
-                    if (currentUser.id == users.last().id) {
-                        currentUser
-                    } else {
-                        val currentIndex = users.indexOfFirst { it.id == currentUser.id }
-                        users[currentIndex + 1]
-                    }
-                } else {
-                    currentUser
+            UserDetailMultiple.Effect.LoadingStarted -> {
+                when (state) {
+                    UserDetailMultiple.State.Initial -> UserDetailMultiple.State.NoResult(loading = true)
+                    is UserDetailMultiple.State.NoResult -> state.copy(loading = true)
+                    is UserDetailMultiple.State.Result -> state.copy(loading = true)
                 }
-                state.copy(currentUser = newCurrentUser)
+            }
+            UserDetailMultiple.Effect.ToNextUser -> {
+                when (state) {
+                    UserDetailMultiple.State.Initial -> state
+                    is UserDetailMultiple.State.NoResult -> state
+                    is UserDetailMultiple.State.Result -> {
+                        val currentUser = state.currentUser
+                        val users = state.userResults.map { it.user }
+                        val newCurrentUser = if (users.map { it.id }.contains(currentUser.id)) {
+                            if (currentUser.id == users.last().id) {
+                                currentUser
+                            } else {
+                                val currentIndex = users.indexOfFirst { it.id == currentUser.id }
+                                users[currentIndex + 1]
+                            }
+                        } else {
+                            currentUser
+                        }
+                        state.copy(currentUser = newCurrentUser)
+                    }
+                }
             }
             UserDetailMultiple.Effect.ToPreviousUser -> {
-                val currentUser = state.currentUser
-                val users = state.userResults.map { it.user }
-                val newCurrentUser = if (currentUser != null && users.map { it.id }.contains(currentUser.id)) {
-                    if (currentUser.id == users.first().id) {
-                        currentUser
-                    } else {
-                        val currentIndex = users.indexOfFirst { it.id == currentUser.id }
-                        users[currentIndex - 1]
+                when (state) {
+                    UserDetailMultiple.State.Initial -> state
+                    is UserDetailMultiple.State.NoResult -> state
+                    is UserDetailMultiple.State.Result -> {
+                        val currentUser = state.currentUser
+                        val users = state.userResults.map { it.user }
+                        val newCurrentUser = if (users.map { it.id }.contains(currentUser.id)) {
+                            if (currentUser.id == users.first().id) {
+                                currentUser
+                            } else {
+                                val currentIndex = users.indexOfFirst { it.id == currentUser.id }
+                                users[currentIndex - 1]
+                            }
+                        } else {
+                            currentUser
+                        }
+                        state.copy(currentUser = newCurrentUser)
                     }
-                } else {
-                    currentUser
                 }
-                state.copy(currentUser = newCurrentUser)
             }
             is UserDetailMultiple.Effect.UsersLoaded -> {
-                val newUsers = effect.users.sorted()
-                val newHistoryUsers = newUsers.filterIsInstance<UserResult.FromHistory>()
-                val currentUser = state.currentUser ?: (newHistoryUsers.lastOrNull() ?: newUsers.firstOrNull())?.user
-                state.copy(
-                    loading = false,
-                    userResults = newUsers,
-                    currentUser = currentUser
-                )
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    is UserDetailMultiple.State.Result,
+                    -> {
+                        if (effect.users.isEmpty()) {
+                            UserDetailMultiple.State.NoResult(loading = false)
+                        } else {
+                            val newUsers = effect.users.sorted()
+                            val newHistoryUsers = newUsers.filterIsInstance<UserResult.FromHistory>()
+                            val currentUser =
+                                (state as? UserDetailMultiple.State.Result)?.currentUser ?: (newHistoryUsers.lastOrNull() ?: newUsers.first()).user
+                            UserDetailMultiple.State.Result(
+                                loading = false,
+                                userResults = newUsers,
+                                currentUser = currentUser
+                            )
+                        }
+                    }
+                }
             }
         }
     }
