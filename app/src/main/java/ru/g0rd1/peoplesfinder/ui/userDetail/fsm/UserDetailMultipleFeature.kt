@@ -209,7 +209,7 @@ class UserDetailMultipleActor @Inject constructor(
         )
             .map { usersFromSearchResult ->
                 val usersFromSearch = usersFromSearchResult.map {
-                    UserResult.FromSearch(it.key)
+                    UserResult.FromSearch(it.user)
                 }
                 currentAndPreviousHistoryUsers.plus(nextHistoryUsers).plus(usersFromSearch)
             }

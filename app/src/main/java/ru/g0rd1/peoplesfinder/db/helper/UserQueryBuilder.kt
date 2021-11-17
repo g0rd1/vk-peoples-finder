@@ -6,7 +6,7 @@ import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserHistoryEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserUserTypeEntity
-import ru.g0rd1.peoplesfinder.db.query.UserEntityWithSameGroupsCount
+import ru.g0rd1.peoplesfinder.db.query.UserIdWithSameGroupsCount
 import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.UserType
 import java.time.LocalDate
@@ -20,9 +20,10 @@ object UserQueryBuilder {
     ): SupportSQLiteQuery {
         val queryBuilder = StringBuilder()
         queryBuilder.append("SELECT *, COUNT(${UserGroupEntity.Column.GROUP_ID}) ")
-        queryBuilder.append("as ${UserEntityWithSameGroupsCount.SAME_GROUPS_COUNT_COLUMN_NAME} FROM (\n")
+        queryBuilder.append("as ${UserIdWithSameGroupsCount.SAME_GROUPS_COUNT_COLUMN_NAME} FROM (\n")
         queryBuilder.append("(\n")
-        queryBuilder.append("SELECT * FROM ${UserEntity.TABLE_NAME}\n")
+        queryBuilder.append("SELECT ${UserEntity.Column.ID} as ${UserIdWithSameGroupsCount.USER_ID}\n")
+        queryBuilder.append("FROM ${UserEntity.TABLE_NAME}\n")
         getUsersWhereConditionOrNull(filterParameters, notInUserTypes)?.let { queryBuilder.append("$it\n") }
         queryBuilder.append(") as u\n")
         queryBuilder.append("JOIN\n")
@@ -30,9 +31,9 @@ object UserQueryBuilder {
         queryBuilder.append("SELECT * FROM ${UserGroupEntity.TABLE_NAME}\n")
         queryBuilder.append(") as ug\n")
         queryBuilder.append("ON\n")
-        queryBuilder.append("u.id = ug.user_id\n")
+        queryBuilder.append("u.${UserIdWithSameGroupsCount.USER_ID} = ug.user_id\n")
         queryBuilder.append(")\n")
-        queryBuilder.append("GROUP BY ${UserEntity.Column.ID}\n")
+        queryBuilder.append("GROUP BY u.${UserIdWithSameGroupsCount.USER_ID}\n")
         queryBuilder.append("ORDER BY COUNT(group_id)\n")
         queryBuilder.append("DESC\n")
         queryBuilder.append("LIMIT $count")

@@ -9,13 +9,12 @@ import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserTypeEntity
-import ru.g0rd1.peoplesfinder.db.helper.UserQueryBuilder
 import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.mapper.UserMapper
 import ru.g0rd1.peoplesfinder.model.Optional
 import ru.g0rd1.peoplesfinder.model.User
 import ru.g0rd1.peoplesfinder.model.UserType
-import ru.g0rd1.peoplesfinder.model.result.UserWithSameGroupsCountResult
+import ru.g0rd1.peoplesfinder.model.result.UserWithSameGroupsAndUserTypesResult
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
 import ru.g0rd1.peoplesfinder.util.subscribeOnIo
 import javax.inject.Inject
@@ -32,50 +31,33 @@ class DBLocalUsersRepo @Inject constructor(
 
     private val insertWithGroupsQueueManager = priorityQueueManagerFactory.create(1)
 
-    override fun getWithSameGroupsCount(): Single<Map<User, Int>> {
-        return userDao.getWithSameGroupsCount(0, 50)
-            .map { userEntitiesWithSameGroupsCounts ->
-                userEntitiesWithSameGroupsCounts
-                    .associate { it.userEntity.toUser() to it.sameGroupsCount }
+    override fun getUserWithMaxSameGroupsCountWithFilters(notInUserTypes: List<UserType>): Single<UserWithSameGroupsAndUserTypesResult> {
+        return getUsersWithSameGroupsCountWithFilters(count = 1, notInUserTypes = notInUserTypes).map {
+            if (it.isEmpty()) {
+                UserWithSameGroupsAndUserTypesResult.Empty
+            } else {
+                it.first()
             }
-            .switchIfEmpty(Single.just(mapOf()))
-            .subscribeOnIo()
-    }
-
-    override fun getUserWithMaxSameGroupsCountWithFilters(notInUserTypes: List<UserType>): Single<UserWithSameGroupsCountResult> {
-        return userDao.getUsersWithSameGroupsCountByQuery(
-            UserQueryBuilder.getUsersQuery(
-                filterParameters = filtersRepo.getFilterParameters(),
-                count = 1,
-                notInUserTypes = notInUserTypes
-            )
-        ).map { userEntitiesWithSameGroupsCounts ->
-            val userEntityWithSameGroupsCounts = userEntitiesWithSameGroupsCounts.first()
-            UserWithSameGroupsCountResult.Result(
-                userEntityWithSameGroupsCounts.userEntity.toUser(),
-                userEntityWithSameGroupsCounts.sameGroupsCount
-            )
         }
-            .cast(UserWithSameGroupsCountResult::class.java)
-            .switchIfEmpty(Single.just(UserWithSameGroupsCountResult.Empty))
-            .subscribeOnIo()
     }
 
     override fun getUsersWithSameGroupsCountWithFilters(
         count: Int,
         notInUserTypes: List<UserType>,
-    ): Single<Map<User, Int>> {
-        return userDao.getUsersWithSameGroupsCountByQuery(
-            UserQueryBuilder.getUsersQuery(
+    ): Single<List<UserWithSameGroupsAndUserTypesResult.Success>> {
+        return Single.fromCallable {
+            userDao.getUsersWithSameGroupsAndUserTypes(
                 filterParameters = filtersRepo.getFilterParameters(),
                 count = count,
                 notInUserTypes = notInUserTypes
-            )
-        ).map { userEntitiesWithSameGroupsCounts ->
-            userEntitiesWithSameGroupsCounts.associate { it.userEntity.toUser() to it.sameGroupsCount }
-        }
-            .switchIfEmpty(Single.just(mapOf()))
-            .subscribeOnIo()
+            ).map { userEntitiesWithSameGroupsCounts ->
+                UserWithSameGroupsAndUserTypesResult.Success(
+                    user = userEntitiesWithSameGroupsCounts.userEntity.toUser(),
+                    sameGroups = userEntitiesWithSameGroupsCounts.groupAndGroupData.map { groupMapper.transform(it.groupEntity, it.groupInfoEntity) },
+                    userTypes = userEntitiesWithSameGroupsCounts.userTypes.map { it.toUserTypes() }
+                )
+            }
+        }.subscribeOnIo()
     }
 
     override fun insertWithGroups(usersWithGroupIds: Map<User, List<Int>>): Completable =

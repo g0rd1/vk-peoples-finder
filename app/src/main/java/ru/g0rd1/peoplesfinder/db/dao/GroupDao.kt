@@ -8,7 +8,7 @@ import io.reactivex.Maybe
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
-import ru.g0rd1.peoplesfinder.db.query.GroupEntityAndGroupDataEntity
+import ru.g0rd1.peoplesfinder.db.query.GroupAndGroupData
 
 @Dao
 abstract class GroupDao : BaseDao<GroupEntity>() {
@@ -23,13 +23,13 @@ abstract class GroupDao : BaseDao<GroupEntity>() {
     abstract fun deleteNotIn(ids: List<Int>): Completable
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
-    abstract fun observeGroupAndGroupData(): Flowable<List<GroupEntityAndGroupDataEntity>>
+    abstract fun observeGroupAndGroupData(): Flowable<List<GroupAndGroupData>>
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
-    abstract fun getGroupAndGroupData(): Maybe<List<GroupEntityAndGroupDataEntity>>
+    abstract fun getGroupAndGroupData(): Maybe<List<GroupAndGroupData>>
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME} WHERE id = :id")
-    abstract fun getGroupAndGroupData(id: Int): Maybe<List<GroupEntityAndGroupDataEntity>>
+    abstract fun getGroupAndGroupData(id: Int): Maybe<List<GroupAndGroupData>>
 
     @Query(
         """
@@ -48,5 +48,5 @@ abstract class GroupDao : BaseDao<GroupEntity>() {
             ${UserGroupEntity.TABLE_NAME}.group_id = ${GroupEntity.TABLE_NAME}.id
     """
     )
-    abstract fun getSameGroupAndGroupDataWithUser(userId: Int): Maybe<List<GroupEntityAndGroupDataEntity>>
+    abstract fun getSameGroupAndGroupDataWithUser(userId: Int): Maybe<List<GroupAndGroupData>>
 }

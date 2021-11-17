@@ -3,33 +3,19 @@ package ru.g0rd1.peoplesfinder.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.RawQuery
+import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import io.reactivex.Maybe
-import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserTypeEntity
-import ru.g0rd1.peoplesfinder.db.query.UserEntityWithSameGroupsCount
+import ru.g0rd1.peoplesfinder.db.helper.UserQueryBuilder
+import ru.g0rd1.peoplesfinder.db.query.UserIdWithSameGroupsCount
+import ru.g0rd1.peoplesfinder.db.query.UserWithSameGroupsAndUserTypes
+import ru.g0rd1.peoplesfinder.model.FilterParameters
+import ru.g0rd1.peoplesfinder.model.UserType
 
 @Dao
 abstract class UserDao : BaseDao<UserEntity>() {
-
-    @Query(
-        """
-            SELECT * FROM (
-                SELECT user_id, COUNT(group_id) as ${UserEntityWithSameGroupsCount.SAME_GROUPS_COUNT_COLUMN_NAME} 
-                FROM ${GroupEntity.TABLE_NAME} g JOIN `user_group` ug ON g.id = ug.group_id 
-                GROUP BY user_id 
-                ORDER BY COUNT(group_id) 
-                DESC
-            )
-            as jn JOIN ${UserEntity.TABLE_NAME} ON jn.user_id = ${UserEntity.TABLE_NAME}.id 
-            LIMIT :count 
-            OFFSET :offset"""
-    )
-    abstract fun getWithSameGroupsCount(
-        offset: Int,
-        count: Int,
-    ): Maybe<List<UserEntityWithSameGroupsCount>>
 
     @Query("SELECT * FROM ${UserEntity.TABLE_NAME}")
     abstract fun get(): Maybe<List<UserEntity>>
@@ -48,7 +34,28 @@ abstract class UserDao : BaseDao<UserEntity>() {
     )
     abstract fun getUserTypes(id: Int): Maybe<List<UserTypeEntity>>
 
+    @Transaction
+    open fun getUsersWithSameGroupsAndUserTypes(
+        filterParameters: FilterParameters,
+        count: Int,
+        notInUserTypes: List<UserType>,
+    ): List<UserWithSameGroupsAndUserTypes> {
+        val usersIdsWithSameGroupsCount = _getUsersIdsWithSameGroupsCountByQuery(
+            UserQueryBuilder.getUsersQuery(
+                filterParameters = filterParameters,
+                count = count,
+                notInUserTypes = notInUserTypes
+            )
+        )
+        return _getUsers(usersIdsWithSameGroupsCount.map { it.userId })
+    }
+
+    @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE ${UserEntity.Column.ID} IN (:userIds)")
+    @Suppress("FunctionName")
+    abstract fun _getUsers(userIds: List<Int>): List<UserWithSameGroupsAndUserTypes>
+
     @RawQuery
-    abstract fun getUsersWithSameGroupsCountByQuery(query: SupportSQLiteQuery): Maybe<List<UserEntityWithSameGroupsCount>>
+    @Suppress("FunctionName")
+    abstract fun _getUsersIdsWithSameGroupsCountByQuery(query: SupportSQLiteQuery): List<UserIdWithSameGroupsCount>
 
 }
