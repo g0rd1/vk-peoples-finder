@@ -19,7 +19,6 @@ import ru.g0rd1.peoplesfinder.model.UserType
         UserGroupEntity::class,
         UserTypeEntity::class,
         UserUserTypeEntity::class,
-        GroupHistoryEntity::class,
         UserHistoryEntity::class,
     ],
     version = 1
@@ -27,7 +26,6 @@ import ru.g0rd1.peoplesfinder.model.UserType
 @TypeConverters(DateConverter::class, UserConverter::class, GroupConverter::class)
 abstract class Database : RoomDatabase() {
     abstract fun groupDao(): GroupDao
-    abstract fun groupHistoryDao(): GroupHistoryDao
     abstract fun userDao(): UserDao
     abstract fun groupDataDao(): GroupDataDao
     abstract fun userGroupDao(): UserGroupDao

@@ -34,10 +34,6 @@ abstract class DatabaseModule {
 
         @Provides
         @Singleton
-        fun groupHistoryDao(db: Database): GroupHistoryDao = db.groupHistoryDao()
-
-        @Provides
-        @Singleton
         fun userGroupDao(db: Database): UserGroupDao = db.userGroupDao()
 
         @Provides

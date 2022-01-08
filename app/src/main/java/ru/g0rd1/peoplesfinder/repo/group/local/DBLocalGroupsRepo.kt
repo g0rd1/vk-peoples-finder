@@ -5,10 +5,9 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.db.dao.GroupDao
 import ru.g0rd1.peoplesfinder.db.dao.GroupDataDao
-import ru.g0rd1.peoplesfinder.db.dao.GroupHistoryDao
 import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
-import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
+import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.model.Optional
@@ -20,7 +19,6 @@ class DBLocalGroupsRepo @Inject constructor(
     private val groupDao: GroupDao,
     private val groupDataDao: GroupDataDao,
     private val userGroupDao: UserGroupDao,
-    private val groupHistoryDao: GroupHistoryDao,
     private val groupMapper: GroupMapper,
 ) : LocalGroupsRepo {
 
@@ -88,32 +86,6 @@ class DBLocalGroupsRepo @Inject constructor(
             }
             .switchIfEmpty(Single.just(listOf()))
             .subscribeOnIo()
-    }
-
-    override fun clearGroupHistory(): Completable {
-        return groupHistoryDao.deleteAll().subscribeOnIo()
-    }
-
-    override fun getPreviousGroupInHistory(groupId: Int): Single<Optional<Group>> {
-        return Single.fromCallable {
-            Optional.create(groupHistoryDao.getPreviousGroupIdOrNull(groupId))
-        }.flatMap { optionalPreviousGroupId ->
-            when (optionalPreviousGroupId) {
-                is Optional.Empty -> Single.just(Optional.empty())
-                is Optional.Value -> get(optionalPreviousGroupId.value)
-            }
-        }.subscribeOnIo()
-    }
-
-    override fun getNextGroupInHistory(groupId: Int): Single<Optional<Group>> {
-        return Single.fromCallable {
-            Optional.create(groupHistoryDao.getNextGroupIdOrNull(groupId))
-        }.flatMap { optionalNextGroupId ->
-            when (optionalNextGroupId) {
-                is Optional.Empty -> Single.just(Optional.empty())
-                is Optional.Value -> get(optionalNextGroupId.value)
-            }
-        }.subscribeOnIo()
     }
 
     override fun get(groupId: Int): Single<Optional<Group>> {

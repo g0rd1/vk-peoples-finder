@@ -30,11 +30,4 @@ interface LocalGroupsRepo {
     fun observeGroups(): Flowable<List<Group>>
 
     fun getSameGroupsWithUser(userId: Int): Single<List<Group>>
-
-    fun clearGroupHistory(): Completable
-
-    fun getPreviousGroupInHistory(groupId: Int): Single<Optional<Group>>
-
-    fun getNextGroupInHistory(groupId: Int): Single<Optional<Group>>
-
 }
