@@ -3,8 +3,8 @@ package ru.g0rd1.peoplesfinder.db.dao
 import androidx.room.Dao
 import androidx.room.Query
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Maybe
+import kotlinx.coroutines.flow.Flow
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
@@ -23,7 +23,7 @@ abstract class GroupDao : BaseDao<GroupEntity>() {
     abstract fun deleteNotIn(ids: List<Int>): Completable
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
-    abstract fun observeGroupAndGroupData(): Flowable<List<GroupAndGroupData>>
+    abstract fun observeGroupAndGroupData(): Flow<List<GroupAndGroupData>>
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
     abstract fun getGroupAndGroupData(): Maybe<List<GroupAndGroupData>>

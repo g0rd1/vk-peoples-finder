@@ -3,10 +3,14 @@ package ru.g0rd1.peoplesfinder.ui.groups
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import androidx.databinding.ObservableInt
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.error.Error
@@ -179,34 +183,33 @@ class GroupsViewModel @Inject constructor(
     private fun observeGroups() {
         showLoader.set(true)
         showContent.set(false)
-        localGroupsRepo.observeGroups()
-            .observeOnUI()
-            .subscribe(
-                { groups ->
-                    membersCount.set(groups.sumOf { it.membersCount })
-                    loadedMembersCount.set(groups.sumOf{ it.loadedMembersCount })
-                    showContent.set(true)
-                    groupViewModels.set(
-                        groups.sortedBy { it.membersCount }.map { group ->
-                            GroupViewData(
-                                id = group.id,
-                                name = group.name,
-                                photo = group.photo,
-                                membersCount = group.membersCount,
-                                loadedMembersCount = group.loadedMembersCount,
-                                hasAccessToMembers = group.hasAccessToMembers
-                            )
-                        }
-                    )
-                    showLoader.set(false)
-                    showContent.set(true)
-                },
-                {
-                    showLoader.set(false)
-                    showContent.set(false)
-                    errorHandler.handle(it, ::observeGroups)
-                }
-            ).disposeLater()
+        viewModelScope.launch {
+            localGroupsRepo.observeGroups()
+                    .catch {
+                        showLoader.set(false)
+                        showContent.set(false)
+                        errorHandler.handle(it, ::observeGroups)
+                    }
+                    .collect { groups ->
+                        membersCount.set(groups.sumOf { it.membersCount })
+                        loadedMembersCount.set(groups.sumOf { it.loadedMembersCount })
+                        showContent.set(true)
+                        groupViewModels.set(
+                                groups.sortedBy { it.membersCount }.map { group ->
+                                    GroupViewData(
+                                            id = group.id,
+                                            name = group.name,
+                                            photo = group.photo,
+                                            membersCount = group.membersCount,
+                                            loadedMembersCount = group.loadedMembersCount,
+                                            hasAccessToMembers = group.hasAccessToMembers
+                                    )
+                                }
+                        )
+                        showLoader.set(false)
+                        showContent.set(true)
+                    }
+        }
     }
 
 }

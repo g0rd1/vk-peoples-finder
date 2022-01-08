@@ -1,14 +1,18 @@
 package ru.g0rd1.peoplesfinder.repo.group.local
 
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import ru.g0rd1.peoplesfinder.db.dao.GroupDao
 import ru.g0rd1.peoplesfinder.db.dao.GroupDataDao
 import ru.g0rd1.peoplesfinder.db.dao.GroupHistoryDao
 import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
-import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
+import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.model.Optional
@@ -61,22 +65,23 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun deleteRelation(id: Int): Completable =
         userGroupDao.delete(id).subscribeOnIo()
 
-    override fun observeGroups(): Flowable<List<Group>> {
+    override fun observeGroups(): Flow<List<Group>> {
         val groupsFlowable =
-            groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
-                GroupEntitiesAndGroupDataEntities.map {
-                    groupMapper.transform(
-                        it.groupEntity,
-                        it.groupInfoEntity
-                    )
-                }.also { groupCache = it }
-            }
+                groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+                    GroupEntitiesAndGroupDataEntities.map {
+                        groupMapper.transform(
+                                it.groupEntity,
+                                it.groupInfoEntity
+                        )
+                    }.also { groupCache = it }
+                }
+        val groupCache = this.groupCache
         return if (groupCache != null) {
-            Flowable.concat(Flowable.just(groupCache), groupsFlowable)
+            groupsFlowable.onStart { emit(groupCache) }
         } else {
             groupsFlowable
         }
-            .subscribeOnIo()
+                .flowOn(Dispatchers.IO)
     }
 
     override fun getSameGroupsWithUser(userId: Int): Single<List<Group>> {

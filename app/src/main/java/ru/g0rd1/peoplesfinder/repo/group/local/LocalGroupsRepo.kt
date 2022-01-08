@@ -1,8 +1,8 @@
 package ru.g0rd1.peoplesfinder.repo.group.local
 
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import ru.g0rd1.peoplesfinder.model.Group
 import ru.g0rd1.peoplesfinder.model.Optional
 import java.time.LocalDate
@@ -27,7 +27,7 @@ interface LocalGroupsRepo {
 
     fun deleteRelation(id: Int): Completable
 
-    fun observeGroups(): Flowable<List<Group>>
+    fun observeGroups(): Flow<List<Group>>
 
     fun getSameGroupsWithUser(userId: Int): Single<List<Group>>
 
