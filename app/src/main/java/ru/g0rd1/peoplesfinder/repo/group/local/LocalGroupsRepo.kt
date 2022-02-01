@@ -27,7 +27,9 @@ interface LocalGroupsRepo {
 
     fun deleteRelation(id: Int): Completable
 
-    fun observeGroups(): Flowable<List<Group>>
+    fun observeUserGroups(): Flowable<List<Group>>
+
+    fun observeOtherGroups(): Flowable<List<Group>>
 
     fun getSameGroupsWithUser(userId: Int): Single<List<Group>>
 }

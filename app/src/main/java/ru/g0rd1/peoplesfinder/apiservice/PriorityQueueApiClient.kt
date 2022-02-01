@@ -66,6 +66,13 @@ class PriorityQueueApiClient(
         )
     }
 
+    override fun searchGroups(searchText: String, count: Int, accessToken: String, version: String): Single<ApiVkResponse<ApiGroup>> {
+        return priorityQueueManager.getQueuedSingle(
+            apiClient.searchGroups(searchText, count, accessToken, version),
+            HIGH_PRIORITY
+        )
+    }
+
     override fun getCountries(
         needAll: Int,
         count: Int,

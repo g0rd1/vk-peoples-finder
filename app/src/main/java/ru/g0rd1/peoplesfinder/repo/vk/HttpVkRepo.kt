@@ -26,6 +26,10 @@ class HttpVkRepo @Inject constructor(
         ).toVkResult(ApiGroup::class.java).subscribeOnIo()
     }
 
+    override fun searchGroups(searchText: String): Single<ApiVkResult<List<ApiGroup>>> {
+        return apiClient.searchGroups(searchText).toVkResult(ApiGroup::class.java).subscribeOnIo()
+    }
+
     override fun getGroupMembers(groupId: String, offset: Int, count: Int): Single<ApiVkResult<List<ApiUser>>> {
         return apiClient.getGroupMembers(groupId, offset, count).toVkResult(ApiUser::class.java).subscribeOnIo()
     }
@@ -38,7 +42,7 @@ class HttpVkRepo @Inject constructor(
         count: Int,
         countryId: Int?,
         query: String?,
-        needAll: Boolean
+        needAll: Boolean,
     ): Single<ApiVkResult<List<ApiCity>>> {
         return apiClient.getCities(
             count = count,

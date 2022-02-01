@@ -31,10 +31,13 @@ data class GroupInfoEntity(
     val allMembersLoadedDate: LocalDate?,
 
     @ColumnInfo(name = "sequential_number")
-    val sequentialNumber: Int,
+    val sequentialNumber: Int?,
 
     @ColumnInfo(name = "has_access_to_members")
     val hasAccessToMembers: Boolean,
+
+    @ColumnInfo(name = "user_in_group")
+    val userInGroup: Boolean,
 ) {
 
     companion object {

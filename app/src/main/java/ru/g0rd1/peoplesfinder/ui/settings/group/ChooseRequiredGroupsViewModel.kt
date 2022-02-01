@@ -1,4 +1,4 @@
-package ru.g0rd1.peoplesfinder.ui.choose.multi.group
+package ru.g0rd1.peoplesfinder.ui.settings.group
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.g0rd1.peoplesfinder.R

@@ -9,6 +9,8 @@ interface VkGroupsRepo {
 
     fun getGroups(): Single<VkResult<List<Group>>>
 
+    fun searchGroups(searchText: String): Single<VkResult<List<Group>>>
+
     fun getGroupMembers(groupId: String, count: Int, offset: Int = 0): Single<VkResult<List<User>>>
 
 }

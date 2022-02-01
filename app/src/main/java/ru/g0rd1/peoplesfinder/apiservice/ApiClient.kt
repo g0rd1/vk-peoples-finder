@@ -59,15 +59,23 @@ interface ApiClient {
         @Query("photo_sizes") photoSizes: Int = 1,
         @Query("rev") rev: Int = 1,
         @Query(ACCESS_TOKEN_QUERY) accessToken: String = getAccessToken(),
-        @Query(VERSION_QUERY) version: String = API_VERSION
+        @Query(VERSION_QUERY) version: String = API_VERSION,
     ): Single<ApiVkResponse<ApiPhoto>>
 
     @GET("execute")
     fun execute(
         @Query("code") code: String,
         @Query(ACCESS_TOKEN_QUERY) accessToken: String = getAccessToken(),
-        @Query(VERSION_QUERY) version: String = API_VERSION
+        @Query(VERSION_QUERY) version: String = API_VERSION,
     ): Single<ApiVkResponse<ApiUser>>
+
+    @GET("groups.search")
+    fun searchGroups(
+        @Query("q") searchText: String,
+        @Query("count") count: Int = 1000,
+        @Query(ACCESS_TOKEN_QUERY) accessToken: String = getAccessToken(),
+        @Query(VERSION_QUERY) version: String = API_VERSION,
+    ): Single<ApiVkResponse<ApiGroup>>
 
     companion object {
         const val API_VERSION = "5.89"

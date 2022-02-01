@@ -119,6 +119,9 @@
     <string name="choose_city_dialog_title">Выбор города</string>
     <string name="choose_city_dialog_search_text_hint">Начните вводить название города</string>
 
+    <string name="choose_other_group_dialog_title">Выбор группы</string>
+    <string name="choose_other_group_dialog_search_text_hint">Начните вводить название группы</string>
+
     <string name="choose_required_groups_dialog_title">Выбор групп</string>
     <string name="choose_required_groups_dialog_search_text_hint">Начните вводить название группы</string>
 

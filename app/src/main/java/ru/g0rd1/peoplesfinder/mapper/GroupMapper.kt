@@ -1,8 +1,8 @@
 package ru.g0rd1.peoplesfinder.mapper
 
 import ru.g0rd1.peoplesfinder.apiservice.model.ApiGroup
-import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
+import ru.g0rd1.peoplesfinder.db.entity.GroupInfoEntity
 import ru.g0rd1.peoplesfinder.model.Group
 import javax.inject.Inject
 
@@ -23,7 +23,8 @@ class GroupMapper @Inject constructor() {
                 loadedMembersCount = group.loadedMembersCount,
                 allMembersLoadedDate = group.allMembersLoadedDate,
                 sequentialNumber = group.sequentialNumber,
-                hasAccessToMembers = group.hasAccessToMembers
+                hasAccessToMembers = group.hasAccessToMembers,
+                userInGroup = group.userInGroup,
             )
         )
     }
@@ -39,13 +40,15 @@ class GroupMapper @Inject constructor() {
             loadedMembersCount = groupInfoEntity.loadedMembersCount,
             allMembersLoadedDate = groupInfoEntity.allMembersLoadedDate,
             sequentialNumber = groupInfoEntity.sequentialNumber,
-            hasAccessToMembers = groupInfoEntity.hasAccessToMembers
+            hasAccessToMembers = groupInfoEntity.hasAccessToMembers,
+            userInGroup = groupInfoEntity.userInGroup,
         )
     }
 
     fun transform(
         apiGroup: ApiGroup,
-        sequentialNumber: Int
+        sequentialNumber: Int?,
+        userInGroup: Boolean,
     ): Group {
         return Group(
             id = apiGroup.id,
@@ -57,7 +60,8 @@ class GroupMapper @Inject constructor() {
             loadedMembersCount = 0,
             allMembersLoadedDate = null,
             sequentialNumber = sequentialNumber,
-            hasAccessToMembers = true
+            hasAccessToMembers = true,
+            userInGroup = userInGroup,
         )
     }
 

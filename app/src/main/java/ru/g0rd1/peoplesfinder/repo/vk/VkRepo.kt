@@ -12,10 +12,12 @@ interface VkRepo {
         count: Int,
     ): Single<ApiVkResult<List<ApiGroup>>>
 
+    fun searchGroups(searchText: String): Single<ApiVkResult<List<ApiGroup>>>
+
     fun getGroupMembers(
         groupId: String,
         offset: Int,
-        count: Int = 1000
+        count: Int = 1000,
     ): Single<ApiVkResult<List<ApiUser>>>
 
     fun getCountries(): Single<ApiVkResult<List<ApiCountry>>>
@@ -24,7 +26,7 @@ interface VkRepo {
         count: Int,
         countryId: Int? = null,
         query: String? = null,
-        needAll: Boolean = !query.isNullOrBlank()
+        needAll: Boolean = !query.isNullOrBlank(),
     ): Single<ApiVkResult<List<ApiCity>>>
 
     fun getProfilePhotos(ownerId: Int): Single<ApiVkResult<List<ApiPhoto>>>

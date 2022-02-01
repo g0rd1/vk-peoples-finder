@@ -1,4 +1,4 @@
-package ru.g0rd1.peoplesfinder.ui.groups
+package ru.g0rd1.peoplesfinder.ui.groups.users
 
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
@@ -13,17 +13,18 @@ import ru.g0rd1.peoplesfinder.base.error.Error
 import ru.g0rd1.peoplesfinder.common.ResourceManager
 import ru.g0rd1.peoplesfinder.control.groupmembersloader.GroupMembersLoaderManager
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
+import ru.g0rd1.peoplesfinder.ui.groups.GroupViewData
 import ru.g0rd1.peoplesfinder.util.observeOnUI
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class GroupsViewModel @Inject constructor(
+class UsersGroupsViewModel @Inject constructor(
     private val groupMembersLoaderManager: GroupMembersLoaderManager,
     private val localGroupsRepo: LocalGroupsRepo,
     private val errorHandler: Error.Handler,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel() {
 
     val showContent = ObservableBoolean(false)
@@ -179,7 +180,7 @@ class GroupsViewModel @Inject constructor(
     private fun observeGroups() {
         showLoader.set(true)
         showContent.set(false)
-        localGroupsRepo.observeGroups()
+        localGroupsRepo.observeUserGroups()
             .observeOnUI()
             .subscribe(
                 { groups ->

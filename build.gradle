@@ -2,14 +2,14 @@
 
 buildscript {
     ext.kotlin_version = '1.6.10'
-    ext.hilt_version = '2.37'
+    ext.hilt_version = '2.38.1'
     repositories {
         google()
         mavenCentral()
         maven { url "https://www.jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:7.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         def nav_version = "2.3.0-alpha03"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"

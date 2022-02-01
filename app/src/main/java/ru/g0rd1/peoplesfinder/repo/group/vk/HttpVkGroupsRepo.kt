@@ -22,11 +22,11 @@ class HttpVkGroupsRepo @Inject constructor(
     private val vkResultMapper: VkResultMapper,
 ) : VkGroupsRepo {
 
-    private var groupsCache: MutableMap<Int, List<Group>> = mutableMapOf()
+    // private var usersGroupsCache: MutableMap<Int, List<Group>> = mutableMapOf()
 
     override fun getGroups(): Single<VkResult<List<Group>>> {
         val userId = vkAccessRepo.getUserId()
-        if (groupsCache[userId] != null) return Single.just(VkResult.Success(groupsCache[userId] ?: listOf()))
+        // if (usersGroupsCache[userId] != null) return Single.just(VkResult.Success(usersGroupsCache[userId] ?: listOf()))
         return vkRepo.getGroups(
             userId = userId,
             count = DEFAULT_GROUP_COUNT
@@ -34,13 +34,27 @@ class HttpVkGroupsRepo @Inject constructor(
             try {
                 val vkResult = vkResultMapper.transform(it) { apiGroups ->
                     apiGroups.mapIndexed { index, apiGroup ->
-                        groupMapper.transform(apiGroup, index)
+                        groupMapper.transform(apiGroup, index, true)
                     }
                 }
-                if (vkResult is VkResult.Success) {
-                    groupsCache[userId] = vkResult.data
-                }
+                // if (vkResult is VkResult.Success) {
+                //     usersGroupsCache[userId] = vkResult.data
+                // }
                 vkResult
+            } catch (t: Throwable) {
+                VkResult.Error.Generic(t)
+            }
+        }.subscribeOnIo()
+    }
+
+    override fun searchGroups(searchText: String): Single<VkResult<List<Group>>> {
+        return vkRepo.searchGroups(searchText).map {
+            try {
+                vkResultMapper.transform(it) { apiGroups ->
+                    apiGroups.map { apiGroup ->
+                        groupMapper.transform(apiGroup, null, false)
+                    }
+                }
             } catch (t: Throwable) {
                 VkResult.Error.Generic(t)
             }

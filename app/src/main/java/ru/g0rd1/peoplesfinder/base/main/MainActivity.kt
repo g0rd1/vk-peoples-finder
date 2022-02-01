@@ -6,9 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.ListFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.MainActivityProvider
+import ru.g0rd1.peoplesfinder.base.SnackbarManager
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
 import ru.g0rd1.peoplesfinder.databinding.ActivityMainBinding
 import ru.g0rd1.peoplesfinder.ui.authorization.AuthorizationFragment
@@ -28,6 +30,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var mainActivityProvider: MainActivityProvider
+
+    @Inject
+    lateinit var snackbarManager: SnackbarManager
 
     private val onFragmentChangeListener: (Fragment) -> Unit = { fragment ->
         when (fragment) {
@@ -66,9 +71,14 @@ class MainActivity : AppCompatActivity() {
             R.layout.activity_main
         )
 
+        snackbarManager.setShowSnackbarFunction { message, length ->
+            val view = binding?.root ?: return@setShowSnackbarFunction
+            Snackbar.make(view, message, length).show()
+        }
+
         appNavigator.addOnFragmentChangeListener(onFragmentChangeListener)
 
-        binding?.navView?.setOnNavigationItemSelectedListener {
+        binding?.navView?.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.groups_fragment -> {
                     appNavigator.groups()
@@ -95,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

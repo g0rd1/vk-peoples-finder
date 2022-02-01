@@ -1,4 +1,4 @@
-package ru.g0rd1.peoplesfinder.ui.choose.multi.group
+package ru.g0rd1.peoplesfinder.ui.settings.group
 
 import android.os.Bundle
 import android.view.LayoutInflater

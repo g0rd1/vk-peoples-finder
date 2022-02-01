@@ -12,6 +12,7 @@ data class Group(
     val membersCount: Int,
     val loadedMembersCount: Int,
     val allMembersLoadedDate: LocalDate?,
-    val sequentialNumber: Int,
-    val hasAccessToMembers: Boolean
+    val sequentialNumber: Int?,
+    val hasAccessToMembers: Boolean,
+    val userInGroup: Boolean,
 )

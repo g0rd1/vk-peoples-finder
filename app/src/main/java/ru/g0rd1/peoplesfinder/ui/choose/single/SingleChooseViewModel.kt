@@ -4,6 +4,7 @@ import androidx.annotation.CallSuper
 import androidx.databinding.Observable
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import io.reactivex.internal.schedulers.NewThreadScheduler
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.Subject
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class SingleChooseViewModel<T> : BaseViewModel(), ItemClickListener<SingleChooseItemViewData<T>> {
 
-    val searchText = ObservableField<String>()
+    val searchText = ObservableField<String>("")
 
     val loaderVisible = ObservableBoolean()
 
@@ -42,7 +43,7 @@ abstract class SingleChooseViewModel<T> : BaseViewModel(), ItemClickListener<Sin
     }
 
     protected fun observeSearchText(): io.reactivex.Observable<String> {
-        return searchTextSubject.throttleLatest(SEARCH_THROTTLE, TimeUnit.MILLISECONDS)
+        return searchTextSubject.debounce(SEARCH_THROTTLE, TimeUnit.MILLISECONDS, NewThreadScheduler())
     }
 
     protected fun setError(errorText: String) {

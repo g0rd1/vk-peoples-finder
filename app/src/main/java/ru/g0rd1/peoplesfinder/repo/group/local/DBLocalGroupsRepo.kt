@@ -22,7 +22,7 @@ class DBLocalGroupsRepo @Inject constructor(
     private val groupMapper: GroupMapper,
 ) : LocalGroupsRepo {
 
-    private var groupCache: List<Group>? = null
+    // private var groupCache: List<Group>? = null
 
     override fun updateLoadedMembersCount(id: Int, loadedMembersCount: Int): Completable =
         groupDataDao.updateLoadedMembersCount(id, loadedMembersCount).subscribeOnIo()
@@ -59,23 +59,49 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun deleteRelation(id: Int): Completable =
         userGroupDao.delete(id).subscribeOnIo()
 
-    override fun observeGroups(): Flowable<List<Group>> {
-        val groupsFlowable =
-            groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
-                GroupEntitiesAndGroupDataEntities.map {
+    override fun observeUserGroups(): Flowable<List<Group>> {
+        return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+            GroupEntitiesAndGroupDataEntities
+                .filter { it.groupInfoEntity.userInGroup }
+                .map {
                     groupMapper.transform(
                         it.groupEntity,
                         it.groupInfoEntity
                     )
-                }.also { groupCache = it }
-            }
-        return if (groupCache != null) {
-            Flowable.concat(Flowable.just(groupCache), groupsFlowable)
-        } else {
-            groupsFlowable
+                }
         }
-            .subscribeOnIo()
     }
+
+    override fun observeOtherGroups(): Flowable<List<Group>> {
+        return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+            GroupEntitiesAndGroupDataEntities
+                .filter { !it.groupInfoEntity.userInGroup }
+                .map {
+                    groupMapper.transform(
+                        it.groupEntity,
+                        it.groupInfoEntity
+                    )
+                }
+        }
+    }
+
+    // override fun observeGroups(): Flowable<List<Group>> {
+    //     val groupsFlowable =
+    //         groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
+    //             GroupEntitiesAndGroupDataEntities.map {
+    //                 groupMapper.transform(
+    //                     it.groupEntity,
+    //                     it.groupInfoEntity
+    //                 )
+    //             }.also { groupCache = it }
+    //         }
+    //     return if (groupCache != null) {
+    //         Flowable.concat(Flowable.just(groupCache), groupsFlowable)
+    //     } else {
+    //         groupsFlowable
+    //     }
+    //         .subscribeOnIo()
+    // }
 
     override fun getSameGroupsWithUser(userId: Int): Single<List<Group>> {
         return groupDao.getSameGroupAndGroupDataWithUser(userId)
