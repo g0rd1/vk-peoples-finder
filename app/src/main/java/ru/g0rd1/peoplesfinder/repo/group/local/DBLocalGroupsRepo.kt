@@ -59,49 +59,29 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun deleteRelation(id: Int): Completable =
         userGroupDao.delete(id).subscribeOnIo()
 
-    override fun observeUserGroups(): Flowable<List<Group>> {
+    override fun observeGroups(): Flowable<List<Group>> {
         return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
             GroupEntitiesAndGroupDataEntities
-                .filter { it.groupEntity.userInGroup }
                 .map {
                     groupMapper.transform(
                         it.groupEntity,
                         it.groupInfoEntity
                     )
                 }
+        }
+    }
+
+    override fun observeUserGroups(): Flowable<List<Group>> {
+        return observeGroups().map { groups ->
+            groups.filter { it.userInGroup }
         }
     }
 
     override fun observeOtherGroups(): Flowable<List<Group>> {
-        return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
-            GroupEntitiesAndGroupDataEntities
-                .filter { !it.groupEntity.userInGroup }
-                .map {
-                    groupMapper.transform(
-                        it.groupEntity,
-                        it.groupInfoEntity
-                    )
-                }
+        return observeGroups().map { groups ->
+            groups.filter { !it.userInGroup }
         }
     }
-
-    // override fun observeGroups(): Flowable<List<Group>> {
-    //     val groupsFlowable =
-    //         groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
-    //             GroupEntitiesAndGroupDataEntities.map {
-    //                 groupMapper.transform(
-    //                     it.groupEntity,
-    //                     it.groupInfoEntity
-    //                 )
-    //             }.also { groupCache = it }
-    //         }
-    //     return if (groupCache != null) {
-    //         Flowable.concat(Flowable.just(groupCache), groupsFlowable)
-    //     } else {
-    //         groupsFlowable
-    //     }
-    //         .subscribeOnIo()
-    // }
 
     override fun getSameGroupsWithUser(userId: Int): Single<List<Group>> {
         return groupDao.getSameGroupAndGroupDataWithUser(userId)

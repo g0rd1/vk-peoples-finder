@@ -3,9 +3,149 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="vm"
+            type="ru.g0rd1.peoplesfinder.ui.groups.GroupsViewModel" />
+
+        <import type="android.view.View" />
+
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/buttons_container"
+            app:layout_constraintEnd_toEndOf="@id/buttons_container"
+            app:layout_constraintStart_toStartOf="@id/buttons_container"
+            app:layout_constraintTop_toTopOf="@id/buttons_container"
+            app:visible="@{vm.showCommandProcessingLoader}"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/buttons_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pause_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:enabled="@{!vm.commandProcessing}"
+                android:lines="2"
+                android:onClick="@{() -> vm.pauseLoad()}"
+                android:text="@string/fragment_groups_download_button_pause_download"
+                app:visible="@{vm.pauseButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/reload_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:enabled="@{!vm.commandProcessing}"
+                android:lines="2"
+                android:onClick="@{() -> vm.reload()}"
+                android:text="@string/fragment_groups_download_button_reload"
+                app:visible="@{vm.reloadButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/continue_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:enabled="@{!vm.commandProcessing}"
+                android:lines="2"
+                android:onClick="@{() -> vm.continueLoad()}"
+                android:text="@string/fragment_groups_download_button_continue_load"
+                app:visible="@{vm.continueButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:enabled="@{!vm.commandProcessing}"
+                android:lines="2"
+                android:onClick="@{() -> vm.startLoad()}"
+                android:text="@string/fragment_groups_download_button_start_download"
+                app:visible="@{vm.startButtonVisible}" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="0.5"
+                android:enabled="@{!vm.commandProcessing}"
+                android:lines="2"
+                android:onClick="@{() -> vm.cancelLoad()}"
+                android:text="@string/fragment_groups_download_button_cancel_download"
+                app:visible="@{vm.cancelButtonVisible}" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:max="@{vm.membersCount}"
+            android:progress="@{vm.loadedMembersCount}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buttons_container" />
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@{vm.errorText}"
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progressBar"
+            app:visible="@{vm.errorTextVisible}"
+            tools:text="Произошла ошибка при загрузке" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
@@ -13,7 +153,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/errorText">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
