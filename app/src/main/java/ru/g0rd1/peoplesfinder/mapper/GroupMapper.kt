@@ -17,6 +17,7 @@ class GroupMapper @Inject constructor() {
                 photo = group.photo,
                 type = group.type,
                 membersCount = group.membersCount,
+                userInGroup = group.userInGroup,
             ),
             GroupInfoEntity(
                 groupId = group.id,
@@ -24,7 +25,6 @@ class GroupMapper @Inject constructor() {
                 allMembersLoadedDate = group.allMembersLoadedDate,
                 sequentialNumber = group.sequentialNumber,
                 hasAccessToMembers = group.hasAccessToMembers,
-                userInGroup = group.userInGroup,
             )
         )
     }
@@ -37,11 +37,11 @@ class GroupMapper @Inject constructor() {
             photo = groupEntity.photo,
             type = groupEntity.type,
             membersCount = groupEntity.membersCount,
+            userInGroup = groupEntity.userInGroup,
             loadedMembersCount = groupInfoEntity.loadedMembersCount,
             allMembersLoadedDate = groupInfoEntity.allMembersLoadedDate,
             sequentialNumber = groupInfoEntity.sequentialNumber,
             hasAccessToMembers = groupInfoEntity.hasAccessToMembers,
-            userInGroup = groupInfoEntity.userInGroup,
         )
     }
 

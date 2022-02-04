@@ -38,7 +38,6 @@ class SynchronizationViewModel @Inject constructor(
     private fun synchronize() {
         showLoading.set(true)
         vkGroupsRepo.getGroups()
-            .doFinally { print("yee") }
             .flatMapCompletable { groupsResult ->
                 when (groupsResult) {
                     is VkResult.Error.ApiVk -> Completable.fromAction { handleError() }
@@ -62,7 +61,7 @@ class SynchronizationViewModel @Inject constructor(
 
     private fun getSyncGroupsWithRepoCompletable(groups: List<Group>): Completable {
         return localGroupsRepo.insert(groups)
-            .andThen(localGroupsRepo.deleteNotIn(groups.map { it.id }))
+            .andThen(localGroupsRepo.deleteUserGroupsNotIn(groups.map { it.id }))
             .andThen(
                 Completable.concat(
                     groups.mapIndexed { index, group ->

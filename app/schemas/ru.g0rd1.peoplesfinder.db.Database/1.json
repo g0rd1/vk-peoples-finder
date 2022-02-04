@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "74b012f68d16bd956babd49ab6e02fd8",
+    "identityHash": "b3d9dfec56a2266e2322af223115acae",
     "entities": [
       {
         "tableName": "groups",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `deactivated` TEXT, `photo_200` TEXT, `type` TEXT NOT NULL, `members_count` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `deactivated` TEXT, `photo_200` TEXT, `type` TEXT NOT NULL, `members_count` INTEGER NOT NULL, `user_in_group` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -43,6 +43,12 @@
             "columnName": "members_count",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "userInGroup",
+            "columnName": "user_in_group",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -56,7 +62,7 @@
       },
       {
         "tableName": "group_info",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` INTEGER NOT NULL, `loaded_members_count` INTEGER NOT NULL, `all_members_loaded_date` INTEGER, `sequential_number` INTEGER, `has_access_to_members` INTEGER NOT NULL, `user_in_group` INTEGER NOT NULL, PRIMARY KEY(`groupId`), FOREIGN KEY(`groupId`) REFERENCES `groups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`groupId` INTEGER NOT NULL, `loaded_members_count` INTEGER NOT NULL, `all_members_loaded_date` INTEGER, `sequential_number` INTEGER, `has_access_to_members` INTEGER NOT NULL, PRIMARY KEY(`groupId`), FOREIGN KEY(`groupId`) REFERENCES `groups`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "groupId",
@@ -85,12 +91,6 @@
           {
             "fieldPath": "hasAccessToMembers",
             "columnName": "has_access_to_members",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userInGroup",
-            "columnName": "user_in_group",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -391,7 +391,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74b012f68d16bd956babd49ab6e02fd8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3d9dfec56a2266e2322af223115acae')"
     ]
   }
 }

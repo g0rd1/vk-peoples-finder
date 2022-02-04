@@ -87,9 +87,8 @@ class ChooseOtherGroupViewModel @Inject constructor(
     override fun onItemClick(item: SingleChooseItemViewData<Group>) {
         Single.zip(
             localGroupsRepo.observeUserGroups().firstOrError(),
-            localGroupsRepo.observeOtherGroups().firstOrError(),
-            { userGroups, otherGroups -> userGroups to otherGroups }
-        )
+            localGroupsRepo.observeOtherGroups().firstOrError()
+        ) { userGroups, otherGroups -> userGroups to otherGroups }
             .flatMapCompletable { (userGroups, otherGroups) ->
                 if (userGroups.any { it.id == item.data.id }) {
                     return@flatMapCompletable Completable.complete()

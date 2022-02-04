@@ -19,8 +19,8 @@ abstract class GroupDao : BaseDao<GroupEntity>() {
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
     abstract fun get(): Maybe<List<GroupEntity>>
 
-    @Query("DELETE FROM ${GroupEntity.TABLE_NAME} WHERE id NOT IN (:ids)")
-    abstract fun deleteNotIn(ids: List<Int>): Completable
+    @Query("DELETE FROM ${GroupEntity.TABLE_NAME} WHERE ${GroupEntity.TABLE_NAME}.user_in_group = 1 AND id NOT IN (:ids)")
+    abstract fun deleteUserGroupsNotIn(ids: List<Int>): Completable
 
     @Query("SELECT * FROM ${GroupEntity.TABLE_NAME}")
     abstract fun observeGroupAndGroupData(): Flowable<List<GroupAndGroupData>>

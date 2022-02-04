@@ -35,9 +35,6 @@ data class GroupInfoEntity(
 
     @ColumnInfo(name = "has_access_to_members")
     val hasAccessToMembers: Boolean,
-
-    @ColumnInfo(name = "user_in_group")
-    val userInGroup: Boolean,
 ) {
 
     companion object {

@@ -23,7 +23,7 @@ interface LocalGroupsRepo {
 
     fun get(groupId: Int): Single<Optional<Group>>
 
-    fun deleteNotIn(ids: List<Int>): Completable
+    fun deleteUserGroupsNotIn(ids: List<Int>): Completable
 
     fun deleteRelation(id: Int): Completable
 

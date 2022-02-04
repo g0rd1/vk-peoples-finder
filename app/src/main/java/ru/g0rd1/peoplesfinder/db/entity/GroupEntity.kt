@@ -26,8 +26,10 @@ data class GroupEntity constructor(
     val type: GroupType,
 
     @ColumnInfo(name = "members_count")
-    val membersCount: Int
+    val membersCount: Int,
 
+    @ColumnInfo(name = "user_in_group")
+    val userInGroup: Boolean,
 ) {
 
     object Column {

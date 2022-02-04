@@ -53,8 +53,8 @@ class DBLocalGroupsRepo @Inject constructor(
             .subscribeOnIo()
     }
 
-    override fun deleteNotIn(ids: List<Int>): Completable =
-        groupDao.deleteNotIn(ids).subscribeOnIo()
+    override fun deleteUserGroupsNotIn(ids: List<Int>): Completable =
+        groupDao.deleteUserGroupsNotIn(ids).subscribeOnIo()
 
     override fun deleteRelation(id: Int): Completable =
         userGroupDao.delete(id).subscribeOnIo()
@@ -62,7 +62,7 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun observeUserGroups(): Flowable<List<Group>> {
         return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
             GroupEntitiesAndGroupDataEntities
-                .filter { it.groupInfoEntity.userInGroup }
+                .filter { it.groupEntity.userInGroup }
                 .map {
                     groupMapper.transform(
                         it.groupEntity,
@@ -75,7 +75,7 @@ class DBLocalGroupsRepo @Inject constructor(
     override fun observeOtherGroups(): Flowable<List<Group>> {
         return groupDao.observeGroupAndGroupData().map { GroupEntitiesAndGroupDataEntities ->
             GroupEntitiesAndGroupDataEntities
-                .filter { !it.groupInfoEntity.userInGroup }
+                .filter { !it.groupEntity.userInGroup }
                 .map {
                     groupMapper.transform(
                         it.groupEntity,
