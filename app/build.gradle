@@ -122,11 +122,6 @@ dependencies {
 
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
-//    def paging_version = "3.0.1"
-//
-//    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-//    implementation "androidx.paging:paging-rxjava2-ktx:$paging_version"
-
     implementation 'com.github.badoo.mvicore:mvicore:1.2.6'
     implementation 'com.github.badoo.mvicore:binder:1.2.6'
     implementation 'com.github.badoo.mvicore:mvicore-android:1.2.6'
