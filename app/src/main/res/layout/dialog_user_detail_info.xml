@@ -291,6 +291,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:alpha="@{vm.isFavorite ? 1.0F : 0.2F}"
+                    android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
                     android:onClick="@{() -> vm.clickOnFavorite()}"
