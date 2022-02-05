@@ -6,9 +6,11 @@ import ru.g0rd1.peoplesfinder.common.PriorityQueueManagerFactory
 import ru.g0rd1.peoplesfinder.db.dao.GroupDao
 import ru.g0rd1.peoplesfinder.db.dao.UserDao
 import ru.g0rd1.peoplesfinder.db.dao.UserGroupDao
+import ru.g0rd1.peoplesfinder.db.dao.UserUserTypeDao
 import ru.g0rd1.peoplesfinder.db.entity.UserEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
 import ru.g0rd1.peoplesfinder.db.entity.UserTypeEntity
+import ru.g0rd1.peoplesfinder.db.entity.UserUserTypeEntity
 import ru.g0rd1.peoplesfinder.mapper.GroupMapper
 import ru.g0rd1.peoplesfinder.mapper.UserMapper
 import ru.g0rd1.peoplesfinder.model.Optional
@@ -26,6 +28,7 @@ class DBLocalUsersRepo @Inject constructor(
     private val userMapper: UserMapper,
     private val groupMapper: GroupMapper,
     private val filtersRepo: FiltersRepo,
+    private val userUserTypeDao: UserUserTypeDao,
     priorityQueueManagerFactory: PriorityQueueManagerFactory,
 ) : LocalUsersRepo {
 
@@ -86,6 +89,12 @@ class DBLocalUsersRepo @Inject constructor(
         return userDao.getById(id).map { Optional.create(it.firstOrNull()?.toUser()) }
             .switchIfEmpty(Single.just(Optional.empty()))
             .subscribeOnIo()
+    }
+
+    override fun switchTypeStatus(userId: Int, userType: UserType): Completable {
+        return Completable.fromAction {
+            userUserTypeDao.insertOrDelete(listOf(UserUserTypeEntity(userId, userType.id)))
+        }.subscribeOnIo()
     }
 
     private fun List<User>.toEntities(): List<UserEntity> {

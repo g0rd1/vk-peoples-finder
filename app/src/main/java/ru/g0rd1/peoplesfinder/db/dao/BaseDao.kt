@@ -20,6 +20,17 @@ abstract class BaseDao<E> {
         }
     }
 
+    @Transaction
+    open fun insertOrDelete(entities: List<E>) {
+        val insertResult = _insert(entities)
+        val updateList = entities.filterIndexed { index, _ ->
+            insertResult[index] == -1L
+        }
+        if (updateList.isNotEmpty()) {
+            _delete(updateList)
+        }
+    }
+
     @Suppress("FunctionName")
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun _insert(entities: List<E>): List<Long>
@@ -27,5 +38,9 @@ abstract class BaseDao<E> {
     @Suppress("FunctionName")
     @Update(onConflict = OnConflictStrategy.IGNORE)
     abstract fun _update(entities: List<E>)
+
+    @Suppress("FunctionName")
+    @Delete
+    abstract fun _delete(entities: List<E>)
 
 }

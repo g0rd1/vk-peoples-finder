@@ -3,10 +3,7 @@ package ru.g0rd1.peoplesfinder.db.query
 import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
-import ru.g0rd1.peoplesfinder.db.entity.GroupEntity
-import ru.g0rd1.peoplesfinder.db.entity.UserEntity
-import ru.g0rd1.peoplesfinder.db.entity.UserGroupEntity
-import ru.g0rd1.peoplesfinder.db.entity.UserTypeEntity
+import ru.g0rd1.peoplesfinder.db.entity.*
 
 data class UserWithSameGroupsAndUserTypes(
     @Embedded
@@ -25,7 +22,12 @@ data class UserWithSameGroupsAndUserTypes(
     @Relation(
         parentColumn = UserEntity.Column.ID,
         entity = UserTypeEntity::class,
-        entityColumn = UserTypeEntity.Column.ID
+        entityColumn = UserTypeEntity.Column.ID,
+        associateBy = Junction(
+            value = UserUserTypeEntity::class,
+            parentColumn = UserUserTypeEntity.Column.USER_ID,
+            entityColumn = UserUserTypeEntity.Column.USER_TYPE_ID
+        )
     )
     val userTypes: List<UserTypeEntity>,
 )

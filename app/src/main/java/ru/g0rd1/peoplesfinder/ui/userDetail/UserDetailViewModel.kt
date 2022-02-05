@@ -2,6 +2,7 @@ package ru.g0rd1.peoplesfinder.ui.userDetail
 
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
+import io.reactivex.Completable
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.base.BaseViewModel
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
@@ -13,7 +14,7 @@ import ru.g0rd1.peoplesfinder.model.User
 import ru.g0rd1.peoplesfinder.model.UserType
 import ru.g0rd1.peoplesfinder.repo.group.local.LocalGroupsRepo
 import ru.g0rd1.peoplesfinder.repo.user.local.LocalUsersRepo
-import timber.log.Timber
+import ru.g0rd1.peoplesfinder.util.observeOnUI
 
 abstract class UserDetailViewModel constructor(
     private val localUsersRepo: LocalUsersRepo,
@@ -40,7 +41,6 @@ abstract class UserDetailViewModel constructor(
     val userCity = ObservableField<String>()
     val imageUrl = ObservableField<String>()
 
-    val isViewed = ObservableBoolean(false)
     val isBlocked = ObservableBoolean(false)
     val isFavorite = ObservableBoolean(false)
 
@@ -57,6 +57,23 @@ abstract class UserDetailViewModel constructor(
     abstract fun previousUser()
 
     abstract fun nextUser()
+
+    fun clickOnBlocked() {
+        switchUserType(UserType.BLOCKED)
+    }
+
+    fun clickOnFavorite() {
+        switchUserType(UserType.FAVORITE)
+    }
+
+    private fun switchUserType(userType: UserType) {
+        localUsersRepo.switchTypeStatus(userId, userType)
+            .observeOnUI()
+            .andThen(onUserChanged())
+            .execute()
+    }
+
+    abstract fun onUserChanged(): Completable
 
     protected fun getSameGroupsAndTypes(userId: Int): Single<Pair<List<Group>, List<UserType>>> {
         return localGroupsRepo.getSameGroupsWithUser(userId)
@@ -80,7 +97,7 @@ abstract class UserDetailViewModel constructor(
         isBlocked.set(userTypes.any { it.id == UserType.BLOCKED.id })
         isFavorite.set(userTypes.any { it.id == UserType.FAVORITE.id })
         this.sameGroups.set(sameGroups)
-        imageUrl.set(user.photoMax.also { Timber.d("TEST: ${user.id} $it") })
+        imageUrl.set(user.photoMax/*.also { Timber.d("TEST: ${user.id} $it") }*/)
         infoVisible.set(true)
     }
 
@@ -95,7 +112,7 @@ abstract class UserDetailViewModel constructor(
     interface Factory {
         fun create(
             dialogType: UserDetailDialogType,
-            fragment: UserDetailDialog
+            fragment: UserDetailDialog,
         ): UserDetailViewModel
     }
 

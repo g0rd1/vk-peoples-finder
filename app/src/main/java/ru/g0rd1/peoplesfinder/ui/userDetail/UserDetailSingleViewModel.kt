@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import io.reactivex.Completable
 import io.reactivex.Single
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
@@ -29,6 +30,10 @@ class UserDetailSingleViewModel @AssistedInject constructor(
     override fun previousUser() = Unit
 
     override fun nextUser() = Unit
+
+    override fun onUserChanged(): Completable {
+        return Completable.fromAction { getUser() }
+    }
 
     override fun onStart() {
         getUser()

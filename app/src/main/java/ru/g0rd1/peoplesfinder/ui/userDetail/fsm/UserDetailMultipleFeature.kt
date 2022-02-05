@@ -5,6 +5,7 @@ import com.badoo.mvicore.element.Reducer
 import com.badoo.mvicore.feature.ActorReducerFeature
 import io.reactivex.Observable
 import io.reactivex.Single
+import ru.g0rd1.peoplesfinder.model.Optional
 import ru.g0rd1.peoplesfinder.model.User
 import ru.g0rd1.peoplesfinder.model.UserType
 import ru.g0rd1.peoplesfinder.repo.user.history.UserHistoryRepo
@@ -51,6 +52,7 @@ object UserDetailMultiple {
         object ToPreviousUser : Wish()
         object ToNextUsers : Wish()
         object LoadUsers : Wish()
+        object ReloadCurrentUser : Wish()
     }
 
     sealed class Effect {
@@ -58,6 +60,7 @@ object UserDetailMultiple {
         data class UsersLoaded(val users: List<UserResult>) : Effect()
         object ToNextUser : Effect()
         object ToPreviousUser : Effect()
+        data class ReloadCurrentUser(val optionalUser: Optional<User>) : Effect()
     }
 
 }
@@ -83,6 +86,9 @@ class UserDetailMultipleFeature @Inject constructor(
         this.accept(UserDetailMultiple.Wish.ToPreviousUser)
     }
 
+    fun reloadCurrentUser() {
+        this.accept(UserDetailMultiple.Wish.ReloadCurrentUser)
+    }
 }
 
 class UserDetailMultipleActor @Inject constructor(
@@ -146,6 +152,20 @@ class UserDetailMultipleActor @Inject constructor(
                         } else {
                             Observable.just(UserDetailMultiple.Effect.ToPreviousUser)
                         }
+                    }
+                }
+            }
+            UserDetailMultiple.Wish.ReloadCurrentUser -> {
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> Observable.error(IllegalStateException())
+                    is UserDetailMultiple.State.Result -> {
+                        userRepo.getById(state.currentUser.id)
+                            .map<UserDetailMultiple.Effect> { UserDetailMultiple.Effect.ReloadCurrentUser(it) }
+                            .toObservable()
+                            .startWith(UserDetailMultiple.Effect.LoadingStarted)
+                            .retry()
                     }
                 }
             }
@@ -294,6 +314,20 @@ class UserDetailMultipleReducer @Inject constructor() : Reducer<UserDetailMultip
                             )
                         }
                     }
+                }
+            }
+            is UserDetailMultiple.Effect.ReloadCurrentUser -> {
+                when (state) {
+                    UserDetailMultiple.State.Initial,
+                    is UserDetailMultiple.State.NoResult,
+                    -> throw IllegalStateException()
+                    is UserDetailMultiple.State.Result -> state.copy(
+                        currentUser = when (effect.optionalUser) {
+                            is Optional.Empty -> state.currentUser
+                            is Optional.Value -> effect.optionalUser.value
+                        },
+                        loading = false
+                    )
                 }
             }
         }

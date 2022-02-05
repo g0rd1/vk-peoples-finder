@@ -31,6 +31,7 @@ abstract class Database : RoomDatabase() {
     abstract fun userGroupDao(): UserGroupDao
     abstract fun userTypeDao(): UserTypeDao
     abstract fun userHistoryDao(): UserHistoryDao
+    abstract fun userUserTypeDao(): UserUserTypeDao
 
     companion object {
         val onCreateCallback = object : RoomDatabase.Callback() {

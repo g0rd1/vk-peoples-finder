@@ -22,8 +22,6 @@ class DBLocalGroupsRepo @Inject constructor(
     private val groupMapper: GroupMapper,
 ) : LocalGroupsRepo {
 
-    // private var groupCache: List<Group>? = null
-
     override fun updateLoadedMembersCount(id: Int, loadedMembersCount: Int): Completable =
         groupDataDao.updateLoadedMembersCount(id, loadedMembersCount).subscribeOnIo()
 

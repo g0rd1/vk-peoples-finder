@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import ru.g0rd1.peoplesfinder.base.navigator.AppNavigator
@@ -50,6 +51,10 @@ class UserDetailMultipleViewModel @AssistedInject constructor(
         userDetailMultipleFeature.toNext()
     }
 
+    override fun onUserChanged(): Completable {
+        return Completable.fromAction { userDetailMultipleFeature.reloadCurrentUser() }
+    }
+
     private fun observe() {
         observeState()
     }
@@ -58,7 +63,7 @@ class UserDetailMultipleViewModel @AssistedInject constructor(
         // TODO Учесть что у стейта Result может поменяться только индикация загрузки и в этом случае не нужно делать повторный запрос в базу
 
         userDetailMultipleSubject
-            .flatMapSingle { state ->
+            .concatMapSingle { state ->
                 when (state) {
                     UserDetailMultiple.State.Initial,
                     is UserDetailMultiple.State.NoResult,

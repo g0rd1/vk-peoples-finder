@@ -50,6 +50,13 @@ abstract class UserDao : BaseDao<UserEntity>() {
         return _getUsers(usersIdsWithSameGroupsCount.map { it.userId })
     }
 
+    // @Query("INSERT INTO ${UserUserTypeEntity.TABLE_NAME} (${UserUserTypeEntity.Column.USER_ID}, ${UserUserTypeEntity.Column.USER_TYPE_ID}) VALUES ()")
+    // abstract fun insertType(userId: Int, userTypeId: Int): Maybe<List<UserEntity>>
+    //
+    // @Query("SELECT * FROM ${UserUserTypeEntity.TABLE_NAME} WHERE ${UserUserTypeEntity.Column.USER_ID} = :userId AND ${UserUserTypeEntity.Column.USER_TYPE_ID} = :userTypeId")
+    // @Suppress("FunctionName")
+    // abstract fun _getUsersWithUserType(userId: Int, userTypeId: Int): List<UserUserTypeEntity>
+
     @Query("SELECT * FROM ${UserEntity.TABLE_NAME} WHERE ${UserEntity.Column.ID} IN (:userIds)")
     @Suppress("FunctionName")
     abstract fun _getUsers(userIds: List<Int>): List<UserWithSameGroupsAndUserTypes>
