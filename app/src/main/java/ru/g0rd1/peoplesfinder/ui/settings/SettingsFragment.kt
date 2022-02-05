@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import ru.g0rd1.peoplesfinder.databinding.FragmentSettingsBinding
-import ru.g0rd1.peoplesfinder.ui.choose.single.city.ChooseCityFragment
-import ru.g0rd1.peoplesfinder.ui.choose.single.country.ChooseCountryFragment
+import ru.g0rd1.peoplesfinder.ui.settings.city.ChooseCityFragment
+import ru.g0rd1.peoplesfinder.ui.settings.country.ChooseCountryFragment
 import ru.g0rd1.peoplesfinder.ui.settings.group.ChooseRequiredGroupsFragment
 
 @AndroidEntryPoint

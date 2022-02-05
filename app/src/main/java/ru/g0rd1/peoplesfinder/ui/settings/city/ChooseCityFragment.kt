@@ -1,4 +1,4 @@
-package ru.g0rd1.peoplesfinder.ui.choose.single.city
+package ru.g0rd1.peoplesfinder.ui.settings.city
 
 import android.os.Bundle
 import android.view.LayoutInflater

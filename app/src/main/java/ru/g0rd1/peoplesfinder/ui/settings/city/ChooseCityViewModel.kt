@@ -1,14 +1,14 @@
-package ru.g0rd1.peoplesfinder.ui.choose.single.country
+package ru.g0rd1.peoplesfinder.ui.settings.city
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.g0rd1.peoplesfinder.R
 import ru.g0rd1.peoplesfinder.base.global.SingleLiveEvent
 import ru.g0rd1.peoplesfinder.common.ResourceManager
-import ru.g0rd1.peoplesfinder.model.Country
+import ru.g0rd1.peoplesfinder.model.City
 import ru.g0rd1.peoplesfinder.model.FilterParameters
 import ru.g0rd1.peoplesfinder.model.VkResult
 import ru.g0rd1.peoplesfinder.repo.filters.FiltersRepo
-import ru.g0rd1.peoplesfinder.repo.vk.country.CountryRepo
+import ru.g0rd1.peoplesfinder.repo.vk.city.CityRepo
 import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseItemViewData
 import ru.g0rd1.peoplesfinder.ui.choose.single.SingleChooseViewModel
 import ru.g0rd1.peoplesfinder.util.exhaustive
@@ -18,20 +18,20 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class ChooseCountryViewModel @Inject constructor(
+class ChooseCityViewModel @Inject constructor(
     private val filtersRepo: FiltersRepo,
-    private val countryRepo: CountryRepo,
+    private val cityRepo: CityRepo,
     resourceManager: ResourceManager,
-) : SingleChooseViewModel<Country>() {
+) : SingleChooseViewModel<City>() {
 
-    override val title: String = resourceManager.getString(R.string.choose_county_dialog_title)
+    override val title: String = resourceManager.getString(R.string.choose_city_dialog_title)
     override val searchTextHint: String =
-        resourceManager.getString(R.string.choose_county_dialog_search_text_hint)
+        resourceManager.getString(R.string.choose_city_dialog_search_text_hint)
 
     val closeEvent = SingleLiveEvent<Unit>()
 
     override val cancelChoiceVisible: Boolean =
-        (filtersRepo.getFilterParameters().country is FilterParameters.Country.Specific)
+        (filtersRepo.getFilterParameters().city is FilterParameters.City.Specific)
 
     override fun onStart() {
         super.onStart()
@@ -41,7 +41,13 @@ class ChooseCountryViewModel @Inject constructor(
     private fun observe() {
         observeSearchText()
             .doOnEach { loaderVisible.set(true) }
-            .flatMapSingle { countryRepo.getCountries(it) }
+            .flatMapSingle {
+                val countryId = when (val country = filtersRepo.getFilterParameters().country) {
+                    FilterParameters.Country.Any -> null
+                    is FilterParameters.Country.Specific -> country.country.id
+                }
+                cityRepo.getCities(countryId, it)
+            }
             .subscribeOnIo()
             .observeOnUI()
             .subscribe(
@@ -62,11 +68,11 @@ class ChooseCountryViewModel @Inject constructor(
                             loaderVisible.set(false)
                             clearError()
                             items.set(
-                                it.data.map { country ->
+                                it.data.map { city ->
                                     SingleChooseItemViewData(
-                                        data = country,
-                                        name = country.title,
-                                        id = country.id
+                                        data = city,
+                                        name = city.title,
+                                        id = city.id
                                     )
                                 }
                             )
@@ -77,17 +83,15 @@ class ChooseCountryViewModel @Inject constructor(
             ).disposeLater()
     }
 
-    override fun onItemClick(item: SingleChooseItemViewData<Country>) {
-        filtersRepo.setCountry(FilterParameters.Country.Specific(item.data))
+    override fun onItemClick(item: SingleChooseItemViewData<City>) {
+        filtersRepo.setCity(FilterParameters.City.Specific(item.data))
         closeEvent.call()
     }
 
     override fun cancelChoice() {
         filtersRepo.setCity(FilterParameters.City.Any)
-        filtersRepo.setCountry(FilterParameters.Country.Any)
         closeEvent.call()
     }
-
     override fun close() {
         closeEvent.call()
     }

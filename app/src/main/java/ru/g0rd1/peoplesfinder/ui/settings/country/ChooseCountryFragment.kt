@@ -1,4 +1,4 @@
-package ru.g0rd1.peoplesfinder.ui.choose.single.country
+package ru.g0rd1.peoplesfinder.ui.settings.country
 
 import android.os.Bundle
 import android.view.LayoutInflater
