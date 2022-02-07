@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,13 @@ class ListsFragment : Fragment() {
     ): View {
         binding = FragmentListsBinding.inflate(inflater, container, false)
         binding.vm = viewModel
+        binding.composeView.setContent {
+            ListsView(
+                listsViewData = viewModel.state.collectAsState(),
+                onFavoriteTabClick = viewModel::onFavoriteClick,
+                onBlockedTabClick = viewModel::onBlockedClick
+            )
+        }
         return binding.root
     }
 

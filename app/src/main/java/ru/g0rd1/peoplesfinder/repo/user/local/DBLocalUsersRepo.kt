@@ -97,6 +97,12 @@ class DBLocalUsersRepo @Inject constructor(
         }.subscribeOnIo()
     }
 
+    override fun getUserByType(userTypeId: Int): Single<List<User>> {
+        return userDao.getByUserType(userTypeId).map { userEntities ->
+            userEntities.map { it.toUser() }
+        }.subscribeOnIo()
+    }
+
     private fun List<User>.toEntities(): List<UserEntity> {
         return this.map { it.toEntity() }
     }

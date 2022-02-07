@@ -20,4 +20,6 @@ interface LocalUsersRepo {
     fun getById(id: Int): Single<Optional<User>>
 
     fun switchTypeStatus(userId: Int, userType: UserType): Completable
+
+    fun getUserByType(userTypeId: Int): Single<List<User>>
 }
